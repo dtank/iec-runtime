@@ -6,15 +6,16 @@
 #include <native/task.h>
 #include <native/timer.h>
 
-#include "plcexecutor.h"
+#include "executor.h"
+#include "generator.h"
+#include "parser.h"
 #include "plcmodel.h"
+#include "debug.h"
 
 
+int DEBUG_LEVEL = DEBUG_INF;
 extern RT_TASK plc_tasks[10];
 TASK *task_list[10];
-void catch_signal(int sig)
-{
-}
 
 int main(int argc, char* argv[])
 {
@@ -30,8 +31,13 @@ int main(int argc, char* argv[])
 	plc_task_list->task = task_list;
 	printf("plc_task_list.task_num = %d\n", plc_task_list->task_num);
 	printf("plc_task_list.task_list[0].config.interval = %u\n",plc_task_list->task[0]->property.interval);
-	signal(SIGTERM, catch_signal);
-	signal(SIGINT, catch_signal);
+
+	FILE *fplc = fopen("plc.bin", "wb");
+	generate_task_num(fplc, 1);
+	fclose(fplc);
+	fplc = fopen("plc.bin", "rb");
+	read_task_num(fplc);
+	fclose(fplc);
 
 	/* Avoids memory swapping for this program */
 	mlockall(MCL_CURRENT|MCL_FUTURE);
