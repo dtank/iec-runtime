@@ -7,12 +7,12 @@
 #define MAX_PLC_TASK_COUNT 10
 
 /* defination of PARAMETERS */
-typedef struct param {
+typedef struct {
 	uint32_t param_index;
 } PARAM;
 
 /* defination of INSTRUCTION*/
-typedef struct instruction {
+typedef struct {
 	uint16_t id;
 	PARAM *param_list;
 } INST;
@@ -27,26 +27,26 @@ typedef void *CONST_SEG;
 typedef void *DATA_SEG;
 
 /* defination of PROGRAM */
-typedef struct program {
+typedef struct {
 	CODE_SEG code_seg;
 	CONST_SEG const_seg;
 	DATA_SEG data_seg;
 } PROGRAM;
 
 /* defination of PROPERTY */
-typedef struct property {
+typedef struct {
 	task_name_t name;
 	task_priority_t priority;
 	task_interval_t interval;
 } PROPERTY;
 
 /* defination of TASK */
-typedef struct task {
+typedef struct {
 	PROPERTY property;
 	PROGRAM program;
 } TASK;
 
-typedef struct task_list {
+typedef struct {
 	task_count_t task_count;
 	TASK **task;
 } TASK_LIST;

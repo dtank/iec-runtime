@@ -35,3 +35,9 @@ void generate_task_interval(FILE *fp, task_interval_t interval) {
 		PRINT(DEBUG_ERR, "Error: generating task interval (%d)...", interval);
 	}
 }
+void generate_task_property(FILE *fp, task_property_t property) {
+	generate_task_name_size(fp, property.name_size);
+	generate_task_name(fp, property.name);
+	generate_task_priority(fp, property.priority);
+	generate_task_interval(fp, property.interval);
+}

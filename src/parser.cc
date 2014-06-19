@@ -35,3 +35,10 @@ task_interval_t read_task_interval(FILE *fp) {
 	PRINT(DEBUG_TRC, "Trace: task interval = %d", interval);
 	return interval;
 }
+PROPERTY read_task_property(FILE *fp) {
+	PROPERTY property;
+	property.name= read_task_name(fp);
+	property.priority= read_task_priority(fp);
+	property.interval= read_task_interval(fp);
+	return property;
+}

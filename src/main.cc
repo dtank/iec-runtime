@@ -20,28 +20,21 @@ TASK *task_list[10];
 
 int main(int argc, char* argv[])
 {
+	task_property_t property = {strlen("task1"), "task1", 99u, 1000000000u};
 	FILE *fplc = fopen("plc.bin", "wb");
 	generate_task_count(fplc, 1);
-	generate_task_name_size(fplc, strlen("task1"));
-	generate_task_name(fplc, "task1");
-	generate_task_priority(fplc, 99);
-	generate_task_interval(fplc, 1000000000u);
+	generate_task_property(fplc, property);
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
 	read_task_count(fplc);
-	read_task_name(fplc);
+	PROPERTY mproperty = read_task_property(fplc);
 
 	TASK plc_task1;
-	plc_task1.property.priority = read_task_priority(fplc);
-	plc_task1.property.interval = read_task_interval(fplc);
-	plc_task1.property.name = "task1";
+	plc_task1.property = mproperty;
 	task_list[0] = &plc_task1;
-	printf("ok\n");
 	TASK_LIST *plc_task_list = new TASK_LIST;
 	plc_task_list->task_count = 1;
 	plc_task_list->task = task_list;
-	printf("plc_task_list.task_count = %d\n", plc_task_list->task_count);
-	printf("plc_task_list.task_list[0].config.interval = %u\n",plc_task_list->task[0]->property.interval);
 	fclose(fplc);
 	/* Avoids memory swapping for this program */
 	mlockall(MCL_CURRENT|MCL_FUTURE);
