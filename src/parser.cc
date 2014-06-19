@@ -3,9 +3,35 @@
 
 extern int DEBUG_LEVEL;
 
-task_num_t read_task_num(FILE *fp) {
-	task_num_t task_num;
-	fread(&task_num, TASK_NUM_SIZE, 1, fp);
-	PRINT(DEBUG_TRC, "Trace: task num = %d", task_num);
-	return task_num;
+task_count_t read_task_count(FILE *fp) {
+	task_count_t count;
+	fread(&count, sizeof(task_count_t), 1, fp);
+	PRINT(DEBUG_TRC, "Trace: task count = %d", count);
+	return count;
+}
+
+task_name_size_t read_task_name_size(FILE *fp) {
+	task_name_size_t size;
+	fread(&size, sizeof(task_name_size_t), 1, fp);
+	PRINT(DEBUG_TRC, "Trace: task name size = %d", size);
+	return size;
+}
+task_name_t read_task_name(FILE *fp) {
+	task_name_t name;
+	task_name_size_t size = read_task_name_size(fp);
+	fread(&name, size, 1, fp);
+	PRINT(DEBUG_TRC, "Trace: task name = %s", name);
+	return name;
+}
+task_priority_t read_task_priority(FILE *fp) {
+	task_priority_t priority;
+	fread(&priority, sizeof(task_priority_t), 1, fp);
+	PRINT(DEBUG_TRC, "Trace: task priority = %d", priority);
+	return priority;
+}
+task_interval_t read_task_interval(FILE *fp) {
+	task_interval_t interval;
+	fread(&interval, sizeof(task_interval_t), 1, fp);
+	PRINT(DEBUG_TRC, "Trace: task interval = %d", interval);
+	return interval;
 }

@@ -4,10 +4,12 @@
 #include <stdint.h>
 
 /* PLC Task Segment */
-#define TASK_NUM_SIZE 1
-typedef uint8_t task_num_t;
+typedef uint8_t task_count_t;
+typedef uint8_t task_name_size_t;
+typedef char * task_name_t;
+typedef uint8_t task_priority_t;
+typedef uint32_t task_interval_t;
 
-typedef char *task_name_t;
 
 #define TASK_PRIORITY_SIZE 1
 typedef uint8_t task_priority_t;

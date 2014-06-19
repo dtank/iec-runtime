@@ -2,8 +2,9 @@
 #define __PLC_MODEL_H__
 
 #include <stdint.h>
+#include "binformat.h"
 
-#define MAX_PLC_TASK_NUM 10
+#define MAX_PLC_TASK_COUNT 10
 
 /* defination of PARAMETERS */
 typedef struct param {
@@ -34,9 +35,9 @@ typedef struct program {
 
 /* defination of PROPERTY */
 typedef struct property {
-	char *name;
-	uint8_t priority;
-	uint32_t interval;
+	task_name_t name;
+	task_priority_t priority;
+	task_interval_t interval;
 } PROPERTY;
 
 /* defination of TASK */
@@ -46,7 +47,7 @@ typedef struct task {
 } TASK;
 
 typedef struct task_list {
-	uint8_t task_num;
+	task_count_t task_count;
 	TASK **task;
 } TASK_LIST;
 #endif
