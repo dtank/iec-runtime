@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 	plc_task_list->task_count = 1;
 	plc_task_list->task = task_list;
 	fclose(fplc);
-	/* Avoids memory swapping for this program */
+	 //Avoids memory swapping for this program 
 	mlockall(MCL_CURRENT|MCL_FUTURE);
 
 	plc_task_create(plc_task_list);

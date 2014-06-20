@@ -35,7 +35,7 @@ typedef struct {
 
 /* defination of PROPERTY */
 typedef struct {
-	task_name_t name;
+	task_name_t *name;
 	task_priority_t priority;
 	task_interval_t interval;
 } PROPERTY;

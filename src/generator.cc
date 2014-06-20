@@ -16,9 +16,9 @@ void generate_task_name_size(FILE *fp, task_name_size_t size) {
 		PRINT(DEBUG_ERR, "Error: generating task name size (%d)...", size);
 	}
 }
-void generate_task_name(FILE *fp, task_name_t name) {
+void generate_task_name(FILE *fp, task_name_t *name) {
 	PRINT(DEBUG_TRC, "Trace: task name = %s", name);
-	if (fwrite(&name, strlen(name), 1, fp) < 1) {
+	if (fwrite(name, strlen(name), 1, fp) < 1) {
 		PRINT(DEBUG_ERR, "Error: generating task name (%s)...", name);
 	}
 }
