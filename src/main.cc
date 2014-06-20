@@ -20,10 +20,12 @@ TASK *task_list[10];
 
 int main(int argc, char* argv[])
 {
-	task_property_t property = {strlen("task1"), "task1", 99u, 1000000000u};
+	task_property_seg_header property_seg_header = {strlen("task1")};
+	task_property_seg property_seg = {"task1", 99u, 1000000000u};
 	FILE *fplc = fopen("plc.bin", "wb");
 	generate_task_count(fplc, 1);
-	generate_task_property(fplc, property);
+	generate_task_property_seg_header(fplc, property_seg_header);
+	generate_task_property_seg(fplc, property_seg);
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
 	read_task_count(fplc);

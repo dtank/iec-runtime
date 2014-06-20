@@ -18,7 +18,6 @@ void generate_task_name_size(FILE *fp, task_name_size_t size) {
 }
 void generate_task_name(FILE *fp, task_name_t name) {
 	PRINT(DEBUG_TRC, "Trace: task name = %s", name);
-	PRINT(DEBUG_TRC, "Trace: strlen(name) = %d", strlen(name));
 	if (fwrite(&name, strlen(name), 1, fp) < 1) {
 		PRINT(DEBUG_ERR, "Error: generating task name (%s)...", name);
 	}
@@ -35,9 +34,11 @@ void generate_task_interval(FILE *fp, task_interval_t interval) {
 		PRINT(DEBUG_ERR, "Error: generating task interval (%d)...", interval);
 	}
 }
-void generate_task_property(FILE *fp, task_property_t property) {
-	generate_task_name_size(fp, property.name_size);
-	generate_task_name(fp, property.name);
-	generate_task_priority(fp, property.priority);
-	generate_task_interval(fp, property.interval);
+void generate_task_property_seg_header(FILE *fp, task_property_seg_header property_seg_header) {
+	generate_task_name_size(fp, property_seg_header.name_size);
+}
+void generate_task_property_seg(FILE *fp, task_property_seg property_seg) {
+	generate_task_name(fp, property_seg.name);
+	generate_task_priority(fp, property_seg.priority);
+	generate_task_interval(fp, property_seg.interval);
 }

@@ -12,10 +12,13 @@ typedef uint32_t task_interval_t;
 
 typedef struct {
 	task_name_size_t name_size;
+} task_property_seg_header;
+
+typedef struct {
 	task_name_t name;
 	task_priority_t priority;
 	task_interval_t interval;
-} task_property_t;
+} task_property_seg;
 
 
 
