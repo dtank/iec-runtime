@@ -20,11 +20,7 @@ typedef struct {
 /* defination of CODE_SEG */
 typedef INST *CODE_SEG;
 
-/* defination of CONST_SEG */
-typedef void *CONST_SEG;
 
-/* defination of DATA_SEG */
-typedef void *DATA_SEG;
 
 /* defination of PROGRAM */
 typedef struct {

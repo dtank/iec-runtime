@@ -11,7 +11,7 @@ extern int DEBUG_LEVEL;
 #define PRINT(level, fmt, ...)                                                                       \
 		do {                                                                                         \
 			if (DEBUG_LEVEL >= level) {                                                              \
-				fprintf(stderr, "File:%s Line:%d Function:%s() ", __FILE__, __LINE__, __FUNCTION__); \
+				fprintf(stderr, "File:%-15s Line:%-4d Function:%-35s ", __FILE__, __LINE__, __FUNCTION__); \
 				fprintf(stderr, fmt, __VA_ARGS__); }                                                 \
 				fprintf(stderr, "\n");                                                               \
 		}while(0)
