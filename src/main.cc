@@ -29,10 +29,12 @@ int main(int argc, char* argv[])
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
 	read_task_count(fplc);
-	PROPERTY mproperty = read_task_property(fplc);
+	task_property_seg mproperty_seg = read_task_property_seg(fplc);
 
 	TASK plc_task1;
-	plc_task1.property = mproperty;
+	plc_task1.property.name = mproperty_seg.name;
+	plc_task1.property.priority = mproperty_seg.priority;
+	plc_task1.property.interval = mproperty_seg.interval;
 	task_list[0] = &plc_task1;
 	TASK_LIST *plc_task_list = new TASK_LIST;
 	plc_task_list->task_count = 1;
