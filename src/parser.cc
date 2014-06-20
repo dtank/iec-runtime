@@ -18,7 +18,7 @@ task_name_size_t read_task_name_size(FILE *fp) {
 }
 task_name_t read_task_name(FILE *fp) {
 	task_name_t name;
-	task_name_size_t size = read_task_name_size(fp);
+	task_name_size_t size = read_task_property_seg_header(fp).name_size;
 	fread(&name, size, 1, fp);
 	PRINT(DEBUG_TRC, "Trace: task name = %s", name);
 	return name;
@@ -34,6 +34,11 @@ task_interval_t read_task_interval(FILE *fp) {
 	fread(&interval, sizeof(task_interval_t), 1, fp);
 	PRINT(DEBUG_TRC, "Trace: task interval = %d", interval);
 	return interval;
+}
+task_property_seg_header read_task_property_seg_header(FILE *fp) {
+	task_property_seg_header property_seg_header;
+	property_seg_header.name_size= read_task_name_size(fp);
+	return property_seg_header;
 }
 task_property_seg read_task_property_seg(FILE *fp) {
 	task_property_seg property_seg;
