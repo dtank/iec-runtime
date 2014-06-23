@@ -17,8 +17,6 @@ TASK_PROPERTY_SEG *read_task_property_seg(FILE *fp);
 
 /* Constant/Data Segment Parser */
 static seg_size_t read_seg_size(FILE *fp);
-static CONST_SEG_HEADER *read_const_seg_header(FILE *fp);
-CONST_SEG *read_const_seg(FILE *fp);
 static DATA_SEG_HEADER *read_data_seg_header(FILE *fp);
 DATA_SEG *read_data_seg(FILE *fp);
 

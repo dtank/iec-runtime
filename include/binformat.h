@@ -24,14 +24,6 @@ typedef struct {
 	task_interval_t interval;
 } TASK_PROPERTY_SEG;
 
-/* Constant Segment Header */
-typedef struct {
-	seg_size_t size;
-} CONST_SEG_HEADER;
-
-/* Constant Segment */
-typedef char CONST_SEG;
-
 /* Data Segment Header */
 typedef struct {
 	seg_size_t size;

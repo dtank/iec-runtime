@@ -58,19 +58,7 @@ static seg_size_t read_seg_size(FILE *fp) {
 	PRINT(DEBUG_TRC, "TRACE: seg_size = %d", size);
 	return size;
 }
-static CONST_SEG_HEADER *read_const_seg_header(FILE *fp) {
-	CONST_SEG_HEADER *const_seg_header = new CONST_SEG_HEADER;
-	const_seg_header->size = read_seg_size(fp);
-	PRINT(DEBUG_TRC, "TRACE: const_seg_header .size = %d", const_seg_header->size);
-	return const_seg_header;
-}
-CONST_SEG *read_const_seg(FILE *fp) {
-	CONST_SEG_HEADER *const_seg_header = read_const_seg_header(fp);
-	CONST_SEG *const_seg = new CONST_SEG[const_seg_header->size];
-	fread(const_seg, const_seg_header->size, 1, fp);
-	PRINT(DEBUG_TRC, "TRACE: const_seg .first = %d; .last = %d", const_seg[0], const_seg[const_seg_header->size - 1]);
-	return const_seg;
-}
+
 static DATA_SEG_HEADER *read_data_seg_header(FILE *fp) {
 	DATA_SEG_HEADER *data_seg_header = new DATA_SEG_HEADER;
 	data_seg_header->size = read_seg_size(fp);

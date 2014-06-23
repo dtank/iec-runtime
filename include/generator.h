@@ -15,8 +15,6 @@ void generate_task_property_seg(FILE *fp, TASK_PROPERTY_SEG *property_seg);
 
 /* Constant/Data Segment Generator */
 static void generate_seg_size(FILE *fp, seg_size_t size);
-void generate_const_seg_header(FILE *fp, CONST_SEG_HEADER *const_seg_header);
-void generate_const_seg(FILE *fp, CONST_SEG_HEADER *const_seg_header, CONST_SEG *const_seg);
 void generate_data_seg_header(FILE *fp, DATA_SEG_HEADER *data_seg_header);
 void generate_data_seg(FILE *fp, DATA_SEG_HEADER *data_seg_header, DATA_SEG *data_seg);
 

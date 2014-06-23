@@ -45,21 +45,13 @@ void generate_task_property_seg(FILE *fp, TASK_PROPERTY_SEG *property_seg) {
 	generate_task_interval(fp, property_seg->interval);
 }
 
-/* Constant/Data Segment Generator */
+/* Data Segment Generator */
 static void generate_seg_size(FILE *fp, seg_size_t size) {
 	if (fwrite(&size, sizeof(seg_size_t), 1, fp) < 1) {
 		PRINT(DEBUG_ERR, "ERROR: generating size of segment (%d)...", size);
 	}
 }
-void generate_const_seg_header(FILE *fp, CONST_SEG_HEADER *const_seg_header) {
-	generate_seg_size(fp, const_seg_header->size);
-}
-void generate_const_seg(FILE *fp, CONST_SEG_HEADER *const_seg_header, CONST_SEG *const_seg) {
-	PRINT(DEBUG_TRC, "TRACE: const_seg_size = %d", const_seg_header->size);
-	if (fwrite(const_seg, const_seg_header->size, 1, fp) < 1) {
-		PRINT(DEBUG_ERR, "ERROR: generating constant segment...", 0);
-	}
-}
+
 void generate_data_seg_header(FILE *fp, DATA_SEG_HEADER *data_seg_header) {
 	generate_seg_size(fp, data_seg_header->size);
 }

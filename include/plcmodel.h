@@ -25,7 +25,7 @@ typedef INST *CODE_SEG;
 /* defination of PROGRAM */
 typedef struct {
 	CODE_SEG code_seg;
-	CONST_SEG const_seg;
+	//CONST_SEG const_seg;
 	DATA_SEG data_seg;
 } PROGRAM;
 
