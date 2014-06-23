@@ -26,7 +26,7 @@ typedef INST *CODE_SEG;
 typedef struct {
 	CODE_SEG code_seg;
 	//CONST_SEG const_seg;
-	DATA_SEG data_seg;
+	//BIN_TDS tds;
 } PROGRAM;
 
 /* defination of PROPERTY */

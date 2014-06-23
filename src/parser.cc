@@ -35,23 +35,23 @@ static task_interval_t read_task_interval(FILE *fp) {
 	PRINT(DEBUG_TRC, "TRACE: task_interval = %d", interval);
 	return interval;
 }
-static TASK_PROPERTY_SEG_HEADER *read_task_property_seg_header(FILE *fp) {
-	TASK_PROPERTY_SEG_HEADER *property_seg_header = new TASK_PROPERTY_SEG_HEADER;
-	property_seg_header->name_size = read_task_name_size(fp);
-	PRINT(DEBUG_TRC, "TRACE: task_property_seg_header .name_size = %d", property_seg_header->name_size);
-	return property_seg_header;
+static BIN_TPS_HEADER *read_tps_header(FILE *fp) {
+	BIN_TPS_HEADER *tps_header = new BIN_TPS_HEADER;
+	tps_header->name_size = read_task_name_size(fp);
+	PRINT(DEBUG_TRC, "TRACE: task_tps_header .name_size = %d", tps_header->name_size);
+	return tps_header;
 }
-TASK_PROPERTY_SEG *read_task_property_seg(FILE *fp) {
-	TASK_PROPERTY_SEG *property_seg = new TASK_PROPERTY_SEG;
-	TASK_PROPERTY_SEG_HEADER *property_seg_header  = read_task_property_seg_header(fp);
-	property_seg->name = read_task_name(fp, property_seg_header->name_size);
-	property_seg->priority = read_task_priority(fp);
-	property_seg->interval = read_task_interval(fp);
-	PRINT(DEBUG_TRC, "TRACE: task_property_seg .name = %s; .priority = %d; .interval = %d", property_seg->name, property_seg->priority, property_seg->interval);
-	return property_seg;
+BIN_TPS *read_tps(FILE *fp) {
+	BIN_TPS *tps = new BIN_TPS;
+	BIN_TPS_HEADER *tps_header  = read_tps_header(fp);
+	tps->name = read_task_name(fp, tps_header->name_size);
+	tps->priority = read_task_priority(fp);
+	tps->interval = read_task_interval(fp);
+	PRINT(DEBUG_TRC, "TRACE: task_tps .name = %s; .priority = %d; .interval = %d", tps->name, tps->priority, tps->interval);
+	return tps;
 }
 
-/* Constant/Data Segment Parser */
+/* Data Segment Parser */
 static seg_size_t read_seg_size(FILE *fp) {
 	seg_size_t size;
 	fread(&size, sizeof(seg_size_t), 1, fp);
@@ -59,16 +59,16 @@ static seg_size_t read_seg_size(FILE *fp) {
 	return size;
 }
 
-static DATA_SEG_HEADER *read_data_seg_header(FILE *fp) {
-	DATA_SEG_HEADER *data_seg_header = new DATA_SEG_HEADER;
-	data_seg_header->size = read_seg_size(fp);
-	PRINT(DEBUG_TRC, "TRACE: data_seg_header .size = %d", data_seg_header->size);
-	return data_seg_header;
+static BIN_TDS_HEADER *read_tds_header(FILE *fp) {
+	BIN_TDS_HEADER *tds_header = new BIN_TDS_HEADER;
+	tds_header->size = read_seg_size(fp);
+	PRINT(DEBUG_TRC, "TRACE: tds_header .size = %d", tds_header->size);
+	return tds_header;
 }
-DATA_SEG *read_data_seg(FILE *fp) {
-	DATA_SEG_HEADER *data_seg_header = read_data_seg_header(fp);
-	DATA_SEG *data_seg = new DATA_SEG[data_seg_header->size];
-	fread(data_seg, data_seg_header->size, 1, fp);
-	PRINT(DEBUG_TRC, "TRACE: data_seg .first = %d; .last = %d", data_seg[0], data_seg[data_seg_header->size - 1]);
-	return data_seg;
+BIN_TDS *read_tds(FILE *fp) {
+	BIN_TDS_HEADER *tds_header = read_tds_header(fp);
+	BIN_TDS *tds = new BIN_TDS[tds_header->size];
+	fread(tds, tds_header->size, 1, fp);
+	PRINT(DEBUG_TRC, "TRACE: tds .first = %d; .last = %d", tds[0], tds[tds_header->size - 1]);
+	return tds;
 }
