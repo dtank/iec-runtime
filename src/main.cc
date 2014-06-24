@@ -16,8 +16,6 @@
 
 
 int DEBUG_LEVEL = DEBUG_INF;
-extern RT_TASK plc_tasks[10];
-PLC_TASK *task_list[10];
 
 int main(int argc, char* argv[])
 {
@@ -42,18 +40,7 @@ int main(int argc, char* argv[])
 	generate_tcs(fplc, &tcs_header, &tcs, &inst_info);
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
-	read_task_count(fplc);
-	PLC_TASK_PROP *task_property = parse_plc_task_property(fplc);
-	PLC_TASK_DATA *task_data = parse_plc_task_data(fplc);
-
-	PLC_TASK plc_task1;
-	plc_task1.property.name = task_property->name;
-	plc_task1.property.priority = task_property->priority;
-	plc_task1.property.interval = task_property->interval;
-	task_list[0] = &plc_task1;
-	TASK_LIST *plc_task_list = new TASK_LIST;
-	plc_task_list->task_count = 1;
-	plc_task_list->task = task_list;
+	PLC_TASK_LIST *plc_task_list = read_plc_task_list(fplc, &inst_info);
 	fclose(fplc);
 	 //Avoids memory swapping for this program 
 	mlockall(MCL_CURRENT|MCL_FUTURE);
@@ -61,7 +48,7 @@ int main(int argc, char* argv[])
 	plc_task_create(plc_task_list);
 	plc_task_start(plc_task_list);
 	pause();
-	rt_task_delete(&plc_tasks[0]);
+	//rt_task_delete(&plc_tasks[0]);
 
 	return 0;
 }

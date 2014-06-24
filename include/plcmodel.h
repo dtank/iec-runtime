@@ -19,11 +19,11 @@ typedef char PLC_TASK_DATA;
 /* Definition of PLC Task Code */
 typedef struct {
 	inst_id_t id;
-	inst_arg_t *arg_list[];
+	inst_arg_t *arg_list;
 } PLC_TASK_INST;
 
 typedef struct {
-	PLC_TASK_INST *inst_list[];
+	PLC_TASK_INST **inst_list;
 } PLC_TASK_CODE;
 
 /* Definition of PLC Task Program */
@@ -34,12 +34,13 @@ typedef struct {
 
 /* Definition of PLC Task */
 typedef struct {
-	PLC_TASK_PROP property;
-	PLC_TASK_PROG program;
+	PLC_TASK_PROP *property;
+	PLC_TASK_PROG *program;
 } PLC_TASK;
 
 typedef struct {
 	task_count_t task_count;
-	PLC_TASK **task;
-} TASK_LIST;
+	RT_TASK *rt_task;
+	PLC_TASK **plc_task;
+} PLC_TASK_LIST;
 #endif

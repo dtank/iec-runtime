@@ -3,7 +3,7 @@
 
 extern int DEBUG_LEVEL;
 
-task_count_t read_task_count(FILE *fp) {
+static task_count_t read_task_count(FILE *fp) {
 	task_count_t count;
 	fread(&count, sizeof(task_count_t), 1, fp);
 	PRINT(DEBUG_TRC, "TRACE: task_count = %d", count);
@@ -41,7 +41,7 @@ static BIN_TPS_HEADER *read_tps_header(FILE *fp) {
 	PRINT(DEBUG_TRC, "TRACE: task_tps_header .name_size = %d", tps_header->name_size);
 	return tps_header;
 }
-PLC_TASK_PROP *parse_plc_task_property(FILE *fp) {
+static PLC_TASK_PROP *read_plc_task_property(FILE *fp) {
 	PLC_TASK_PROP *property = new PLC_TASK_PROP;
 	BIN_TPS_HEADER *tps_header  = read_tps_header(fp);
 	property->name = read_task_name(fp, tps_header->name_size);
@@ -65,10 +65,76 @@ static BIN_TDS_HEADER *read_tds_header(FILE *fp) {
 	PRINT(DEBUG_TRC, "TRACE: tds_header .size = %d", tds_header->size);
 	return tds_header;
 }
-PLC_TASK_DATA *parse_plc_task_data(FILE *fp) {
+static PLC_TASK_DATA *read_plc_task_data(FILE *fp) {
 	BIN_TDS_HEADER *tds_header = read_tds_header(fp);
 	PLC_TASK_DATA *data = new PLC_TASK_DATA[tds_header->size];
 	fread(data, tds_header->size, 1, fp);
 	PRINT(DEBUG_TRC, "TRACE: plc_task_data .first = %d; .last = %d", data[0], data[tds_header->size - 1]);
 	return data;
+}
+
+/* PLC Task Code Parser */
+static inst_count_t read_inst_count(FILE *fp) {
+	inst_count_t count;
+	fread(&count, sizeof(inst_count_t), 1, fp);
+	PRINT(DEBUG_TRC, "TRACE: inst_count = %d", count);
+	return count;
+}
+static inst_id_t read_inst_id(FILE *fp) {
+	inst_id_t id;
+	fread(&id, sizeof(inst_id_t), 1, fp);
+	PRINT(DEBUG_TRC, "TRACE: inst_id = %d", id);
+	return id;
+}
+static inst_arg_t read_inst_arg(FILE *fp) {
+	inst_arg_t arg;
+	fread(&arg, sizeof(inst_arg_t), 1, fp);
+	PRINT(DEBUG_TRC, "TRACE: inst_arg = %d", arg);
+	return arg;
+}
+static BIN_TCS_HEADER *read_tcs_header(FILE *fp) {
+	BIN_TCS_HEADER *tcs_header = new BIN_TCS_HEADER;
+	tcs_header->inst_count = read_inst_count(fp);
+	PRINT(DEBUG_TRC, "TRACE: tcs_header .inst_count = %d", tcs_header->inst_count);
+	return tcs_header;
+}
+static PLC_TASK_INST *read_plc_task_inst(FILE *fp, INST_INFO *info) {
+	PLC_TASK_INST *inst = new PLC_TASK_INST;
+	inst->id = read_inst_id(fp);
+	inst->arg_list = new inst_arg_t[info->args_count[inst->id]];
+	for (int i = 0; i < info->args_count[inst->id]; ++i) {
+		inst->arg_list[i] = read_inst_arg(fp);
+	}
+	return inst;
+}
+static PLC_TASK_CODE *read_plc_task_code(FILE *fp, INST_INFO *info) {
+	BIN_TCS_HEADER *tcs_header = read_tcs_header(fp);
+	PLC_TASK_CODE *code = new PLC_TASK_CODE;
+	code->inst_list = new PLC_TASK_INST*[tcs_header->inst_count];
+	for (int i = 0; i < tcs_header->inst_count; ++i) {
+		code->inst_list[i] = read_plc_task_inst(fp, info);
+	}
+	return code;
+}
+static PLC_TASK_PROG *read_plc_task_program(FILE *fp, INST_INFO *info) {
+	PLC_TASK_PROG *program = new PLC_TASK_PROG;
+	program->data = read_plc_task_data(fp);
+	program->code = read_plc_task_code(fp, info);
+	return program;
+}
+static PLC_TASK *read_plc_task(FILE *fp, INST_INFO *info) {
+	PLC_TASK *task = new PLC_TASK;
+	task->property = read_plc_task_property(fp);
+	task->program = read_plc_task_program(fp, info);
+	return task;
+}
+PLC_TASK_LIST *read_plc_task_list(FILE *fp, INST_INFO *info) {
+	PLC_TASK_LIST *task_list = new PLC_TASK_LIST;
+	task_list->task_count = read_task_count(fp);
+	task_list->rt_task = new RT_TASK[task_list->task_count];
+	task_list->plc_task = new PLC_TASK*[task_list->task_count];
+	for (int i = 0; i < task_list->task_count; ++i) {
+		task_list->plc_task[i] = read_plc_task(fp, info);
+	}
+	return task_list;
 }
