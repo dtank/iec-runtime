@@ -6,44 +6,40 @@
 
 #define MAX_PLC_TASK_COUNT 10
 
-/* defination of PARAMETERS */
-typedef struct {
-	uint32_t param_index;
-} PARAM;
-
-/* defination of INSTRUCTION*/
-typedef struct {
-	uint16_t id;
-	PARAM *param_list;
-} INST;
-
-/* defination of CODE_SEG */
-typedef INST *CODE_SEG;
-
-
-
-/* defination of PROGRAM */
-typedef struct {
-	CODE_SEG code_seg;
-	//CONST_SEG const_seg;
-	//BIN_TDS tds;
-} PROGRAM;
-
-/* defination of PROPERTY */
+/* Definition of PLC Task Property */
 typedef struct {
 	task_name_t *name;
 	task_priority_t priority;
 	task_interval_t interval;
-} PROPERTY;
+} PLC_TASK_PROP;
 
-/* defination of TASK */
+/* Definition of PLC Task Data */
+typedef char PLC_TASK_DATA;
+
+/* Definition of PLC Task Code */
 typedef struct {
-	PROPERTY property;
-	PROGRAM program;
-} TASK;
+	inst_id_t id;
+	inst_arg_t *arg_list[];
+} PLC_TASK_INST;
+
+typedef struct {
+	PLC_TASK_INST *inst_list[];
+} PLC_TASK_CODE;
+
+/* Definition of PLC Task Program */
+typedef struct {
+	PLC_TASK_DATA *data;
+	PLC_TASK_CODE *code;
+} PLC_TASK_PROG;
+
+/* Definition of PLC Task */
+typedef struct {
+	PLC_TASK_PROP property;
+	PLC_TASK_PROG program;
+} PLC_TASK;
 
 typedef struct {
 	task_count_t task_count;
-	TASK **task;
+	PLC_TASK **task;
 } TASK_LIST;
 #endif

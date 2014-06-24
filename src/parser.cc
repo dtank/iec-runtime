@@ -10,7 +10,7 @@ task_count_t read_task_count(FILE *fp) {
 	return count;
 }
 
-/* Task Property Segment Parser */
+/* PLC Task Property Parser */
 static task_name_size_t read_task_name_size(FILE *fp) {
 	task_name_size_t size;
 	fread(&size, sizeof(task_name_size_t), 1, fp);
@@ -41,17 +41,17 @@ static BIN_TPS_HEADER *read_tps_header(FILE *fp) {
 	PRINT(DEBUG_TRC, "TRACE: task_tps_header .name_size = %d", tps_header->name_size);
 	return tps_header;
 }
-BIN_TPS *read_tps(FILE *fp) {
-	BIN_TPS *tps = new BIN_TPS;
+PLC_TASK_PROP *parse_plc_task_property(FILE *fp) {
+	PLC_TASK_PROP *property = new PLC_TASK_PROP;
 	BIN_TPS_HEADER *tps_header  = read_tps_header(fp);
-	tps->name = read_task_name(fp, tps_header->name_size);
-	tps->priority = read_task_priority(fp);
-	tps->interval = read_task_interval(fp);
-	PRINT(DEBUG_TRC, "TRACE: task_tps .name = %s; .priority = %d; .interval = %d", tps->name, tps->priority, tps->interval);
-	return tps;
+	property->name = read_task_name(fp, tps_header->name_size);
+	property->priority = read_task_priority(fp);
+	property->interval = read_task_interval(fp);
+	PRINT(DEBUG_TRC, "TRACE: plc_task_property .name = %s; .priority = %d; .interval = %d", property->name, property->priority, property->interval);
+	return property;
 }
 
-/* Data Segment Parser */
+/* PLC Task Data Parser */
 static seg_size_t read_seg_size(FILE *fp) {
 	seg_size_t size;
 	fread(&size, sizeof(seg_size_t), 1, fp);
@@ -65,10 +65,10 @@ static BIN_TDS_HEADER *read_tds_header(FILE *fp) {
 	PRINT(DEBUG_TRC, "TRACE: tds_header .size = %d", tds_header->size);
 	return tds_header;
 }
-BIN_TDS *read_tds(FILE *fp) {
+PLC_TASK_DATA *parse_plc_task_data(FILE *fp) {
 	BIN_TDS_HEADER *tds_header = read_tds_header(fp);
-	BIN_TDS *tds = new BIN_TDS[tds_header->size];
-	fread(tds, tds_header->size, 1, fp);
-	PRINT(DEBUG_TRC, "TRACE: tds .first = %d; .last = %d", tds[0], tds[tds_header->size - 1]);
-	return tds;
+	PLC_TASK_DATA *data = new PLC_TASK_DATA[tds_header->size];
+	fread(data, tds_header->size, 1, fp);
+	PRINT(DEBUG_TRC, "TRACE: plc_task_data .first = %d; .last = %d", data[0], data[tds_header->size - 1]);
+	return data;
 }

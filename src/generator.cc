@@ -37,9 +37,11 @@ static void generate_task_interval(FILE *fp, task_interval_t interval) {
 	}
 }
 void generate_tps_header(FILE *fp, BIN_TPS_HEADER *tps_header) {
+	PRINT(DEBUG_TRC, "TRACE: tps_header .name_size = %d", tps_header->name_size);
 	generate_task_name_size(fp, tps_header->name_size);
 }
 void generate_tps(FILE *fp, BIN_TPS *tps) {
+	PRINT(DEBUG_TRC, "TRACE: tps .name = %s; .priority = %d; .interval = %d", tps->name, tps->priority, tps->interval);
 	generate_task_name(fp, tps->name);
 	generate_task_priority(fp, tps->priority);
 	generate_task_interval(fp, tps->interval);
@@ -47,15 +49,16 @@ void generate_tps(FILE *fp, BIN_TPS *tps) {
 
 /* Task Data Segment Generator */
 static void generate_seg_size(FILE *fp, seg_size_t size) {
+	PRINT(DEBUG_TRC, "TRACE: seg_size = %d", size);
 	if (fwrite(&size, sizeof(seg_size_t), 1, fp) < 1) {
 		PRINT(DEBUG_ERR, "ERROR: generating size of segment (%d)...", size);
 	}
 }
 void generate_tds_header(FILE *fp, BIN_TDS_HEADER *tds_header) {
+	PRINT(DEBUG_TRC, "TRACE: tds_header .size = %d", tds_header->size);
 	generate_seg_size(fp, tds_header->size);
 }
 void generate_tds(FILE *fp, BIN_TDS_HEADER *tds_header, BIN_TDS *tds) {
-	PRINT(DEBUG_TRC, "TRACE: tds_size = %d", tds_header->size);
 	if (fwrite(tds, tds_header->size, 1, fp) < 1) {
 		PRINT(DEBUG_ERR, "ERROR: generating task data segment...", 0);
 	}
@@ -87,11 +90,11 @@ static void generate_inst(FILE *fp, BIN_INST *inst, INST_INFO *info) {
 	}
 }
 void generate_tcs_header(FILE *fp, BIN_TCS_HEADER *tcs_header) {
+	PRINT(DEBUG_TRC, "TRACE: tcs_header .inst_count = %d", tcs_header->inst_count);
 	generate_inst_count(fp, tcs_header->inst_count);
 }
 void generate_tcs(FILE *fp, BIN_TCS_HEADER *tcs_header, BIN_TCS *tcs, INST_INFO *info) {
 	for (int i = 0; i < tcs_header->inst_count; ++i) {
 		generate_inst(fp, &(tcs->inst_list[i]), info);
-		//PRINT(DEBUG_TRC, "TRACE: inst_arg = %d", arg);
 	}
 }

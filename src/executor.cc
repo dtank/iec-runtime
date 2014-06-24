@@ -10,7 +10,7 @@ RT_TASK plc_tasks[MAX_PLC_TASK_COUNT];
 
 void plc_task_execute(void *task) {
 
-	rt_task_set_periodic(NULL, TM_NOW, ((TASK *)task)->property.interval);
+	rt_task_set_periodic(NULL, TM_NOW, ((PLC_TASK *)task)->property.interval);
 	while (1) {
 		rt_task_wait_period(NULL);
 		printf("stub code in plc_executor\n");

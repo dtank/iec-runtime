@@ -17,7 +17,7 @@
 
 int DEBUG_LEVEL = DEBUG_INF;
 extern RT_TASK plc_tasks[10];
-TASK *task_list[10];
+PLC_TASK *task_list[10];
 
 int main(int argc, char* argv[])
 {
@@ -43,13 +43,13 @@ int main(int argc, char* argv[])
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
 	read_task_count(fplc);
-	BIN_TPS *mtps = read_tps(fplc);
-	BIN_TDS *mtds = read_tds(fplc);
+	PLC_TASK_PROP *task_property = parse_plc_task_property(fplc);
+	PLC_TASK_DATA *task_data = parse_plc_task_data(fplc);
 
-	TASK plc_task1;
-	plc_task1.property.name = mtps->name;
-	plc_task1.property.priority = mtps->priority;
-	plc_task1.property.interval = mtps->interval;
+	PLC_TASK plc_task1;
+	plc_task1.property.name = task_property->name;
+	plc_task1.property.priority = task_property->priority;
+	plc_task1.property.interval = task_property->interval;
 	task_list[0] = &plc_task1;
 	TASK_LIST *plc_task_list = new TASK_LIST;
 	plc_task_list->task_count = 1;
