@@ -42,13 +42,14 @@ int main(int argc, char* argv[])
 	fplc = fopen("plc.bin", "rb");
 	PLC_TASK_LIST *plc_task_list = read_plc_task_list(fplc, &inst_info);
 	fclose(fplc);
-	 //Avoids memory swapping for this program 
+
+	//Avoids memory swapping for this program
 	mlockall(MCL_CURRENT|MCL_FUTURE);
 
 	plc_task_create(plc_task_list);
 	plc_task_start(plc_task_list);
 	pause();
-	//rt_task_delete(&plc_tasks[0]);
+	plc_task_delete(plc_task_list);
 
 	return 0;
 }
