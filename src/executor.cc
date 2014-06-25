@@ -16,10 +16,10 @@ void plc_task_execute(void *plc_task) {
 	while (1) {
 		rt_task_wait_period(NULL);
 		printf("stub code in plc_executor\n");
-//TODO: how to get instruction count
-		//for (int i = 0; i < task->program->code->)
-		//((inst_3op_t)inst_desc[STD_ADD].inst_addr)((void *)task->program->code, (void *)&op2, (void *)&op3);
-		//PRINT(DEBUG_TRC, "op3 = %d", op3);
+		for (int i = 0; i < task->property->inst_count; ++i) {
+			((inst_3op_t)inst_desc[STD_ADD].inst_addr)((void *)&task->program->data[task->program->code->inst_list[i]->arg_list[0]],(void *)&task->program->data[task->program->code->inst_list[i]->arg_list[1]], (void *)&task->program->data[task->program->code->inst_list[i]->arg_list[2]]);
+			PRINT(DEBUG_TRC, "result = %d", (int32_t)task->program->data[task->program->code->inst_list[i]->arg_list[2]]);
+		}
 	}
 }
 
