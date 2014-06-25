@@ -8,9 +8,12 @@
 
 /* Definition of PLC Task Property */
 typedef struct {
+	task_name_size_t name_size;
 	task_name_t *name;
 	task_priority_t priority;
 	task_interval_t interval;
+	tds_size_t tds_size;
+	inst_count_t inst_count;
 } PLC_TASK_PROP;
 
 /* Definition of PLC Task Data */

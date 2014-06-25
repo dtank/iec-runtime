@@ -19,7 +19,7 @@ void plc_task_execute(void *plc_task) {
 //TODO: how to get instruction count
 		//for (int i = 0; i < task->program->code->)
 		//((inst_3op_t)inst_desc[STD_ADD].inst_addr)((void *)task->program->code, (void *)&op2, (void *)&op3);
-		PRINT(DEBUG_TRC, "op3 = %d", op3);
+		//PRINT(DEBUG_TRC, "op3 = %d", op3);
 	}
 }
 
