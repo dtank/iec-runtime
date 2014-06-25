@@ -23,8 +23,8 @@ void generate_tds(FILE *fp, BIN_TDS_HEADER *tds_header, BIN_TDS *tds);
 static void generate_inst_count(FILE *fp, inst_count_t inst_count);
 static void generate_inst_id(FILE *fp, inst_id_t inst_id);
 static void generate_inst_arg(FILE *fp, inst_arg_t inst_arg);
-static void generate_inst(FILE *fp, BIN_INST *inst, INST_INFO *info);
+static void generate_inst(FILE *fp, BIN_INST *inst, inst_desc_map_t *inst_desc);
 void generate_tcs_header(FILE *fp, BIN_TCS_HEADER *tcs_header);
-void generate_tcs(FILE *fp, BIN_TCS_HEADER *tcs_hader, BIN_TCS *tcs, INST_INFO *info);
+void generate_tcs(FILE *fp, BIN_TCS_HEADER *tcs_hader, BIN_TCS *tcs, inst_desc_map_t *inst_desc);
 
 #endif

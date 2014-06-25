@@ -14,14 +14,14 @@
 EXECUTABLE := iec-runtime    # 可执行文件名
 LIBDIR:=  ../lib/xenomai            # 静态库目录
 LIBS :=    native xenomai pthread_rt           # 静态库文件名
-INCLUDES:=../include ../include/xenomai# 头文件目录
-SRCDIR:=  # 除了当前目录外，其他的源代码文件目录
+INCLUDES:=../include ../include/xenomai # 头文件目录
+SRCDIR:=  ./instset# 除了当前目录外，其他的源代码文件目录
 #
 # # Now alter any implicit rules' variables if you like, e.g.:
 
 CC= arm-none-linux-gnueabi-g++
 CXX= arm-none-linux-gnueabi-g++
-CFLAGS := 
+CFLAGS := -std=c++0x
 CPPFLAGS := $(CFLAGS)
 CPPFLAGS += $(addprefix -I,$(INCLUDES))
 CPPFLAGS += -MMD

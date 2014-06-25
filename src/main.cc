@@ -13,14 +13,15 @@
 #include "plcmodel.h"
 #include "instruction.h"
 #include "debug.h"
+#include "stdinst.h"
 
 
 int DEBUG_LEVEL = DEBUG_INF;
 
+inst_desc_map_t inst_desc = inst_desc_map;
 int main(int argc, char* argv[])
 {
-	INST_INFO inst_info = {args_count};
-	BIN_TPS_HEADER tps_header = {strlen("task1")};
+	BIN_TPS_HEADER tps_header = {(uint8_t)strlen("task1")};
 	BIN_TPS tps = {"task1", 99u, 1000000000u};
 	BIN_TDS_HEADER tds_header = {20u};
 	BIN_TDS tds[20] = {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
@@ -37,10 +38,10 @@ int main(int argc, char* argv[])
 	generate_tds_header(fplc, &tds_header);
 	generate_tds(fplc, &tds_header, tds);
 	generate_tcs_header(fplc, &tcs_header);
-	generate_tcs(fplc, &tcs_header, &tcs, &inst_info);
+	generate_tcs(fplc, &tcs_header, &tcs, &inst_desc);
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
-	PLC_TASK_LIST *plc_task_list = read_plc_task_list(fplc, &inst_info);
+	PLC_TASK_LIST *plc_task_list = read_plc_task_list(fplc, &inst_desc);
 	fclose(fplc);
 
 	//Avoids memory swapping for this program

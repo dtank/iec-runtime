@@ -83,9 +83,9 @@ static void generate_inst_arg(FILE *fp, inst_arg_t arg) {
 		PRINT(DEBUG_ERR, "ERROR: generating instruction argument (%d)...", arg);
 	}
 }
-static void generate_inst(FILE *fp, BIN_INST *inst, INST_INFO *info) {
+static void generate_inst(FILE *fp, BIN_INST *inst, inst_desc_map_t *inst_desc) {
 	generate_inst_id(fp, inst->id);
-	for (int i = 0; i < info->args_count[inst->id]; ++i) {
+	for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
 		generate_inst_arg(fp, inst->arg_list[i]);
 	}
 }
@@ -93,8 +93,8 @@ void generate_tcs_header(FILE *fp, BIN_TCS_HEADER *tcs_header) {
 	PRINT(DEBUG_TRC, "TRACE: tcs_header .inst_count = %d", tcs_header->inst_count);
 	generate_inst_count(fp, tcs_header->inst_count);
 }
-void generate_tcs(FILE *fp, BIN_TCS_HEADER *tcs_header, BIN_TCS *tcs, INST_INFO *info) {
+void generate_tcs(FILE *fp, BIN_TCS_HEADER *tcs_header, BIN_TCS *tcs, inst_desc_map_t *inst_desc) {
 	for (int i = 0; i < tcs_header->inst_count; ++i) {
-		generate_inst(fp, &(tcs->inst_list[i]), info);
+		generate_inst(fp, &(tcs->inst_list[i]), inst_desc);
 	}
 }

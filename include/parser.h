@@ -27,11 +27,11 @@ static inst_count_t    read_inst_count(FILE *fp);
 static inst_id_t       read_inst_id(FILE *fp);
 static inst_arg_t      read_inst_arg(FILE *fp);
 static BIN_TCS_HEADER *read_tcs_header(FILE *fp);
-static PLC_TASK_INST  *read_plc_task_inst(FILE *fp, INST_INFO *info);
-static PLC_TASK_CODE  *read_plc_task_code(FILE *fp, INST_INFO *info);
+static PLC_TASK_INST  *read_plc_task_inst(FILE *fp, inst_desc_map_t *inst_desc);
+static PLC_TASK_CODE  *read_plc_task_code(FILE *fp, inst_desc_map_t *info);
 
 /* PLC Task Parser */
-static PLC_TASK_PROG *read_plc_task_program(FILE *fp, INST_INFO *info);
-static PLC_TASK      *read_plc_task(FILE *fp, INST_INFO *info);
-PLC_TASK_LIST        *read_plc_task_list(FILE *fp, INST_INFO *info);
+static PLC_TASK_PROG *read_plc_task_program(FILE *fp, inst_desc_map_t *info);
+static PLC_TASK      *read_plc_task(FILE *fp, inst_desc_map_t *info);
+PLC_TASK_LIST        *read_plc_task_list(FILE *fp, inst_desc_map_t *info);
 #endif

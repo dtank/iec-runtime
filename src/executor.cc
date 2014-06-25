@@ -4,16 +4,22 @@
 #include <native/task.h>
 #include <native/timer.h>
 #include "executor.h"
+#include "stdinst.h"
+#include "instruction.h"
 #include "debug.h"
 
 
-void plc_task_execute(void *task) {
-
-	rt_task_set_periodic(NULL, TM_NOW, ((PLC_TASK *)task)->property->interval);
+extern inst_desc_map_t inst_desc;
+void plc_task_execute(void *plc_task) {
+	PLC_TASK *task = (PLC_TASK *)plc_task;
+	rt_task_set_periodic(NULL, TM_NOW, task->property->interval);
 	while (1) {
 		rt_task_wait_period(NULL);
 		printf("stub code in plc_executor\n");
+//TODO: how to get instruction count
 		//for (int i = 0; i < task->program->code->)
+		//((inst_3op_t)inst_desc[STD_ADD].inst_addr)((void *)task->program->code, (void *)&op2, (void *)&op3);
+		PRINT(DEBUG_TRC, "op3 = %d", op3);
 	}
 }
 
