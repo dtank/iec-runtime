@@ -30,11 +30,11 @@ typedef char BIN_TDS;
  /*Definition of Task Code Segment */
 typedef struct {
 	inst_id_t id;
-	inst_arg_t arg_list[3];
+	inst_arg_t argv[3];
 } BIN_INST;
 
 typedef struct {
-	BIN_INST inst_list[50];
+	BIN_INST inst[50];
 } BIN_TCS;
 
 

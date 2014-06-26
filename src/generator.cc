@@ -1,4 +1,4 @@
-#include <string.h> 
+#include <string.h>
 #include "generator.h"
 #include "debug.h"
 
@@ -81,11 +81,11 @@ static void generate_inst_arg(FILE *fp, inst_arg_t arg) {
 static void generate_inst(FILE *fp, BIN_INST *inst, inst_desc_map_t *inst_desc) {
 	generate_inst_id(fp, inst->id);
 	for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
-		generate_inst_arg(fp, inst->arg_list[i]);
+		generate_inst_arg(fp, inst->argv[i]);
 	}
 }
 void generate_tcs(FILE *fp, BIN_TPS *tps, BIN_TCS *tcs, inst_desc_map_t *inst_desc) {
 	for (int i = 0; i < tps->inst_count; ++i) {
-		generate_inst(fp, &(tcs->inst_list[i]), inst_desc);
+		generate_inst(fp, &(tcs->inst[i]), inst_desc);
 	}
 }

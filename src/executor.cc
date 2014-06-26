@@ -1,24 +1,21 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <native/task.h>
-#include <native/timer.h>
 #include "executor.h"
-#include "stdinst.h"
 #include "instruction.h"
 #include "debug.h"
 
 
 extern inst_desc_map_t inst_desc;
+
 void plc_task_execute(void *plc_task) {
 	PLC_TASK *task = (PLC_TASK *)plc_task;
 	rt_task_set_periodic(NULL, TM_NOW, task->property->interval);
 	while (1) {
 		rt_task_wait_period(NULL);
-		printf("stub code in plc_executor\n");
 		for (int i = 0; i < task->property->inst_count; ++i) {
-			((inst_3op_t)inst_desc[STD_ADD].inst_addr)((void *)&task->data[task->code->inst_list[i]->arg_list[0]],(void *)&task->data[task->code->inst_list[i]->arg_list[1]], (void *)&task->data[task->code->inst_list[i]->arg_list[2]]);
-			PRINT(DEBUG_TRC, "result = %d", (int32_t)task->data[task->code->inst_list[i]->arg_list[2]]);
+			((inst_3op_t)inst_desc[task->code->inst[i]->id].inst_addr)(
+				(void *)&task->data[task->code->inst[i]->argv[0]],
+				(void *)&task->data[task->code->inst[i]->argv[1]],
+				(void *)&task->data[task->code->inst[i]->argv[2]]);
+			PRINT(DEBUG_TRC, "TRACE: result = %d", (int32_t)task->data[task->code->inst[i]->argv[2]]);
 		}
 	}
 }

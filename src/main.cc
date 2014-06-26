@@ -1,24 +1,16 @@
-#include <stdio.h>
-#include <string.h>
-#include <signal.h>
-#include <unistd.h>
+#include <unistd.h> /* required */
 #include <sys/mman.h>
 
-#include <native/task.h>
-#include <native/timer.h>
-
-#include "executor.h"
 #include "generator.h"
 #include "parser.h"
-#include "plcmodel.h"
-#include "instruction.h"
+#include "executor.h"
 #include "debug.h"
-#include "stdinst.h"
 
 
 int DEBUG_LEVEL = DEBUG_INF;
 
 inst_desc_map_t inst_desc = inst_desc_map;
+
 int main(int argc, char* argv[])
 {
 	BIN_TPS tps = {(uint8_t)strlen("task1"), "task1", 99u, 1000000000u, (tds_size_t)20u, (inst_count_t)3u};

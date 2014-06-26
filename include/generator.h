@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "binformat.h"
 #include "instruction.h"
+
 void generate_task_count(FILE *fp, task_count_t count);
 
 /* Task Property Segment Generator */
@@ -18,7 +19,7 @@ void generate_tps(FILE *fp, BIN_TPS *tps);
 /* Task Data Segment Generator */
 void generate_tds(FILE *fp, BIN_TPS *tps, BIN_TDS *tds);
 
- //Task Code Segment Generator 
+/* Task Code Segment Generator */
 static void generate_inst_id(FILE *fp, inst_id_t inst_id);
 static void generate_inst_arg(FILE *fp, inst_arg_t inst_arg);
 static void generate_inst(FILE *fp, BIN_INST *inst, inst_desc_map_t *inst_desc);

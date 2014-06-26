@@ -1,7 +1,6 @@
 #ifndef __PLC_MODEL_H__
 #define __PLC_MODEL_H__
 
-#include <stdint.h>
 #include <native/task.h>
 #include "binformat.h"
 
@@ -23,11 +22,11 @@ typedef char PLC_TASK_DATA;
 /* Definition of PLC Task Code */
 typedef struct {
 	inst_id_t id;
-	inst_arg_t *arg_list;
+	inst_arg_t *argv;
 } PLC_TASK_INST;
 
 typedef struct {
-	PLC_TASK_INST **inst_list;
+	PLC_TASK_INST **inst;
 } PLC_TASK_CODE;
 
 /* Definition of PLC Task */

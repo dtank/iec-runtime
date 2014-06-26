@@ -83,17 +83,17 @@ static inst_arg_t read_inst_arg(FILE *fp) {
 static PLC_TASK_INST *read_plc_task_inst(FILE *fp, inst_desc_map_t *inst_desc) {
 	PLC_TASK_INST *inst = new PLC_TASK_INST;
 	inst->id = read_inst_id(fp);
-	inst->arg_list = new inst_arg_t[(*inst_desc)[inst->id].args_count];
+	inst->argv = new inst_arg_t[(*inst_desc)[inst->id].args_count];
 	for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
-		inst->arg_list[i] = read_inst_arg(fp);
+		inst->argv[i] = read_inst_arg(fp);
 	}
 	return inst;
 }
 static PLC_TASK_CODE *read_plc_task_code(FILE *fp, PLC_TASK_PROP *property, inst_desc_map_t *inst_desc) {
 	PLC_TASK_CODE *code = new PLC_TASK_CODE;
-	code->inst_list = new PLC_TASK_INST*[property->inst_count];
+	code->inst = new PLC_TASK_INST*[property->inst_count];
 	for (int i = 0; i < property->inst_count; ++i) {
-		code->inst_list[i] = read_plc_task_inst(fp, inst_desc);
+		code->inst[i] = read_plc_task_inst(fp, inst_desc);
 	}
 	return code;
 }
