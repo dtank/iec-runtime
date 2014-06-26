@@ -17,8 +17,8 @@ void plc_task_execute(void *plc_task) {
 		rt_task_wait_period(NULL);
 		printf("stub code in plc_executor\n");
 		for (int i = 0; i < task->property->inst_count; ++i) {
-			((inst_3op_t)inst_desc[STD_ADD].inst_addr)((void *)&task->program->data[task->program->code->inst_list[i]->arg_list[0]],(void *)&task->program->data[task->program->code->inst_list[i]->arg_list[1]], (void *)&task->program->data[task->program->code->inst_list[i]->arg_list[2]]);
-			PRINT(DEBUG_TRC, "result = %d", (int32_t)task->program->data[task->program->code->inst_list[i]->arg_list[2]]);
+			((inst_3op_t)inst_desc[STD_ADD].inst_addr)((void *)&task->data[task->code->inst_list[i]->arg_list[0]],(void *)&task->data[task->code->inst_list[i]->arg_list[1]], (void *)&task->data[task->code->inst_list[i]->arg_list[2]]);
+			PRINT(DEBUG_TRC, "result = %d", (int32_t)task->data[task->code->inst_list[i]->arg_list[2]]);
 		}
 	}
 }

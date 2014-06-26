@@ -97,16 +97,11 @@ static PLC_TASK_CODE *read_plc_task_code(FILE *fp, PLC_TASK_PROP *property, inst
 	}
 	return code;
 }
-static PLC_TASK_PROG *read_plc_task_program(FILE *fp, PLC_TASK_PROP *property, inst_desc_map_t *inst_desc) {
-	PLC_TASK_PROG *program = new PLC_TASK_PROG;
-	program->data = read_plc_task_data(fp, property);
-	program->code = read_plc_task_code(fp, property, inst_desc);
-	return program;
-}
 static PLC_TASK *read_plc_task(FILE *fp, inst_desc_map_t *inst_desc) {
 	PLC_TASK *task = new PLC_TASK;
 	task->property = read_plc_task_property(fp);
-	task->program = read_plc_task_program(fp, task->property, inst_desc);
+	task->data = read_plc_task_data(fp, task->property);
+	task->code = read_plc_task_code(fp, task->property, inst_desc);
 	return task;
 }
 PLC_TASK_LIST *read_plc_task_list(FILE *fp, inst_desc_map_t *inst_desc) {

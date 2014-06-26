@@ -2,6 +2,7 @@
 #define __PLC_MODEL_H__
 
 #include <stdint.h>
+#include <native/task.h>
 #include "binformat.h"
 
 #define MAX_PLC_TASK_COUNT 10
@@ -29,16 +30,11 @@ typedef struct {
 	PLC_TASK_INST **inst_list;
 } PLC_TASK_CODE;
 
-/* Definition of PLC Task Program */
-typedef struct {
-	PLC_TASK_DATA *data;
-	PLC_TASK_CODE *code;
-} PLC_TASK_PROG;
-
 /* Definition of PLC Task */
 typedef struct {
 	PLC_TASK_PROP *property;
-	PLC_TASK_PROG *program;
+	PLC_TASK_DATA *data;
+	PLC_TASK_CODE *code;
 } PLC_TASK;
 
 typedef struct {
