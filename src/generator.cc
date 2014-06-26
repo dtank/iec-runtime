@@ -4,14 +4,25 @@
 
 extern int DEBUG_LEVEL;
 
-void generate_task_count(FILE *fp, task_count_t count) {
+/* PLC Object File Header Generator */
+static void generate_io_refresh_interval(FILE *fp, io_refresh_interval_t interval) {
+	PRINT(DEBUG_TRC, "TRACE: io_refresh_interval = %d", interval);
+	if (fwrite(&interval, sizeof(io_refresh_interval_t), 1, fp) < 1) {
+		PRINT(DEBUG_ERR, "ERROR: generating io refresh interval (%d)...", interval);
+	}
+}
+static void generate_task_count(FILE *fp, task_count_t count) {
 	PRINT(DEBUG_TRC, "TRACE: task_count = %d", count);
 	if (fwrite(&count, sizeof(task_count_t), 1, fp) < 1) {
 		PRINT(DEBUG_ERR, "ERROR: generating task count (%d)...", count);
 	}
 }
+void generate_bin_header(FILE *fp, BIN_HEADER *header) {
+	generate_io_refresh_interval(fp, header->io_refresh_interval);
+	generate_task_count(fp, header->task_count);
+}
 
-/* Task Property Segment Generator */
+/* PLC Object File Body -- Task Property Segment Generator */
 static void generate_task_name_size(FILE *fp, task_name_size_t size) {
 	PRINT(DEBUG_TRC, "TRACE: task_name_size = %d", size);
 	if (fwrite(&size, sizeof(task_name_size_t), 1, fp) < 1) {
@@ -58,14 +69,14 @@ void generate_tps(FILE *fp, BIN_TPS *tps) {
 	generate_inst_count(fp, tps->inst_count);
 }
 
-/* Task Data Segment Generator */
+/* PLC Object File Body -- Task Data Segment Generator */
 void generate_tds(FILE *fp, BIN_TPS *tps, BIN_TDS *tds) {
 	if (fwrite(tds, tps->tds_size, 1, fp) < 1) {
 		PRINT(DEBUG_ERR, "ERROR: generating task data segment...", 0);
 	}
 }
 
-/* Task Code Segment Generator */
+/* PLC Object File Body -- Task Code Segment Generator */
 static void generate_inst_id(FILE *fp, inst_id_t id) {
 	PRINT(DEBUG_TRC, "TRACE: inst_id = %d", id);
 	if (fwrite(&id, sizeof(inst_id_t), 1, fp) < 1) {

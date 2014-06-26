@@ -4,7 +4,11 @@
 #include <native/task.h>
 #include "binformat.h"
 
-#define MAX_PLC_TASK_COUNT 10
+/* Definition of PLC Configuration */
+typedef struct {
+	io_refresh_interval_t io_refresh_interval;
+	task_count_t task_count;
+} PLC_CONFIG;
 
 /* Definition of PLC Task Property */
 typedef struct {
@@ -37,7 +41,6 @@ typedef struct {
 } PLC_TASK;
 
 typedef struct {
-	task_count_t task_count;
 	RT_TASK *rt_task;
 	PLC_TASK **plc_task;
 } PLC_TASK_LIST;

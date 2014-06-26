@@ -3,11 +3,24 @@
 
 extern int DEBUG_LEVEL;
 
+/* PLC Configuration Parser */
+static io_refresh_interval_t read_io_refresh_interval(FILE *fp) {
+	io_refresh_interval_t interval;
+	fread(&interval, sizeof(interval), 1, fp);
+	PRINT(DEBUG_TRC, "TRACE: io_refresh_interval = %d", interval);
+	return interval;
+}
 static task_count_t read_task_count(FILE *fp) {
 	task_count_t count;
 	fread(&count, sizeof(task_count_t), 1, fp);
 	PRINT(DEBUG_TRC, "TRACE: task_count = %d", count);
 	return count;
+}
+PLC_CONFIG *read_plc_config(FILE *fp) {
+	PLC_CONFIG *config = new PLC_CONFIG;
+	config->io_refresh_interval = read_io_refresh_interval(fp);
+	config->task_count = read_task_count(fp);
+	return config;
 }
 
 /* PLC Task Property Parser */
@@ -104,12 +117,11 @@ static PLC_TASK *read_plc_task(FILE *fp, inst_desc_map_t *inst_desc) {
 	task->code = read_plc_task_code(fp, task->property, inst_desc);
 	return task;
 }
-PLC_TASK_LIST *read_plc_task_list(FILE *fp, inst_desc_map_t *inst_desc) {
+PLC_TASK_LIST *read_plc_task_list(FILE *fp, PLC_CONFIG *config, inst_desc_map_t *inst_desc) {
 	PLC_TASK_LIST *task_list = new PLC_TASK_LIST;
-	task_list->task_count = read_task_count(fp);
-	task_list->rt_task = new RT_TASK[task_list->task_count];
-	task_list->plc_task = new PLC_TASK*[task_list->task_count];
-	for (int i = 0; i < task_list->task_count; ++i) {
+	task_list->rt_task = new RT_TASK[config->task_count];
+	task_list->plc_task = new PLC_TASK*[config->task_count];
+	for (int i = 0; i < config->task_count; ++i) {
 		task_list->plc_task[i] = read_plc_task(fp, inst_desc);
 	}
 	return task_list;

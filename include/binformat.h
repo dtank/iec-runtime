@@ -3,8 +3,16 @@
 
 #include <stdint.h>
 
-/* PLC Task Segment */
+/* Definition of PLC Object File Header */
+typedef uint32_t io_refresh_interval_t;
 typedef uint8_t  task_count_t;
+
+typedef struct {
+	io_refresh_interval_t io_refresh_interval;
+	task_count_t task_count;
+} BIN_HEADER;
+
+/* Definition of PLC Object File Body */
 typedef uint8_t  task_name_size_t;
 typedef char     task_name_t;
 typedef uint8_t  task_priority_t;

@@ -4,8 +4,12 @@
 #include "plcmodel.h"
 #include "instruction.h"
 
+/* PLC Configuration Parser */
+static io_refresh_interval_t read_io_refresh_interval(FILE *fp);
+static task_count_t read_task_count(FILE *fp);
+PLC_CONFIG *read_plc_config(FILE *fp);
+
 /* PLC Task Property Parser */
-static task_count_t     read_task_count(FILE *fp);
 static task_name_size_t read_task_name_size(FILE *fp);
 static task_name_t     *read_task_name(FILE *fp, task_name_size_t size);
 static task_priority_t  read_task_priority(FILE *fp);
@@ -25,5 +29,5 @@ static PLC_TASK_CODE *read_plc_task_code(FILE *fp, PLC_TASK_PROP *property, inst
 
 /* PLC Task Parser */
 static PLC_TASK *read_plc_task(FILE *fp, inst_desc_map_t *inst_desc);
-PLC_TASK_LIST   *read_plc_task_list(FILE *fp, inst_desc_map_t *inst_desc);
+PLC_TASK_LIST   *read_plc_task_list(FILE *fp, PLC_CONFIG *config, inst_desc_map_t *inst_desc);
 #endif
