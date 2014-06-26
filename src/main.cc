@@ -4,12 +4,15 @@
 #include "generator.h"
 #include "parser.h"
 #include "executor.h"
+#include "iocontroller.h"
 #include "debug.h"
 
+#include "shmem.h"
 
 int DEBUG_LEVEL = DEBUG_INF;
 
 inst_desc_map_t inst_desc = inst_desc_map;
+void *shared_mem;
 
 int main(int argc, char* argv[])
 {
@@ -33,9 +36,12 @@ int main(int argc, char* argv[])
 	//Avoids memory swapping for this program
 	mlockall(MCL_CURRENT|MCL_FUTURE);
 
+	io_task_create();
 	plc_task_create(plc_task_list);
+	io_task_start();
 	plc_task_start(plc_task_list);
 	pause();
+	io_task_delete();
 	plc_task_delete(plc_task_list);
 
 	return 0;
