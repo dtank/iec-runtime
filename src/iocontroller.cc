@@ -3,12 +3,13 @@
 #include "debug.h"
 
 static RT_TASK io_task;
-void *io_shm;
+char *io_shm = new char[IO_SHM_SIZE];
+
 static void io_refresh(void *config) {
 	rt_task_set_periodic(NULL, TM_NOW, ((PLC_CONFIG *)config)->io_refresh_interval);
 	while (1) {
 		rt_task_wait_period(NULL);
-		PRINT(DEBUG_INF, "stub code in io_refresh...", 0);
+		PRINT(DEBUG_TRC, "TRACE: io_shm[0] = %d", *(int32_t *)&io_shm[0]);
 	}
 }
 
