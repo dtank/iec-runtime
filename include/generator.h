@@ -24,7 +24,7 @@ void generate_tds(FILE *fp, BIN_TPS *tps, BIN_TDS *tds);
 
 /* PLC Object File Body -- Task Code Segment Generator */
 static void generate_inst_id(FILE *fp, inst_id_t inst_id);
-static void generate_inst_arg(FILE *fp, inst_arg_t inst_arg);
+static void generate_inst_arg_va(FILE *fp, inst_arg_va_t arg_va);
 static void generate_inst(FILE *fp, BIN_INST *inst, inst_desc_map_t *inst_desc);
 void generate_tcs(FILE *fp, BIN_TPS *tps, BIN_TCS *tcs, inst_desc_map_t *inst_desc);
 

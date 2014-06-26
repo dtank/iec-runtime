@@ -11,14 +11,11 @@ static void plc_task_execute(void *plc_task) {
 	while (1) {
 		rt_task_wait_period(NULL);
 		for (int i = 0; i < task->property->inst_count; ++i) {
-			/*((inst_3op_t)inst_desc[task->code->inst[i]->id].inst_addr)(*/
-				/*(void *)&task->data[task->code->inst[i]->argv[0]],*/
-				/*(void *)&task->data[task->code->inst[i]->argv[1]],*/
-				/*(void *)&task->data[task->code->inst[i]->argv[2]]);*/
 			((inst_3op_t)inst_desc[task->code->inst[i]->id].inst_addr)(
-				(void *)&task->data[task->code->inst[i]->argv[0]],
-				(void *)&io_shm[0],
-				(void *)&io_shm[0]);
+				(void *)task->code->inst[i]->arg_addr[0],
+				(void *)task->code->inst[i]->arg_addr[1],
+				(void *)task->code->inst[i]->arg_addr[2]);
+			/*PRINT(DEBUG_TRC, "arg1_value = %d", *(uint32_t *)task->code->inst[i]->arg_addr[0]);*/
 		}
 	}
 }

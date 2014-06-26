@@ -24,9 +24,10 @@ typedef struct {
 typedef char PLC_TASK_DATA;
 
 /* Definition of PLC Task Code */
+typedef char inst_arg_addr_t;
 typedef struct {
 	inst_id_t id;
-	inst_arg_t *argv;
+	inst_arg_addr_t **arg_addr;
 } PLC_TASK_INST;
 
 typedef struct {

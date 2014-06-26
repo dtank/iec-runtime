@@ -83,16 +83,16 @@ static void generate_inst_id(FILE *fp, inst_id_t id) {
 		PRINT(DEBUG_ERR, "ERROR: generating instruction id (%d)...", id);
 	}
 }
-static void generate_inst_arg(FILE *fp, inst_arg_t arg) {
-	PRINT(DEBUG_TRC, "TRACE: inst_arg = %d", arg);
-	if (fwrite(&arg, sizeof(inst_arg_t), 1, fp) < 1) {
-		PRINT(DEBUG_ERR, "ERROR: generating instruction argument (%d)...", arg);
+static void generate_inst_arg_va(FILE *fp, inst_arg_va_t arg_va) {
+	PRINT(DEBUG_TRC, "TRACE: inst_arg_va = %d", arg_va);
+	if (fwrite(&arg_va, sizeof(arg_va), 1, fp) < 1) {
+		PRINT(DEBUG_ERR, "ERROR: generating instruction argument virtual address (%d)...", arg_va);
 	}
 }
 static void generate_inst(FILE *fp, BIN_INST *inst, inst_desc_map_t *inst_desc) {
 	generate_inst_id(fp, inst->id);
 	for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
-		generate_inst_arg(fp, inst->argv[i]);
+		generate_inst_arg_va(fp, inst->arg_va[i]);
 	}
 }
 void generate_tcs(FILE *fp, BIN_TPS *tps, BIN_TCS *tcs, inst_desc_map_t *inst_desc) {

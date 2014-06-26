@@ -2,6 +2,7 @@
 #include "debug.h"
 
 extern int DEBUG_LEVEL;
+extern char *io_shm;
 
 /* PLC Configuration Parser */
 static io_refresh_interval_t read_io_refresh_interval(FILE *fp) {
@@ -87,26 +88,34 @@ static inst_id_t read_inst_id(FILE *fp) {
 	PRINT(DEBUG_TRC, "TRACE: inst_id = %d", id);
 	return id;
 }
-static inst_arg_t read_inst_arg(FILE *fp) {
-	inst_arg_t arg;
-	fread(&arg, sizeof(inst_arg_t), 1, fp);
-	PRINT(DEBUG_TRC, "TRACE: inst_arg = %d", arg);
-	return arg;
+static inst_arg_addr_t *read_inst_arg_addr(FILE *fp, PLC_TASK_DATA *data) {
+	inst_arg_va_t arg_va;
+	inst_arg_addr_t *arg_addr;
+	fread(&arg_va, sizeof(inst_arg_va_t), 1, fp);
+	int flag = arg_va & ARG_ADDR_FLAG_MASK;
+	uint32_t arg_addr_offset = arg_va >> ARG_ADDR_FLAG_SIZE;
+	switch (flag) {
+		case ARG_ADDR_DATA: arg_addr = &data[arg_addr_offset];break;
+		case ARG_ADDR_IO:   arg_addr = &io_shm[arg_addr_offset];break;
+		default: PRINT(DEBUG_ERR, "ERROR: instruction argument virtual address is valid...", 0);break;
+	}
+	PRINT(DEBUG_TRC, "TRACE: inst_arg_addr = %d", arg_addr);
+	return arg_addr;
 }
-static PLC_TASK_INST *read_plc_task_inst(FILE *fp, inst_desc_map_t *inst_desc) {
+static PLC_TASK_INST *read_plc_task_inst(FILE *fp, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
 	PLC_TASK_INST *inst = new PLC_TASK_INST;
 	inst->id = read_inst_id(fp);
-	inst->argv = new inst_arg_t[(*inst_desc)[inst->id].args_count];
+	inst->arg_addr = new inst_arg_addr_t*[(*inst_desc)[inst->id].args_count];
 	for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
-		inst->argv[i] = read_inst_arg(fp);
+		inst->arg_addr[i] = read_inst_arg_addr(fp, data);
 	}
 	return inst;
 }
-static PLC_TASK_CODE *read_plc_task_code(FILE *fp, PLC_TASK_PROP *property, inst_desc_map_t *inst_desc) {
+static PLC_TASK_CODE *read_plc_task_code(FILE *fp, PLC_TASK_PROP *property, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
 	PLC_TASK_CODE *code = new PLC_TASK_CODE;
 	code->inst = new PLC_TASK_INST*[property->inst_count];
 	for (int i = 0; i < property->inst_count; ++i) {
-		code->inst[i] = read_plc_task_inst(fp, inst_desc);
+		code->inst[i] = read_plc_task_inst(fp, data, inst_desc);
 	}
 	return code;
 }
@@ -114,7 +123,7 @@ static PLC_TASK *read_plc_task(FILE *fp, inst_desc_map_t *inst_desc) {
 	PLC_TASK *task = new PLC_TASK;
 	task->property = read_plc_task_property(fp);
 	task->data = read_plc_task_data(fp, task->property);
-	task->code = read_plc_task_code(fp, task->property, inst_desc);
+	task->code = read_plc_task_code(fp, task->property, task->data, inst_desc);
 	return task;
 }
 PLC_TASK_LIST *read_plc_task_list(FILE *fp, PLC_CONFIG *config, inst_desc_map_t *inst_desc) {

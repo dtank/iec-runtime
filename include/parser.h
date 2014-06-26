@@ -23,9 +23,9 @@ static PLC_TASK_DATA *read_plc_task_data(FILE *fp, PLC_TASK_PROP *property);
 
 /* PLC Task Code Parser */
 static inst_id_t      read_inst_id(FILE *fp);
-static inst_arg_t     read_inst_arg(FILE *fp);
-static PLC_TASK_INST *read_plc_task_inst(FILE *fp, inst_desc_map_t *inst_desc);
-static PLC_TASK_CODE *read_plc_task_code(FILE *fp, PLC_TASK_PROP *property, inst_desc_map_t *inst_desc);
+static inst_arg_addr_t     *read_inst_arg(FILE *fp, PLC_TASK_DATA *data);
+static PLC_TASK_INST *read_plc_task_inst(FILE *fp, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc);
+static PLC_TASK_CODE *read_plc_task_code(FILE *fp, PLC_TASK_PROP *property, PLC_TASK_CODE *data, inst_desc_map_t *inst_desc);
 
 /* PLC Task Parser */
 static PLC_TASK *read_plc_task(FILE *fp, inst_desc_map_t *inst_desc);

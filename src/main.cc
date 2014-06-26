@@ -15,13 +15,13 @@ void *shared_mem;
 
 int main(int argc, char* argv[])
 {
-	BIN_HEADER header = {50000000u, 1};
-	BIN_TPS tps = {(uint8_t)strlen("task1"), "task1", 99u, 1000000000u, (tds_size_t)20u, (inst_count_t)3u};
+	BIN_HEADER header = {1000000u, 1};
+	BIN_TPS tps = {(uint8_t)strlen("task1"), "task1", 80u, 1000000000u, (tds_size_t)20u, (inst_count_t)3u};
 	BIN_TDS tds[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
 	BIN_TCS tcs = {
-		STD_ADD, 0u, 4u, 4u,
-		STD_ADD, 0u, 4u, 4u,
-		STD_ADD, 0u, 4u, 4u
+		STD_ADD, 0x00000001, 0x00000002, 0x00000002,
+		STD_ADD, 0x00000001, 0x00000002, 0x00000002,
+		STD_ADD, 0x00000001, 0x00000002, 0x00000002
 	};
 	FILE *fplc = fopen("plc.bin", "wb");
 	generate_bin_header(fplc, &header);
