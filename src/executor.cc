@@ -1,9 +1,11 @@
+#include <native/mutex.h>
 #include "executor.h"
 #include "instruction.h"
 #include "debug.h"
 
 extern inst_desc_map_t inst_desc;
 extern char *io_shm;
+extern RT_MUTEX mutex_io_shm;
 
 static void plc_task_execute(void *plc_task) {
 	PLC_TASK *task = (PLC_TASK *)plc_task;
@@ -11,10 +13,12 @@ static void plc_task_execute(void *plc_task) {
 	while (1) {
 		rt_task_wait_period(NULL);
 		for (int i = 0; i < task->property->inst_count; ++i) {
+			rt_mutex_acquire(&mutex_io_shm, TM_INFINITE);
 			((inst_3op_t)inst_desc[task->code->inst[i]->id].inst_addr)(
 				(void *)task->code->inst[i]->arg_addr[0],
 				(void *)task->code->inst[i]->arg_addr[1],
 				(void *)task->code->inst[i]->arg_addr[2]);
+			rt_mutex_release(&mutex_io_shm);
 			/*PRINT(DEBUG_TRC, "arg1_value = %d", *(uint32_t *)task->code->inst[i]->arg_addr[0]);*/
 		}
 	}
