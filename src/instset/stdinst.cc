@@ -1,4 +1,7 @@
-#include "stdlib.h"
+//#include <map>
+#include <stdint.h>
+#include "stdinst.h"
+//#include "instruction.h"
 
 void std_add(void *in1, void *in2, void *out) {
 	int32_t in1_32b = *(int32_t *)in1;

@@ -2,6 +2,8 @@
 #define __INSTRUCTION_H__
 
 #include <map>
+#include <stdint.h>
+#include "stdinst.h"
 
 using namespace std;
 
@@ -12,18 +14,21 @@ enum INST_ID {
 	STD_DIV
 };
 
-typedef map<uint32_t, uint8_t> args_count_t;
-const args_count_t::value_type data[] = {
-	args_count_t::value_type(STD_ADD, 3u),
-	args_count_t::value_type(STD_SUB, 3u),
-	args_count_t::value_type(STD_MUL, 3u),
-	args_count_t::value_type(STD_DIV, 3u),
-};
-const uint32_t elem_count = sizeof data / sizeof data[0];
-const args_count_t args_count(data, data + elem_count);
-
 typedef struct {
-	args_count_t args_count;
-} INST_INFO;
+	uint8_t args_count;
+	void *inst_addr;
+} INST_DESC;
+
+
+typedef void (*inst_3op_t)(void *, void *, void *);
+
+typedef map<uint32_t, INST_DESC> inst_desc_map_t;
+const inst_desc_map_t::value_type inst_desc_data[] = {
+	inst_desc_map_t::value_type(STD_ADD, {3u, (void *)std_add}),
+};
+const uint32_t inst_desc_count = sizeof inst_desc_data / sizeof inst_desc_data[0];
+const inst_desc_map_t inst_desc_map(inst_desc_data, inst_desc_data + inst_desc_count);
+
+
 
 #endif
