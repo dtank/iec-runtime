@@ -19,7 +19,11 @@
 #define IO_TASK_NAME "io_task"
 #define IO_TASK_PRIORITY 99
 
-static void io_refresh(void *io_shm);
+static void local_di_refresh();
+static void local_do_refresh();
+static void local_ai_refresh();
+static void local_ao_refresh();
+static void io_refresh(void *config);
 void io_task_create();
 void io_task_start(PLC_CONFIG *config);
 void io_task_delete();

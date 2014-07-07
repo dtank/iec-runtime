@@ -1,19 +1,34 @@
 #include <native/task.h>
-#include <native/mutex.h>
 #include "iocontroller.h"
 #include "debug.h"
 
 static RT_TASK io_task;
 char *io_shm = new char[IO_SHM_SIZE];
-extern RT_MUTEX mutex_io_shm;
+
+static void local_di_refresh() {
+	//PRINT(DEBUG_TRC, "TRACE: io_shm .local_di = %d", *(uint8_t *)&io_shm[LDI_ADDR_OFFSET]);
+}
+
+static void local_do_refresh() {
+	PRINT(DEBUG_TRC, "TRACE: io_shm .local_do = %d", *(uint8_t *)&io_shm[LDO_ADDR_OFFSET]);
+}
+
+static void local_ai_refresh() {
+	//PRINT(DEBUG_TRC, "TRACE: io_shm .local_ai = %d", *(uint16_t *)&io_shm[LAI_ADDR_OFFSET]);
+}
+
+static void local_ao_refresh() {
+	//PRINT(DEBUG_TRC, "TRACE: io_shm .local_ao = %d", *(uint16_t *)&io_shm[LAO_ADDR_OFFSET]);
+}
 
 static void io_refresh(void *config) {
 	rt_task_set_periodic(NULL, TM_NOW, ((PLC_CONFIG *)config)->io_refresh_interval);
 	while (1) {
 		rt_task_wait_period(NULL);
-		rt_mutex_acquire(&mutex_io_shm, TM_INFINITE);
-		PRINT(DEBUG_TRC, "TRACE: io_shm[0] = %d", *(int32_t *)&io_shm[0]);
-		rt_mutex_release(&mutex_io_shm);
+		local_di_refresh();
+		local_do_refresh();
+		local_ai_refresh();
+		local_ao_refresh();
 	}
 }
 

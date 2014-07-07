@@ -1,6 +1,5 @@
 #include <unistd.h> /* required */
 #include <sys/mman.h>
-#include <native/mutex.h>
 
 #include "generator.h"
 #include "parser.h"
@@ -11,7 +10,6 @@
 
 int DEBUG_LEVEL = DEBUG_INF;
 inst_desc_map_t inst_desc = inst_desc_map;
-RT_MUTEX mutex_io_shm;
 
 int main(int argc, char* argv[])
 {
@@ -19,9 +17,9 @@ int main(int argc, char* argv[])
 	BIN_TPS tps = {(uint8_t)strlen("task1"), "task1", 80u, 100000000u, (tds_size_t)20u, (inst_count_t)3u};
 	BIN_TDS tds[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
 	BIN_TCS tcs = {
-		STD_ADD, 0x00000001, 0x00000002, 0x00000002,
-		STD_ADD, 0x00000001, 0x00000002, 0x00000002,
-		STD_ADD, 0x00000001, 0x00000002, 0x00000002
+		STD_ADD, 0x00000001, 0x00000006, 0x00000006,
+		STD_ADD, 0x00000001, 0x00000006, 0x00000006,
+		STD_ADD, 0x00000001, 0x00000006, 0x00000006
 	};
 	FILE *fplc = fopen("plc.bin", "wb");
 	generate_bin_header(fplc, &header);
@@ -34,7 +32,6 @@ int main(int argc, char* argv[])
 	PLC_TASK_LIST *plc_task_list = read_plc_task_list(fplc, config, &inst_desc);
 	fclose(fplc);
 
-	rt_mutex_create(&mutex_io_shm, "mutex_io_shm");
 	//Avoids memory swapping for this program
 	mlockall(MCL_CURRENT|MCL_FUTURE);
 
