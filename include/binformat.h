@@ -3,16 +3,47 @@
 
 #include <stdint.h>
 
-/* Definition of PLC Object File Header */
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Object File Header
+ *---------------------------------------------------------------------------*/
+#define MAGIC_SIZE 5
+#define OBJ_TYPE_32 1
+#define OBJ_TYPE_64 2
+#define BYTE_ORDER_LIT 1
+#define BYTE_ORDER_BIG 2
+#define MACH_CORTEX_A8 1
+typedef struct {
+	char magic[MAGIC_SIZE];
+	uint8_t type;
+	uint8_t order;
+	uint8_t version;
+	uint8_t machine;
+} OBJ_HEADER;
+/*-----------------------------------------------------------------------------
+ * Definition of I/O Configuration Segment
+ *---------------------------------------------------------------------------*/
 typedef uint32_t io_refresh_interval_t;
-typedef uint8_t  task_count_t;
+/*-----------------------------------------------------------------------------
+ * Definition of Servo Configuration Segment
+ *---------------------------------------------------------------------------*/
+typedef uint8_t axis_count_t;
+typedef char axis_name_t;
+typedef uint8_t axis_nodeid_t;
+typedef uint8_t axis_oper_mode_t;
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Task Configuration Segment
+ *---------------------------------------------------------------------------*/
+typedef uint8_t task_count_t;
+
 
 typedef struct {
 	io_refresh_interval_t io_refresh_interval;
 	task_count_t task_count;
 } BIN_HEADER;
 
-/* Definition of PLC Object File Body */
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Object File Body
+ *---------------------------------------------------------------------------*/
 typedef uint8_t  task_name_size_t;
 typedef char     task_name_t;
 typedef uint8_t  task_priority_t;

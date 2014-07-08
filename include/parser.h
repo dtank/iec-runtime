@@ -1,9 +1,14 @@
 #ifndef __PARSER_H__
 #define __PARSER_H__
 
+#include "binformat.h"
 #include "plcmodel.h"
 #include "instruction.h"
 
+/*-----------------------------------------------------------------------------
+ * PLC Object File Header Parser
+ *---------------------------------------------------------------------------*/
+OBJ_HEADER *read_obj_header(FILE *fp);
 /* PLC Configuration Parser */
 static io_refresh_interval_t read_io_refresh_interval(FILE *fp);
 static task_count_t read_task_count(FILE *fp);

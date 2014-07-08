@@ -4,6 +4,23 @@
 extern int DEBUG_LEVEL;
 extern char *io_shm;
 
+/*-----------------------------------------------------------------------------
+ * PLC Object File Header Parser
+ *---------------------------------------------------------------------------*/
+OBJ_HEADER *read_obj_header(FILE *fp) {
+	OBJ_HEADER *header = new OBJ_HEADER;
+	if (header != NULL) {
+		fread(header->magic, MAGIC_SIZE, 1, fp);
+		fread(&header->type, sizeof(header->type), 1, fp);
+		fread(&header->order, sizeof(header->order), 1, fp);
+		fread(&header->version, sizeof(header->version), 1, fp);
+		fread(&header->machine, sizeof(header->machine), 1, fp);
+		PRINT(DEBUG_TRC, "TRACE: obj_header:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
+				header->magic, header->type, header->order, header->version, header->machine);
+		return header;
+	}
+	return NULL;
+}
 /* PLC Configuration Parser */
 static io_refresh_interval_t read_io_refresh_interval(FILE *fp) {
 	io_refresh_interval_t interval;

@@ -4,6 +4,17 @@
 
 extern int DEBUG_LEVEL;
 
+/*-----------------------------------------------------------------------------
+ * PLC Object File Header Generator
+ *---------------------------------------------------------------------------*/
+void generate_obj_header(FILE *fp, OBJ_HEADER *header) {
+	fwrite(header->magic, MAGIC_SIZE, 1, fp);
+	fwrite(&header->type, sizeof(header->type), 1, fp);
+	fwrite(&header->order, sizeof(header->order), 1, fp);
+	fwrite(&header->version, sizeof(header->version), 1, fp);
+	fwrite(&header->machine, sizeof(header->machine), 1, fp);
+}
+
 /* PLC Object File Header Generator */
 static void generate_io_refresh_interval(FILE *fp, io_refresh_interval_t interval) {
 	PRINT(DEBUG_TRC, "TRACE: io_refresh_interval = %d", interval);
