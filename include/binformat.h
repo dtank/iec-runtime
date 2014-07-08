@@ -14,8 +14,8 @@
 #define MACH_CORTEX_A8 1
 typedef struct {
 	char magic[MAGIC_SIZE]; /* magic number */
-	uint8_t type;           /* type of object file: 32bit or 64bit */
-	uint8_t order;          /* byte order: little-endian or big-endian */
+	uint8_t type;           /* type of object file: 32BIT | 64BIT */
+	uint8_t order;          /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
 	uint8_t version;        /* version of object file */
 	uint8_t machine;        /* CPU platform */
 } OBJ_HEADER;
@@ -29,14 +29,33 @@ typedef struct {
 	uint8_t ldo_count;        /* number of local digital output module */
 	uint8_t lai_count;        /* number of local analog input module */
 	uint8_t lao_count;        /* number of local analog output module */
-} OBJ_IOCS;
+} OBJ_IOCS; /* I/O Configuration Segment */
 /*-----------------------------------------------------------------------------
  * Definition of Servo Configuration Segment
  *---------------------------------------------------------------------------*/
-typedef uint8_t axis_count_t;
-typedef char axis_name_t;
-typedef uint8_t axis_nodeid_t;
-typedef uint8_t axis_oper_mode_t;
+#define MAX_AXIS_COUNT 8
+#define MAX_AXIS_NAME_SIZE 10
+#define MIN_AXIS_NODE_ID 1
+#define MAX_AXIS_NODE_ID 127
+#define OPER_MODE_POS 1
+#define OPER_MODE_VEL 2
+#define OPER_MODE_TOR 3
+typedef struct {
+	uint8_t name_size;
+	char *name;
+	uint8_t node_id;
+	uint8_t oper_mode;  /* operating mode: POSITION | VELOCITY | TORQUE */
+	float sw_limit_neg; /* negtive position limit (unit:) */
+	float sw_limit_pos; /* positive position limit (unit:) */
+	float max_vel;      /* velocity limit (unit:) */
+	float max_acc;      /* accelaration limit (unit:) */
+	float max_dec;      /* decelaration limit (unit:) */
+	float max_jerk;     /* jerk limit (unit:) */
+} OBJ_ACS; /* Axis Configuration Segment */
+typedef struct {
+	uint8_t axis_count;
+	OBJ_ACS *axis_group;
+} OBJ_SCS; /* Servo Configuration Segment */
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Configuration Segment
  *---------------------------------------------------------------------------*/
