@@ -9,6 +9,10 @@
  * PLC Object File Header Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_header(FILE *fp, OBJ_HEADER *header);
+/*-----------------------------------------------------------------------------
+ * I/O Configuration Segment Generator
+ *---------------------------------------------------------------------------*/
+void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs);
 /* PLC Object File Header Generator */
 static void generate_io_refresh_interval(FILE *fp, io_refresh_interval_t interval);
 static void generate_task_count(FILE *fp, task_count_t count);

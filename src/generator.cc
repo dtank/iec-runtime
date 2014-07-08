@@ -14,7 +14,16 @@ void generate_obj_header(FILE *fp, OBJ_HEADER *header) {
 	fwrite(&header->version, sizeof(header->version), 1, fp);
 	fwrite(&header->machine, sizeof(header->machine), 1, fp);
 }
-
+/*-----------------------------------------------------------------------------
+ * I/O Configuration Segment Generator
+ *---------------------------------------------------------------------------*/
+void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs) {
+	fwrite(&iocs->update_interval, sizeof(iocs->update_interval), 1, fp);
+	fwrite(&iocs->ldi_count, sizeof(iocs->ldi_count), 1, fp);
+	fwrite(&iocs->ldo_count, sizeof(iocs->ldo_count), 1, fp);
+	fwrite(&iocs->lai_count, sizeof(iocs->lai_count), 1, fp);
+	fwrite(&iocs->lao_count, sizeof(iocs->lao_count), 1, fp);
+}
 /* PLC Object File Header Generator */
 static void generate_io_refresh_interval(FILE *fp, io_refresh_interval_t interval) {
 	PRINT(DEBUG_TRC, "TRACE: io_refresh_interval = %d", interval);

@@ -13,16 +13,23 @@
 #define BYTE_ORDER_BIG 2
 #define MACH_CORTEX_A8 1
 typedef struct {
-	char magic[MAGIC_SIZE];
-	uint8_t type;
-	uint8_t order;
-	uint8_t version;
-	uint8_t machine;
+	char magic[MAGIC_SIZE]; /* magic number */
+	uint8_t type;           /* type of object file: 32bit or 64bit */
+	uint8_t order;          /* byte order: little-endian or big-endian */
+	uint8_t version;        /* version of object file */
+	uint8_t machine;        /* CPU platform */
 } OBJ_HEADER;
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration Segment
  *---------------------------------------------------------------------------*/
 typedef uint32_t io_refresh_interval_t;
+typedef struct {
+	uint32_t update_interval; /* I/O data update interval */
+	uint8_t ldi_count;        /* number of local digital input module */
+	uint8_t ldo_count;        /* number of local digital output module */
+	uint8_t lai_count;        /* number of local analog input module */
+	uint8_t lao_count;        /* number of local analog output module */
+} OBJ_IOCS;
 /*-----------------------------------------------------------------------------
  * Definition of Servo Configuration Segment
  *---------------------------------------------------------------------------*/

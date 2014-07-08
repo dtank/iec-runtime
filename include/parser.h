@@ -9,6 +9,10 @@
  * PLC Object File Header Parser
  *---------------------------------------------------------------------------*/
 OBJ_HEADER *read_obj_header(FILE *fp);
+/*-----------------------------------------------------------------------------
+ * I/O Configuration Parser
+ *---------------------------------------------------------------------------*/
+IO_CONFIG *read_io_config(FILE *fp);
 /* PLC Configuration Parser */
 static io_refresh_interval_t read_io_refresh_interval(FILE *fp);
 static task_count_t read_task_count(FILE *fp);

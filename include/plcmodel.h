@@ -4,6 +4,16 @@
 #include <native/task.h>
 #include "binformat.h"
 
+/*-----------------------------------------------------------------------------
+ * Definition of I/O Configuration
+ *---------------------------------------------------------------------------*/
+typedef struct {
+	uint32_t update_interval; /* I/O data update interval */
+	uint8_t ldi_count;        /* number of local digital input module */
+	uint8_t ldo_count;        /* number of local digital output module */
+	uint8_t lai_count;        /* number of local analog input module */
+	uint8_t lao_count;        /* number of local analog output module */
+} IO_CONFIG;
 /* Definition of PLC Configuration */
 typedef struct {
 	io_refresh_interval_t io_refresh_interval;

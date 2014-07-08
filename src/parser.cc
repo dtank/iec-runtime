@@ -15,9 +15,26 @@ OBJ_HEADER *read_obj_header(FILE *fp) {
 		fread(&header->order, sizeof(header->order), 1, fp);
 		fread(&header->version, sizeof(header->version), 1, fp);
 		fread(&header->machine, sizeof(header->machine), 1, fp);
-		PRINT(DEBUG_TRC, "TRACE: obj_header:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
+		PRINT(DEBUG_TRC, "\nTRACE: obj_header:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
 				header->magic, header->type, header->order, header->version, header->machine);
 		return header;
+	}
+	return NULL;
+}
+/*-----------------------------------------------------------------------------
+ * I/O Configuration Parser
+ *---------------------------------------------------------------------------*/
+IO_CONFIG *read_io_config(FILE *fp) {
+	IO_CONFIG *io_config = new IO_CONFIG;
+	if (io_config != NULL) {
+		fread(&io_config->update_interval, sizeof(io_config->update_interval), 1, fp);
+		fread(&io_config->ldi_count, sizeof(io_config->ldi_count), 1, fp);
+		fread(&io_config->ldo_count, sizeof(io_config->ldo_count), 1, fp);
+		fread(&io_config->lai_count, sizeof(io_config->lai_count), 1, fp);
+		fread(&io_config->lao_count, sizeof(io_config->lao_count), 1, fp);
+		PRINT(DEBUG_TRC, "\nTRACE: io_config:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
+				io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
+		return io_config;
 	}
 	return NULL;
 }
