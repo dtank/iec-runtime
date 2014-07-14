@@ -24,6 +24,30 @@ void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs) {
 	fwrite(&iocs->lai_count, sizeof(iocs->lai_count), 1, fp);
 	fwrite(&iocs->lao_count, sizeof(iocs->lao_count), 1, fp);
 }
+/*-----------------------------------------------------------------------------
+ * Servo Configuration Segment Generator
+ *---------------------------------------------------------------------------*/
+void generate_obj_acs(FILE *fp, OBJ_ACS *acs) {
+	fwrite(&acs->is_combined, sizeof(acs->is_combined), 1, fp);
+	fwrite(&acs->name_size, sizeof(acs->name_size), 1, fp);
+	fwrite(acs->name, acs->name_size, 1, fp); /* including '\0' */
+	fwrite(&acs->node_id, sizeof(acs->node_id), 1, fp);
+	fwrite(&acs->axis_type, sizeof(acs->axis_type), 1, fp);
+	fwrite(&acs->oper_mode, sizeof(acs->oper_mode), 1, fp);
+	fwrite(&acs->sw_limit_neg, sizeof(acs->sw_limit_neg), 1, fp);
+	fwrite(&acs->sw_limit_pos, sizeof(acs->sw_limit_pos), 1, fp);
+	fwrite(&acs->max_vel, sizeof(acs->max_vel), 1, fp);
+	fwrite(&acs->max_acc, sizeof(acs->max_acc), 1, fp);
+	fwrite(&acs->max_dec, sizeof(acs->max_dec), 1, fp);
+	fwrite(&acs->max_jerk, sizeof(acs->max_jerk), 1, fp);
+}
+void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
+	fwrite(&scs->axis_count, sizeof(scs->axis_count), 1, fp);
+	for (int i = 0; i < scs->axis_count; ++i) {
+		generate_obj_acs(fp, &(scs->axis_group[i]));
+	}
+}
+
 /* PLC Object File Header Generator */
 static void generate_io_refresh_interval(FILE *fp, io_refresh_interval_t interval) {
 	PRINT(DEBUG_TRC, "TRACE: io_refresh_interval = %d", interval);

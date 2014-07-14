@@ -6,7 +6,7 @@
 /*-----------------------------------------------------------------------------
  * Definition of PLC Object File Header
  *---------------------------------------------------------------------------*/
-#define MAGIC_SIZE 5
+#define MAGIC_SIZE 5 /* including '\0' */
 #define OBJ_TYPE_32 1
 #define OBJ_TYPE_64 2
 #define BYTE_ORDER_LIT 1
@@ -16,7 +16,7 @@ typedef struct {
 	char magic[MAGIC_SIZE]; /* magic number */
 	uint8_t type;           /* type of object file: 32BIT | 64BIT */
 	uint8_t order;          /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
-	uint8_t version;        /* version of object file */
+	uint8_t version;        /* version of object file (default: 1)*/
 	uint8_t machine;        /* CPU platform */
 } OBJ_HEADER;
 /*-----------------------------------------------------------------------------
@@ -37,13 +37,17 @@ typedef struct {
 #define MAX_AXIS_NAME_SIZE 10
 #define MIN_AXIS_NODE_ID 1
 #define MAX_AXIS_NODE_ID 127
+#define AXIS_TYPE_FINITE 1
+#define AXIS_TYPE_MODULO 2
 #define OPER_MODE_POS 1
 #define OPER_MODE_VEL 2
 #define OPER_MODE_TOR 3
 typedef struct {
-	uint8_t name_size;
-	char *name;
-	uint8_t node_id;
+	bool is_combined;   /* independent axis | combined axis */
+	uint8_t name_size;  /* including '\0' */
+	char *name;         /* axis name */
+	uint8_t node_id;    /* axis id */
+	uint8_t axis_type;  /* axis type: FINITE | MODULO */
 	uint8_t oper_mode;  /* operating mode: POSITION | VELOCITY | TORQUE */
 	float sw_limit_neg; /* negtive position limit (unit:) */
 	float sw_limit_pos; /* positive position limit (unit:) */
@@ -52,9 +56,10 @@ typedef struct {
 	float max_dec;      /* decelaration limit (unit:) */
 	float max_jerk;     /* jerk limit (unit:) */
 } OBJ_ACS; /* Axis Configuration Segment */
+
 typedef struct {
-	uint8_t axis_count;
-	OBJ_ACS *axis_group;
+	uint8_t axis_count;  /* number of axis */
+	OBJ_ACS *axis_group; /* array of axis */
 } OBJ_SCS; /* Servo Configuration Segment */
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Configuration Segment
