@@ -3,14 +3,15 @@
 
 #include "binformat.h"
 #include "generator.h"
-#include "parser.h"
+#include "loader.h"
 #include "executor.h"
 #include "iocontroller.h"
-#include "debug.h"
+#include "logger.h"
 
 
-int DEBUG_LEVEL = DEBUG_INF;
+int LOGGER_LEVEL = LOGGER_ALL;
 inst_desc_map_t inst_desc = inst_desc_map;
+ec_map_t ec_msg = ec_map;
 
 int main(int argc, char* argv[])
 {
@@ -76,13 +77,13 @@ int main(int argc, char* argv[])
 	//generate_tps(fplc, &tps);
 	//generate_tds(fplc, &tps, tds);
 	//generate_tcs(fplc, &tps, &tcs, &inst_desc);
-	//fclose(fplc);
-	//fplc = fopen("plc.bin", "rb");
-	//OBJ_HEADER *myobj_header = read_obj_header(fplc);
-	//IO_CONFIG *io_config = read_io_config(fplc);
-	//PLC_CONFIG *config = read_plc_config(fplc);
-	//PLC_TASK_LIST *plc_task_list = read_plc_task_list(fplc, config, &inst_desc);
-	//fclose(fplc);
+	fclose(fplc);
+	fplc = fopen("plc.bin", "rb");
+	OBJ_HEADER *myobj_header = load_obj_header(fplc);
+	//IO_CONFIG *io_config = load_io_config(fplc);
+	//PLC_CONFIG *config = load_plc_config(fplc);
+	//PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, config, &inst_desc);
+	fclose(fplc);
 
 	//Avoids memory swapping for this program
 	//mlockall(MCL_CURRENT|MCL_FUTURE);
