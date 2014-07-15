@@ -5,44 +5,84 @@
 extern char *io_shm;
 extern ec_map_t ec_msg;
 /*-----------------------------------------------------------------------------
- * PLC Object File Header Parser
+ * PLC Object File Header Loader
  *---------------------------------------------------------------------------*/
 OBJ_HEADER *load_obj_header(FILE *fp) {
 	OBJ_HEADER *header = new OBJ_HEADER;
 	if (header != NULL) {
-		fread(header->magic, MAGIC_SIZE, 1, fp);
+		fread(header->magic, MAGIC_SIZE, 1, fp); /* read magic number */
 		if (strcmp(header->magic, MAGIC) != 0) {
-		    LOGGER(LOGGER_ERR, ec_msg[EC_FILE], EC_FILE);
-			return NULL;
+		    LOGGER(LOGGER_ERR, ec_msg[EC_PLC_FILE], EC_PLC_FILE);
+			//return NULL;
 		}
 		fread(&header->type, sizeof(header->type), 1, fp);
+		if (header->type != SYS_TYPE) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_SYS_TYPE], EC_SYS_TYPE);
+			//return NULL;
+		}
 		fread(&header->order, sizeof(header->order), 1, fp);
+		if (header->order != SYS_BYTE_ORDER) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_BYTE_ORDER], EC_BYTE_ORDER);
+			//return NULL;
+		}
 		fread(&header->version, sizeof(header->version), 1, fp);
+		if (SYS_VERSION < header->version) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_SYS_VERSION], EC_SYS_VERSION);
+			//return NULL;
+		}
 		fread(&header->machine, sizeof(header->machine), 1, fp);
-		LOGGER(LOGGER_DBG, "\nTRACE: obj_header:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
+		if (header->machine != SYS_MACHINE) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_SYS_MACHINE], EC_SYS_MACHINE);
+			//return NULL;
+		}
+		LOGGER(LOGGER_DBG,
+				"OBJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
 				header->magic, header->type, header->order, header->version, header->machine);
 		return header;
 	}
+    LOGGER(LOGGER_ERR, ec_msg[EC_OBJ_HEADER], EC_OBJ_HEADER);
 	return NULL;
 }
 /*-----------------------------------------------------------------------------
- * I/O Configuration Parser
+ * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
 IO_CONFIG *load_io_config(FILE *fp) {
 	IO_CONFIG *io_config = new IO_CONFIG;
 	if (io_config != NULL) {
 		fread(&io_config->update_interval, sizeof(io_config->update_interval), 1, fp);
+		if (io_config->update_interval < SYS_MIN_IO_INTERVAL) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_IO_INTERVAL], EC_IO_INTERVAL);
+			//return NULL;
+		}
 		fread(&io_config->ldi_count, sizeof(io_config->ldi_count), 1, fp);
+		if (SYS_MAX_LDI_COUNT < io_config->ldi_count) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_LDI_COUNT], EC_LDI_COUNT);
+			//return NULL;
+		}
 		fread(&io_config->ldo_count, sizeof(io_config->ldo_count), 1, fp);
+		if (SYS_MAX_LDO_COUNT < io_config->ldo_count) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_LDO_COUNT], EC_LDO_COUNT);
+			//return NULL;
+		}
 		fread(&io_config->lai_count, sizeof(io_config->lai_count), 1, fp);
+		if (SYS_MAX_LAI_COUNT < io_config->lai_count) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_LAI_COUNT], EC_LAI_COUNT);
+			//return NULL;
+		}
 		fread(&io_config->lao_count, sizeof(io_config->lao_count), 1, fp);
-		LOGGER(LOGGER_DBG, "\nTRACE: io_config:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
+		if (SYS_MAX_LAO_COUNT < io_config->lao_count) {
+		    LOGGER(LOGGER_ERR, ec_msg[EC_LAO_COUNT], EC_LAO_COUNT);
+			//return NULL;
+		}
+		LOGGER(LOGGER_DBG,
+				"IO_CONFIG:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
 				io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
 		return io_config;
 	}
+    LOGGER(LOGGER_ERR, ec_msg[EC_SYS_IOC], EC_SYS_IOC);
 	return NULL;
 }
-/* PLC Configuration Parser */
+/* PLC Configuration Loader */
 static io_refresh_interval_t load_io_refresh_interval(FILE *fp) {
 	io_refresh_interval_t interval;
 	fread(&interval, sizeof(interval), 1, fp);
@@ -62,7 +102,7 @@ PLC_CONFIG *load_plc_config(FILE *fp) {
 	return config;
 }
 
-/* PLC Task Property Parser */
+/* PLC Task Property Loader */
 static task_name_size_t load_task_name_size(FILE *fp) {
 	task_name_size_t size;
 	fread(&size, sizeof(task_name_size_t), 1, fp);
@@ -111,7 +151,7 @@ static PLC_TASK_PROP *load_plc_task_property(FILE *fp) {
 	return property;
 }
 
-/* PLC Task Data Parser */
+/* PLC Task Data Loader */
 static PLC_TASK_DATA *load_plc_task_data(FILE *fp, PLC_TASK_PROP *property) {
 	PLC_TASK_DATA *data = new PLC_TASK_DATA[property->tds_size];
 	fread(data, property->tds_size, 1, fp);
@@ -119,7 +159,7 @@ static PLC_TASK_DATA *load_plc_task_data(FILE *fp, PLC_TASK_PROP *property) {
 	return data;
 }
 
-/* PLC Task Code Parser */
+/* PLC Task Code Loader */
 static inst_id_t load_inst_id(FILE *fp) {
 	inst_id_t id;
 	fread(&id, sizeof(inst_id_t), 1, fp);

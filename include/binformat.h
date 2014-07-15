@@ -8,8 +8,8 @@
  *---------------------------------------------------------------------------*/
 #define MAGIC "\x7FPLC"
 #define MAGIC_SIZE 5 /* including '\0' */
-#define OBJ_TYPE_32 1
-#define OBJ_TYPE_64 2
+#define SYS_TYPE_32 1
+#define SYS_TYPE_64 2
 #define BYTE_ORDER_LIT 1
 #define BYTE_ORDER_BIG 2
 #define MACH_CORTEX_A8 1

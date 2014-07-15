@@ -17,17 +17,17 @@ int main(int argc, char* argv[])
 {
 	OBJ_HEADER obj_header = {
 		MAGIC,         /* magic number */
-		OBJ_TYPE_32,    /* type of object file: 32BIT | 64BIT */
-		BYTE_ORDER_LIT, /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
-		1,              /* version of object file */
-		MACH_CORTEX_A8  /* CPU platform */
+		SYS_TYPE_64,    /* type of object file: 32BIT | 64BIT */
+		BYTE_ORDER_BIG, /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
+		2,              /* version of object file */
+		3//MACH_CORTEX_A8  /* CPU platform */
 	};
 	OBJ_IOCS obj_iocs = {
-		10000000, /* I/O data update interval */
-		0,         /* number of local digital input module */
-		1,         /* number of local digital output module */
-		0,         /* number of local analog input module */
-		0          /* number of local analog output module */
+		1000000, /* I/O data update interval */
+		2,         /* number of local digital input module */
+		2,         /* number of local digital output module */
+		2,         /* number of local analog input module */
+		2          /* number of local analog output module */
 	};
 	OBJ_ACS obj_acs[] = {
 		{	false,            /* independent axis */
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
 	OBJ_HEADER *myobj_header = load_obj_header(fplc);
-	//IO_CONFIG *io_config = load_io_config(fplc);
+	IO_CONFIG *io_config = load_io_config(fplc);
 	//PLC_CONFIG *config = load_plc_config(fplc);
 	//PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, config, &inst_desc);
 	fclose(fplc);

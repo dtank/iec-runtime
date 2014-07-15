@@ -5,6 +5,21 @@
 #include "binformat.h"
 
 /*-----------------------------------------------------------------------------
+ * Definition of Runtime System Environment
+ *---------------------------------------------------------------------------*/
+/* basic */
+#define SYS_TYPE SYS_TYPE_32
+#define SYS_BYTE_ORDER BYTE_ORDER_LIT
+#define SYS_VERSION 1
+#define SYS_MACHINE MACH_CORTEX_A8
+/* I/O */
+#define SYS_MAX_LDI_COUNT 1
+#define SYS_MAX_LDO_COUNT 1
+#define SYS_MAX_LAI_COUNT 1
+#define SYS_MAX_LAO_COUNT 1
+#define SYS_MIN_IO_INTERVAL 2000000 /* unit: ns */
+
+/*-----------------------------------------------------------------------------
  * Definition of I/O Configuration
  *---------------------------------------------------------------------------*/
 typedef struct {
