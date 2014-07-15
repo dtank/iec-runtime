@@ -6,6 +6,7 @@
 /*-----------------------------------------------------------------------------
  * Definition of PLC Object File Header
  *---------------------------------------------------------------------------*/
+#define MAGIC "\x7FPLC"
 #define MAGIC_SIZE 5 /* including '\0' */
 #define OBJ_TYPE_32 1
 #define OBJ_TYPE_64 2

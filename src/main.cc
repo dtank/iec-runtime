@@ -15,7 +15,7 @@ inst_desc_map_t inst_desc = inst_desc_map;
 int main(int argc, char* argv[])
 {
 	OBJ_HEADER obj_header = {
-		"pcl1",         /* magic number */
+		MAGIC,         /* magic number */
 		OBJ_TYPE_32,    /* type of object file: 32BIT | 64BIT */
 		BYTE_ORDER_LIT, /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
 		1,              /* version of object file */
