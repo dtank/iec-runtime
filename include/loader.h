@@ -13,6 +13,11 @@ OBJ_HEADER *load_obj_header(FILE *fp);
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
 IO_CONFIG *load_io_config(FILE *fp);
+/*-----------------------------------------------------------------------------
+ * Servo Configuration Loader
+ *---------------------------------------------------------------------------*/
+AXIS_CONFIG *load_axis_config(FILE *fp);
+SERVO_CONFIG *load_servo_config(FILE *fp);
 /* PLC Configuration Loader */
 static io_refresh_interval_t load_io_refresh_interval(FILE *fp);
 static task_count_t load_task_count(FILE *fp);

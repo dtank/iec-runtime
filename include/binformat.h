@@ -34,10 +34,6 @@ typedef struct {
 /*-----------------------------------------------------------------------------
  * Definition of Servo Configuration Segment
  *---------------------------------------------------------------------------*/
-#define MAX_AXIS_COUNT 8
-#define MAX_AXIS_NAME_SIZE 10
-#define MIN_AXIS_NODE_ID 1
-#define MAX_AXIS_NODE_ID 127
 #define AXIS_TYPE_FINITE 1
 #define AXIS_TYPE_MODULO 2
 #define OPER_MODE_POS 1

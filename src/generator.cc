@@ -49,13 +49,13 @@ void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
 
 /* PLC Object File Header Generator */
 static void generate_io_refresh_interval(FILE *fp, io_refresh_interval_t interval) {
-	LOGGER(LOGGER_DBG, "TRACE: io_refresh_interval = %d", interval);
+	LOGGER_DBG("TRACE: io_refresh_interval = %d", interval);
 	if (fwrite(&interval, sizeof(io_refresh_interval_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating io refresh interval (%d)...", interval);
 	}
 }
 static void generate_task_count(FILE *fp, task_count_t count) {
-	LOGGER(LOGGER_DBG, "TRACE: task_count = %d", count);
+	LOGGER_DBG("TRACE: task_count = %d", count);
 	if (fwrite(&count, sizeof(task_count_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating task count (%d)...", count);
 	}
@@ -67,37 +67,37 @@ void generate_bin_header(FILE *fp, BIN_HEADER *header) {
 
 /* PLC Object File Body -- Task Property Segment Generator */
 static void generate_task_name_size(FILE *fp, task_name_size_t size) {
-	LOGGER(LOGGER_DBG, "TRACE: task_name_size = %d", size);
+	LOGGER_DBG("TRACE: task_name_size = %d", size);
 	if (fwrite(&size, sizeof(task_name_size_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating size of task name (%d)...", size);
 	}
 }
 static void generate_task_name(FILE *fp, task_name_t *name) {
-	LOGGER(LOGGER_DBG, "TRACE: task_name = %s", name);
+	LOGGER_DBG("TRACE: task_name = %s", name);
 	if (fwrite(name, strlen(name), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating task name (%s)...", name);
 	}
 }
 static void generate_task_priority(FILE *fp, task_priority_t priority) {
-	LOGGER(LOGGER_DBG, "TRACE: task_priority = %d", priority);
+	LOGGER_DBG("TRACE: task_priority = %d", priority);
 	if (fwrite(&priority, sizeof(task_priority_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating task priority (%d)...", priority);
 	}
 }
 static void generate_task_interval(FILE *fp, task_interval_t interval) {
-	LOGGER(LOGGER_DBG, "TRACE: task_interval = %d", interval);
+	LOGGER_DBG("TRACE: task_interval = %d", interval);
 	if (fwrite(&interval, sizeof(task_interval_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating task interval (%d)...", interval);
 	}
 }
 static void generate_tds_size(FILE *fp, tds_size_t size) {
-	LOGGER(LOGGER_DBG, "TRACE: tds_size = %d", size);
+	LOGGER_DBG("TRACE: tds_size = %d", size);
 	if (fwrite(&size, sizeof(tds_size_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating size of task data segment (%d)...", size);
 	}
 }
 static void generate_inst_count(FILE *fp, inst_count_t count) {
-	LOGGER(LOGGER_DBG, "TRACE: inst_count = %d", count);
+	LOGGER_DBG("TRACE: inst_count = %d", count);
 	if (fwrite(&count, sizeof(inst_count_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating instruction count (%d)...", count);
 	}
@@ -121,13 +121,13 @@ void generate_tds(FILE *fp, BIN_TPS *tps, BIN_TDS *tds) {
 
 /* PLC Object File Body -- Task Code Segment Generator */
 static void generate_inst_id(FILE *fp, inst_id_t id) {
-	LOGGER(LOGGER_DBG, "TRACE: inst_id = %d", id);
+	LOGGER_DBG("TRACE: inst_id = %d", id);
 	if (fwrite(&id, sizeof(inst_id_t), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating instruction id (%d)...", id);
 	}
 }
 static void generate_inst_arg_va(FILE *fp, inst_arg_va_t arg_va) {
-	LOGGER(LOGGER_DBG, "TRACE: inst_arg_va = %d", arg_va);
+	LOGGER_DBG("TRACE: inst_arg_va = %d", arg_va);
 	if (fwrite(&arg_va, sizeof(arg_va), 1, fp) < 1) {
 		//LOGGER(LOGGER_ERR, "ERROR: generating instruction argument virtual address (%d)...", arg_va);
 	}

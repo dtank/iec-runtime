@@ -10,7 +10,7 @@ static void local_di_update() {
 }
 
 static void local_do_update() {
-	LOGGER(LOGGER_DBG, "TRACE: io_shm .local_do = %d", *(uint8_t *)&io_shm[LDO_ADDR_OFFSET]);
+	LOGGER_DBG("TRACE: io_shm .local_do = %d", *(uint8_t *)&io_shm[LDO_ADDR_OFFSET]);
 }
 
 static void local_ai_update() {
