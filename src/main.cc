@@ -16,14 +16,14 @@ ec_map_t ec_msg = ec_map;
 int main(int argc, char* argv[])
 {
 	OBJ_HEADER obj_header = {
-		MAGIC,         /* magic number */
+		MAGIC,          /* magic number */
 		SYS_TYPE_32,    /* type of object file: 32BIT | 64BIT */
 		BYTE_ORDER_LIT, /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
 		1,              /* version of object file */
 		MACH_CORTEX_A8  /* CPU platform */
 	};
 	OBJ_IOCS obj_iocs = {
-		4000000, /* I/O data update interval */
+		4000000,   /* I/O data update interval */
 		0,         /* number of local digital input module */
 		1,         /* number of local digital output module */
 		0,         /* number of local analog input module */
@@ -61,18 +61,86 @@ int main(int argc, char* argv[])
 		2, /* number of axis */
 		obj_acs
 	};
-	//BIN_HEADER header = {10000000u, 1};
-	//BIN_TPS tps = {(uint8_t)strlen("task1"), "task1", 80u, 100000000u, (tds_size_t)20u, (inst_count_t)3u};
-	//BIN_TDS tds[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
-	//BIN_TCS tcs = {
-		//STD_ADD, 0x00000001, 0x00000006, 0x00000006,
-		//STD_ADD, 0x00000001, 0x00000006, 0x00000006,
-		//STD_ADD, 0x00000001, 0x00000006, 0x00000006
-	//};
+/*-----------------------------------------------------------------------------
+ * PLC Task 1
+ **---------------------------------------------------------------------------*/
+	OBJ_PTPS task1_ptps = {
+		(uint8_t)strlen("task1")+1, /* size of plc task name, including '\0' */
+		"task1",                    /* plc task name */
+		80,                         /* plc task priority */
+		100000000u,                 /* plc task period interval (unit: ns) */
+		//20,                         [> size of plc task data segment <]
+		//3                           [> number of plc task instructions <]
+	};
+    char task1_data[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
+    OBJ_PTDS task1_ptds = {
+        20,
+        task1_data
+    };
+    uint32_t task1_inst1_args[] = {0x00000001, 0x00000006, 0x00000006};
+    uint32_t task1_inst2_args[] = {0x00000001, 0x00000006, 0x00000006};
+    uint32_t task1_inst3_args[] = {0x00000001, 0x00000006, 0x00000006};
+    OBJ_INST task1_inst[] = {
+        {STD_ADD, task1_inst1_args},
+        {STD_ADD, task1_inst2_args},
+        {STD_ADD, task1_inst3_args}
+    };
+    OBJ_PTCS task1_ptcs = {
+        3,
+        task1_inst
+    };
+    OBJ_PTS task1_pts = {
+        task1_ptps,
+        task1_ptds,
+        task1_ptcs
+    };
+/*-----------------------------------------------------------------------------
+ * PLC Task 2
+ **---------------------------------------------------------------------------*/
+    OBJ_PTPS task2_ptps = {
+		(uint8_t)strlen("task2")+1, /* size of plc task name, including '\0' */
+		"task2",                    /* plc task name */
+		90,                         /* plc task priority */
+		500000000u,                 /* plc task period interval (unit: ns) */
+		//20,                         [> size of plc task data segment <]
+		//3                           [> number of plc task instructions <]
+	};
+    char task2_data[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
+    OBJ_PTDS task2_ptds = {
+        20,
+        task2_data
+    };
+    uint32_t task2_inst1_args[] = {0x00000001, 0x00000006, 0x00000006};
+    uint32_t task2_inst2_args[] = {0x00000001, 0x00000006, 0x00000006};
+    uint32_t task2_inst3_args[] = {0x00000001, 0x00000006, 0x00000006};
+    OBJ_INST task2_inst[] = {
+        {STD_ADD, task2_inst1_args},
+        {STD_ADD, task2_inst2_args},
+        {STD_ADD, task2_inst3_args}
+    };
+    OBJ_PTCS task2_ptcs = {
+        3,
+        task2_inst
+    };
+    OBJ_PTS task2_pts = {
+        task2_ptps,
+        task2_ptds,
+        task2_ptcs
+    };
+    OBJ_PTS obj_tasks[] = {
+        task1_pts,
+        task2_pts
+    };
+    OBJ_PTLS obj_ptls = {
+        2,
+        obj_tasks
+    };
+
 	FILE *fplc = fopen("plc.bin", "wb");
 	generate_obj_header(fplc, &obj_header);
 	generate_obj_iocs(fplc, &obj_iocs);
 	generate_obj_scs(fplc, &obj_scs);
+	generate_obj_ptls(fplc, &obj_ptls, &inst_desc);
 	//generate_bin_header(fplc, &header);
 	//generate_tps(fplc, &tps);
 	//generate_tds(fplc, &tps, tds);
@@ -82,6 +150,9 @@ int main(int argc, char* argv[])
 	OBJ_HEADER *myobj_header = load_obj_header(fplc);
 	IO_CONFIG *io_config = load_io_config(fplc);
 	SERVO_CONFIG *servo_config = load_servo_config(fplc);
+	//OBJ_PTCS *myobj_ptcs = load_obj_ptcs(fplc);
+	//PLC_TASK_PROP *plc_task_prop = load_plc_task_property(fplc);
+    //PLC_TASK_DATA *plc_task_data = load_plc_task_data(fplc);
 	//PLC_CONFIG *config = load_plc_config(fplc);
 	//PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, config, &inst_desc);
 	fclose(fplc);

@@ -58,57 +58,76 @@ typedef struct {
 	uint8_t axis_count;  /* number of axis */
 	OBJ_ACS *axis_group; /* array of axis */
 } OBJ_SCS; /* Servo Configuration Segment */
-/*-----------------------------------------------------------------------------
- * Definition of PLC Task Configuration Segment
- *---------------------------------------------------------------------------*/
-typedef uint8_t task_count_t;
-
-
-typedef struct {
-	io_refresh_interval_t io_refresh_interval;
-	task_count_t task_count;
-} BIN_HEADER;
 
 /*-----------------------------------------------------------------------------
- * Definition of PLC Object File Body
+ * Definition of PLC Task Property Segment
  *---------------------------------------------------------------------------*/
-typedef uint8_t  task_name_size_t;
-typedef char     task_name_t;
-typedef uint8_t  task_priority_t;
-typedef uint32_t task_interval_t;
-typedef uint64_t tds_size_t;
-typedef uint32_t inst_count_t;
-typedef uint16_t inst_id_t;
-typedef uint32_t inst_arg_va_t;
-
-/* Definition of Task Property Segment */
 typedef struct {
-	task_name_size_t name_size;
-	task_name_t *name;
-	task_priority_t priority;
-	task_interval_t interval;
-	tds_size_t tds_size;
-	inst_count_t inst_count;
-} BIN_TPS;
+	uint8_t name_size;   /* size of plc task name, including '\0' */
+	char *name;          /* plc task name */
+	uint8_t priority;    /* plc task priority */
+	uint32_t interval;   /* plc task period interval (unit: ns) */
+	//uint32_t ptds_size;  [> size of plc task data segment <]
+	//uint32_t inst_count; [> number of plc task instructions <]
+} OBJ_PTPS; /* PLC Task Property Segment */
 
-/* Definition of Task Data Segment */
-typedef char BIN_TDS;
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Task Data Segment
+ *---------------------------------------------------------------------------*/
+typedef struct {
+	uint32_t size; /* size of plc task data segment */
+	char *data;    /* starting address of plc task data segment */
+} OBJ_PTDS; /* PLC Task Data Segment */
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Task Code Segment
+ *---------------------------------------------------------------------------*/
+typedef struct {
+    uint16_t id;      /* instruction id */
+    uint32_t *arg_va; /* vitual address(AKA index) of instruction's arguments */
+} OBJ_INST;
+
+typedef struct {
+    uint32_t inst_count; /* number of instructions */
+    OBJ_INST *inst;      /* list of instructions */
+} OBJ_PTCS; /* PLC Task Code Segment */
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Task List Segment
+ *---------------------------------------------------------------------------*/
+typedef struct {
+    OBJ_PTPS prop;
+    OBJ_PTDS data;
+    OBJ_PTCS code;
+} OBJ_PTS;
+typedef struct {
+    uint8_t task_count; /* number of plc task */
+    OBJ_PTS *task;      /* list of plc task */
+} OBJ_PTLS; /* PLC Task List Segment */
+
+//typedef uint8_t  task_name_size_t;
+//typedef char     task_name_t;
+//typedef uint8_t  task_priority_t;
+//typedef uint32_t task_interval_t;
+//typedef uint64_t tds_size_t;
+//typedef uint32_t inst_count_t;
+//typedef uint16_t inst_id_t;
+//typedef uint32_t inst_arg_va_t;
+
 
  /*Definition of Task Code Segment */
-#define ARG_ADDR_INVALID 0x00
-#define ARG_ADDR_DATA    0x01
-#define ARG_ADDR_IO      0x02
-#define ARG_ADDR_RESERVE 0x03
-#define ARG_ADDR_FLAG_SIZE 2
-#define ARG_ADDR_FLAG_MASK ~(0xFFFFFFFF << 2)
-typedef struct {
-	inst_id_t id;
-	inst_arg_va_t arg_va[3];
-} BIN_INST;
+//#define ARG_ADDR_INVALID 0x00
+//#define ARG_ADDR_DATA    0x01
+//#define ARG_ADDR_IO      0x02
+//#define ARG_ADDR_RESERVE 0x03
+//#define ARG_ADDR_FLAG_SIZE 2
+//#define ARG_ADDR_FLAG_MASK ~(0xFFFFFFFF << 2)
+//typedef struct {
+	//inst_id_t id;
+	//inst_arg_va_t arg_va[3];
+//} BIN_INST;
 
-typedef struct {
-	BIN_INST inst[50];
-} BIN_TCS;
+//typedef struct {
+	//BIN_INST inst[50];
+//} BIN_TCS;
 
 
 

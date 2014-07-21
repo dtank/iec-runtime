@@ -137,136 +137,178 @@ SERVO_CONFIG *load_servo_config(FILE *fp) {
 		}
 		return servo_config;
 	}
+    LOGGER_ERR(EC_FULL_MEM, "Can't load servo configuration");
 	return NULL;
 }
+/*-----------------------------------------------------------------------------
+ * PLC Task Configuration Segment Loader
+ *---------------------------------------------------------------------------*/
+//OBJ_PTCS *load_obj_ptcs(FILE *fp) {
+	//OBJ_PTCS *ptcs = new OBJ_PTCS;
+	//fread(&ptcs->task_count, sizeof(ptcs->task_count), 1, fp);
+	//LOGGER_DBG("task_count = %d", ptcs->task_count);
+	//return ptcs;
+//}
+/*-----------------------------------------------------------------------------
+ * PLC Task Property Loader
+ *---------------------------------------------------------------------------*/
+PLC_TASK_PROP *load_plc_task_property(FILE *fp) {
+	uint8_t name_size;
+    fread(&name_size, sizeof(name_size), 1, fp);
+	PLC_TASK_PROP *property = new PLC_TASK_PROP;
+	if (property != NULL) {
+    	fread(property->name, name_size, 1, fp);
+    	fread(&property->priority, sizeof(property->priority), 1, fp);
+    	fread(&property->interval, sizeof(property->interval), 1, fp);
+        //fread(&property->data_size, sizeof(property->data_size), 1, fp);
+        //fread(&property->inst_count, sizeof(property->inst_count), 1, fp);
+		LOGGER_DBG("PLC_TASK_PROP:\n .name = %s\n .priority = %d\n .interval = %d", property->name, property->priority, property->interval);
+		return property;
+	}
+	return NULL;
+}
+/*-----------------------------------------------------------------------------
+ * PLC Task Data Loader
+ *---------------------------------------------------------------------------*/
+PLC_TASK_DATA *load_plc_task_data(FILE *fp) {
+    uint32_t size;
+    fread(&size, sizeof(size), 1, fp);
+    PLC_TASK_DATA *data = new PLC_TASK_DATA[size];
+    if (data != NULL) {
+        fread(data, size, 1, fp);
+        LOGGER_DBG("PLC_TASK_DATA:\n .first = %d, .last = %d", data[0], data[size-1]);
+        return data;
+    }
+    return NULL;
+}
 /* PLC Configuration Loader */
-static io_refresh_interval_t load_io_refresh_interval(FILE *fp) {
-	io_refresh_interval_t interval;
-	fread(&interval, sizeof(interval), 1, fp);
-	LOGGER_DBG("TRACE: io_refresh_interval = %d", interval);
-	return interval;
-}
-static task_count_t load_task_count(FILE *fp) {
-	task_count_t count;
-	fread(&count, sizeof(task_count_t), 1, fp);
-	LOGGER_DBG("TRACE: task_count = %d", count);
-	return count;
-}
-PLC_CONFIG *load_plc_config(FILE *fp) {
-	PLC_CONFIG *config = new PLC_CONFIG;
-	config->io_refresh_interval = load_io_refresh_interval(fp);
-	config->task_count = load_task_count(fp);
-	return config;
-}
+//static io_refresh_interval_t load_io_refresh_interval(FILE *fp) {
+	//io_refresh_interval_t interval;
+	//fread(&interval, sizeof(interval), 1, fp);
+	//LOGGER_DBG("TRACE: io_refresh_interval = %d", interval);
+	//return interval;
+//}
+//static task_count_t load_task_count(FILE *fp) {
+	//task_count_t count;
+	//fread(&count, sizeof(task_count_t), 1, fp);
+	//LOGGER_DBG("TRACE: task_count = %d", count);
+	//return count;
+//}
+//PLC_CONFIG *load_plc_config(FILE *fp) {
+	//PLC_CONFIG *config = new PLC_CONFIG;
+	//config->io_refresh_interval = load_io_refresh_interval(fp);
+	//config->task_count = load_task_count(fp);
+	//return config;
+//}
 
 /* PLC Task Property Loader */
-static task_name_size_t load_task_name_size(FILE *fp) {
-	task_name_size_t size;
-	fread(&size, sizeof(task_name_size_t), 1, fp);
-	LOGGER_DBG("TRACE: task_name_size = %d", size);
-	return size;
-}
-static task_name_t *load_task_name(FILE *fp, task_name_size_t size) {
-	task_name_t *name = new task_name_t[size];
-	fread(name, size, 1, fp);
-	LOGGER_DBG("TRACE: task_name = %s", name);
-	return name;
-}
-static task_priority_t load_task_priority(FILE *fp) {
-	task_priority_t priority;
-	fread(&priority, sizeof(task_priority_t), 1, fp);
-	LOGGER_DBG("TRACE: task_priority = %d", priority);
-	return priority;
-}
-static task_interval_t load_task_interval(FILE *fp) {
-	task_interval_t interval;
-	fread(&interval, sizeof(task_interval_t), 1, fp);
-	LOGGER_DBG("TRACE: task_interval = %d", interval);
-	return interval;
-}
-static tds_size_t load_tds_size(FILE *fp) {
-	tds_size_t size;
-	fread(&size, sizeof(tds_size_t), 1, fp);
-	LOGGER_DBG("TRACE: tds_size = %d", size);
-	return size;
-}
-static inst_count_t load_inst_count(FILE *fp) {
-	inst_count_t count;
-	fread(&count, sizeof(inst_count_t), 1, fp);
-	LOGGER_DBG("TRACE: inst_count = %d", count);
-	return count;
-}
+//static task_name_size_t load_task_name_size(FILE *fp) {
+	//task_name_size_t size;
+	//fread(&size, sizeof(task_name_size_t), 1, fp);
+	//LOGGER_DBG("TRACE: task_name_size = %d", size);
+	//return size;
+//}
+//static task_name_t *load_task_name(FILE *fp, task_name_size_t size) {
+	//task_name_t *name = new task_name_t[size];
+	//fread(name, size, 1, fp);
+	//LOGGER_DBG("TRACE: task_name = %s", name);
+	//return name;
+//}
+//static task_priority_t load_task_priority(FILE *fp) {
+	//task_priority_t priority;
+	//fread(&priority, sizeof(task_priority_t), 1, fp);
+	//LOGGER_DBG("TRACE: task_priority = %d", priority);
+	//return priority;
+//}
+//static task_interval_t load_task_interval(FILE *fp) {
+	//task_interval_t interval;
+	//fread(&interval, sizeof(task_interval_t), 1, fp);
+	//LOGGER_DBG("TRACE: task_interval = %d", interval);
+	//return interval;
+//}
+//static tds_size_t load_tds_size(FILE *fp) {
+	//tds_size_t size;
+	//fread(&size, sizeof(tds_size_t), 1, fp);
+	//LOGGER_DBG("TRACE: tds_size = %d", size);
+	//return size;
+//}
+//static inst_count_t load_inst_count(FILE *fp) {
+	//inst_count_t count;
+	//fread(&count, sizeof(inst_count_t), 1, fp);
+	//LOGGER_DBG("TRACE: inst_count = %d", count);
+	//return count;
+//}
 
-static PLC_TASK_PROP *load_plc_task_property(FILE *fp) {
-	PLC_TASK_PROP *property = new PLC_TASK_PROP;
-	property->name_size = load_task_name_size(fp);
-	property->name = load_task_name(fp, property->name_size);
-	property->priority = load_task_priority(fp);
-	property->interval = load_task_interval(fp);
-	property->tds_size = load_tds_size(fp);
-	property->inst_count = load_inst_count(fp);
-	return property;
-}
+//static PLC_TASK_PROP *load_plc_task_property(FILE *fp) {
+	//PLC_TASK_PROP *property = new PLC_TASK_PROP;
+	//property->name_size = load_task_name_size(fp);
+	//property->name = load_task_name(fp, property->name_size);
+	//property->priority = load_task_priority(fp);
+	//property->interval = load_task_interval(fp);
+	//property->tds_size = load_tds_size(fp);
+	//property->inst_count = load_inst_count(fp);
+	//return property;
+//}
 
 /* PLC Task Data Loader */
-static PLC_TASK_DATA *load_plc_task_data(FILE *fp, PLC_TASK_PROP *property) {
-	PLC_TASK_DATA *data = new PLC_TASK_DATA[property->tds_size];
-	fread(data, property->tds_size, 1, fp);
-	LOGGER_DBG("TRACE: plc_task_data .first = %d; .last = %d", data[0], data[property->tds_size - 1]);
-	return data;
-}
+//static PLC_TASK_DATA *load_plc_task_data(FILE *fp, PLC_TASK_PROP *property) {
+	//PLC_TASK_DATA *data = new PLC_TASK_DATA[property->tds_size];
+	//fread(data, property->tds_size, 1, fp);
+	//LOGGER_DBG("TRACE: plc_task_data .first = %d; .last = %d", data[0], data[property->tds_size - 1]);
+	//return data;
+//}
 
 /* PLC Task Code Loader */
-static inst_id_t load_inst_id(FILE *fp) {
-	inst_id_t id;
-	fread(&id, sizeof(inst_id_t), 1, fp);
-	LOGGER_DBG("TRACE: inst_id = %d", id);
-	return id;
-}
-static inst_arg_addr_t *load_inst_arg_addr(FILE *fp, PLC_TASK_DATA *data) {
-	inst_arg_va_t arg_va;
-	inst_arg_addr_t *arg_addr;
-	fread(&arg_va, sizeof(inst_arg_va_t), 1, fp);
-	int flag = arg_va & ARG_ADDR_FLAG_MASK;
-	uint32_t arg_addr_offset = arg_va >> ARG_ADDR_FLAG_SIZE;
-	switch (flag) {
-		case ARG_ADDR_DATA: arg_addr = &data[arg_addr_offset];break;
-		case ARG_ADDR_IO:   arg_addr = &io_shm[arg_addr_offset];break;
-		// TODO default: LOGGER_ERR("ERROR: instruction argument virtual address is valid...", 0);break;
-	}
-	LOGGER_DBG("TRACE: inst_arg_addr = %d", arg_addr);
-	return arg_addr;
-}
-static PLC_TASK_INST *load_plc_task_inst(FILE *fp, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
-	PLC_TASK_INST *inst = new PLC_TASK_INST;
-	inst->id = load_inst_id(fp);
-	inst->arg_addr = new inst_arg_addr_t*[(*inst_desc)[inst->id].args_count];
-	for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
-		inst->arg_addr[i] = load_inst_arg_addr(fp, data);
-	}
-	return inst;
-}
-static PLC_TASK_CODE *load_plc_task_code(FILE *fp, PLC_TASK_PROP *property, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
-	PLC_TASK_CODE *code = new PLC_TASK_CODE;
-	code->inst = new PLC_TASK_INST*[property->inst_count];
-	for (int i = 0; i < property->inst_count; ++i) {
-		code->inst[i] = load_plc_task_inst(fp, data, inst_desc);
-	}
-	return code;
-}
-static PLC_TASK *load_plc_task(FILE *fp, inst_desc_map_t *inst_desc) {
-	PLC_TASK *task = new PLC_TASK;
-	task->property = load_plc_task_property(fp);
-	task->data = load_plc_task_data(fp, task->property);
-	task->code = load_plc_task_code(fp, task->property, task->data, inst_desc);
-	return task;
-}
-PLC_TASK_LIST *load_plc_task_list(FILE *fp, PLC_CONFIG *config, inst_desc_map_t *inst_desc) {
-	PLC_TASK_LIST *task_list = new PLC_TASK_LIST;
-	task_list->rt_task = new RT_TASK[config->task_count];
-	task_list->plc_task = new PLC_TASK*[config->task_count];
-	for (int i = 0; i < config->task_count; ++i) {
-		task_list->plc_task[i] = load_plc_task(fp, inst_desc);
-	}
-	return task_list;
-}
+//static inst_id_t load_inst_id(FILE *fp) {
+	//inst_id_t id;
+	//fread(&id, sizeof(inst_id_t), 1, fp);
+	//LOGGER_DBG("TRACE: inst_id = %d", id);
+	//return id;
+//}
+//static inst_arg_addr_t *load_inst_arg_addr(FILE *fp, PLC_TASK_DATA *data) {
+	//inst_arg_va_t arg_va;
+	//inst_arg_addr_t *arg_addr;
+	//fread(&arg_va, sizeof(inst_arg_va_t), 1, fp);
+	//int flag = arg_va & ARG_ADDR_FLAG_MASK;
+	//uint32_t arg_addr_offset = arg_va >> ARG_ADDR_FLAG_SIZE;
+	//switch (flag) {
+		//case ARG_ADDR_DATA: arg_addr = &data[arg_addr_offset];break;
+		//case ARG_ADDR_IO:   arg_addr = &io_shm[arg_addr_offset];break;
+		 //TODO default: LOGGER_ERR("ERROR: instruction argument virtual address is valid...", 0);break;
+	//}
+	//LOGGER_DBG("TRACE: inst_arg_addr = %d", arg_addr);
+	//return arg_addr;
+//}
+//static PLC_TASK_INST *load_plc_task_inst(FILE *fp, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
+	//PLC_TASK_INST *inst = new PLC_TASK_INST;
+	//inst->id = load_inst_id(fp);
+	//inst->arg_addr = new inst_arg_addr_t*[(*inst_desc)[inst->id].args_count];
+	//for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
+		//inst->arg_addr[i] = load_inst_arg_addr(fp, data);
+	//}
+	//return inst;
+//}
+//static PLC_TASK_CODE *load_plc_task_code(FILE *fp, PLC_TASK_PROP *property, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
+	//PLC_TASK_CODE *code = new PLC_TASK_CODE;
+	//code->inst = new PLC_TASK_INST*[property->inst_count];
+	//for (int i = 0; i < property->inst_count; ++i) {
+		//code->inst[i] = load_plc_task_inst(fp, data, inst_desc);
+	//}
+	//return code;
+//}
+//static PLC_TASK *load_plc_task(FILE *fp, inst_desc_map_t *inst_desc) {
+	//PLC_TASK *task = new PLC_TASK;
+	//task->property = load_plc_task_property(fp);
+	//task->data = load_plc_task_data(fp, task->property);
+	//task->code = load_plc_task_code(fp, task->property, task->data, inst_desc);
+	//return task;
+//}
+//PLC_TASK_LIST *load_plc_task_list(FILE *fp, PLC_CONFIG *config, inst_desc_map_t *inst_desc) {
+	//PLC_TASK_LIST *task_list = new PLC_TASK_LIST;
+	//task_list->rt_task = new RT_TASK[config->task_count];
+	//task_list->plc_task = new PLC_TASK*[config->task_count];
+	//for (int i = 0; i < config->task_count; ++i) {
+		//task_list->plc_task[i] = load_plc_task(fp, inst_desc);
+	//}
+	//return task_list;
+//}
