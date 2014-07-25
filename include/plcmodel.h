@@ -25,6 +25,10 @@
 #define SYS_MAX_AXIS_NODE_ID SYS_MAX_AXIS_COUNT
 /* PLC Task */
 #define SYS_MAX_TASK_NAME_SIZE 16
+#define SYS_MAX_TASK_PRIORITY 90
+#define SYS_MIN_TASK_PRIORITY 50
+#define SYS_MIN_TASK_INTERVAL 8000000
+#define SYS_MAX_TASK_DATA_SIZE 65535
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration
  *---------------------------------------------------------------------------*/
@@ -54,7 +58,7 @@ typedef struct {
 
 typedef struct {
 	uint8_t axis_count;      /* number of axis */
-	AXIS_CONFIG **axis_group; /* array of axis configuration */
+	AXIS_CONFIG *axis_group; /* array of axis configuration */
 } SERVO_CONFIG;
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Property
@@ -70,27 +74,30 @@ typedef struct {
  * Definition of PLC Task Data
  *---------------------------------------------------------------------------*/
 typedef char PLC_TASK_DATA;
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Task Code
+ *---------------------------------------------------------------------------*/
+typedef struct {
+    uint16_t id;      /* instruction id */
+    char **arg_addr; /* actual address of instruction's arguments */
+} PLC_TASK_INST;
 
-/* Definition of PLC Task Code */
-//typedef char inst_arg_addr_t;
-//typedef struct {
-	//inst_id_t id;
-	//inst_arg_addr_t **arg_addr;
-//} PLC_TASK_INST;
+typedef struct {
+    PLC_TASK_INST **inst;
+} PLC_TASK_CODE;
 
-//typedef struct {
-	//PLC_TASK_INST **inst;
-//} PLC_TASK_CODE;
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Task List
+ *---------------------------------------------------------------------------*/
+typedef struct {
+    PLC_TASK_PROP property; /* task property */
+    PLC_TASK_DATA *data; /* task data */
+    PLC_TASK_CODE code; /* task code */
+} PLC_TASK; /* PLC Task Segment */
 
-/* Definition of PLC Task */
-//typedef struct {
-	//PLC_TASK_PROP *property;
-	//PLC_TASK_DATA *data;
-	//PLC_TASK_CODE *code;
-//} PLC_TASK;
+typedef struct {
+    RT_TASK *rt_task;
+    PLC_TASK *plc_task;
+} PLC_TASK_LIST;
 
-//typedef struct {
-	//RT_TASK *rt_task;
-	//PLC_TASK **plc_task;
-//} PLC_TASK_LIST;
 #endif

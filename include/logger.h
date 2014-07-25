@@ -44,10 +44,16 @@ enum ERROR_CODE {
 	EC_LDO_COUNT,
 	EC_LAI_COUNT,
 	EC_LAO_COUNT,
+	EC_AXIS_COUNT,
 	EC_AXIS_NAME_SIZE,
 	EC_AXIS_ID_RANGE,
 	EC_AXIS_TYPE,
 	EC_AXIS_OPER_MODE,
+	EC_TASK_NAME_SIZE,
+	EC_TASK_PRIORITY,
+	EC_TASK_INTERVAL,
+	EC_TASK_DATA_SIZE,
+    EC_ARG_VA_INVALID,
 };
 
 typedef map<ERROR_CODE, const char *> ec_map_t;
@@ -63,10 +69,16 @@ static const ec_map_t::value_type ec_data[] = {
 	ec_map_t::value_type(EC_LDO_COUNT, "Over maximum count of local digital output module"),
 	ec_map_t::value_type(EC_LAI_COUNT, "Over maximum count of local analog input module"),
 	ec_map_t::value_type(EC_LAO_COUNT, "Over maximum count of local analog output module"),
+	ec_map_t::value_type(EC_AXIS_COUNT, "Over maximum count of axis"),
 	ec_map_t::value_type(EC_AXIS_NAME_SIZE, "Over maximum size of axis name"),
-	ec_map_t::value_type(EC_AXIS_ID_RANGE, "Out of range for axis' node id"),
+	ec_map_t::value_type(EC_AXIS_ID_RANGE, "Out of range of axis' node id"),
 	ec_map_t::value_type(EC_AXIS_TYPE, "Unknown type of axis"),
 	ec_map_t::value_type(EC_AXIS_OPER_MODE, "Unknown operation mode of axis"),
+	ec_map_t::value_type(EC_TASK_NAME_SIZE, "Over maximum size of plc task name"),
+	ec_map_t::value_type(EC_TASK_PRIORITY, "Out of range of plc task priority"),
+	ec_map_t::value_type(EC_TASK_INTERVAL, "Below minimum interval of plc task"),
+	ec_map_t::value_type(EC_TASK_DATA_SIZE, "Over maximum size of plc task data segment"),
+	ec_map_t::value_type(EC_ARG_VA_INVALID, "Invalid virtual address of instruction argument"),
 
 };
 static const uint32_t ec_count = sizeof ec_data / sizeof ec_data[0];

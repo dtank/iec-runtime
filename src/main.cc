@@ -135,16 +135,15 @@ int main(int argc, char* argv[])
         2,
         obj_tasks
     };
+    OBJ_FILE obj_file = {
+        obj_header,
+        obj_iocs,
+        obj_scs,
+        obj_ptls
+    };
 
 	FILE *fplc = fopen("plc.bin", "wb");
-	generate_obj_header(fplc, &obj_header);
-	generate_obj_iocs(fplc, &obj_iocs);
-	generate_obj_scs(fplc, &obj_scs);
-	generate_obj_ptls(fplc, &obj_ptls, &inst_desc);
-	//generate_bin_header(fplc, &header);
-	//generate_tps(fplc, &tps);
-	//generate_tds(fplc, &tps, tds);
-	//generate_tcs(fplc, &tps, &tcs, &inst_desc);
+	generate_obj_file(fplc, &obj_file, &inst_desc);
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
 	OBJ_HEADER *myobj_header = load_obj_header(fplc);
@@ -154,7 +153,7 @@ int main(int argc, char* argv[])
 	//PLC_TASK_PROP *plc_task_prop = load_plc_task_property(fplc);
     //PLC_TASK_DATA *plc_task_data = load_plc_task_data(fplc);
 	//PLC_CONFIG *config = load_plc_config(fplc);
-	//PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, config, &inst_desc);
+    PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, &inst_desc);
 	fclose(fplc);
 
 	//Avoids memory swapping for this program

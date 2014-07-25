@@ -2,6 +2,7 @@
 #define __IO_CONTROLLER_H__
 
 #include "plcmodel.h"
+// TODO Move macros to plcmodel.h & add initializer
 /* I/O Shared Memory Definition */
 #define LDI_SIZE 1
 #define LDO_SIZE 1
