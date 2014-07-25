@@ -18,6 +18,14 @@
 #define SYS_MAX_LAI_COUNT 1
 #define SYS_MAX_LAO_COUNT 1
 #define SYS_MIN_IO_INTERVAL 2000000 /* unit: ns */
+#define SYS_LDI_WORDSIZE 1 /* unit: Byte */
+#define SYS_LDO_WORDSIZE 1 /* unit: Byte */
+#define SYS_LAI_WORDSIZE 1 /* unit: Byte */
+#define SYS_LAO_WORDSIZE 1 /* unit: Byte */
+#define SYS_MAX_IO_MEM_SIZE (SYS_MAX_LDI_COUNT*SYS_LDI_WORDSIZE + \
+        SYS_MAX_LDO_COUNT*SYS_LDO_WORDSIZE + \
+        SYS_MAX_LAI_COUNT*SYS_LAI_WORDSIZE + \
+        SYS_MAX_LAO_COUNT*SYS_LAO_WORDSIZE)
 /* Servo */
 #define SYS_MAX_AXIS_COUNT 8
 #define SYS_MAX_AXIS_NAME_SIZE 16

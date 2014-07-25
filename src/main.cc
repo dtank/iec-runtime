@@ -7,6 +7,7 @@
 #include "executor.h"
 #include "iocontroller.h"
 #include "logger.h"
+#include "shmem.h"
 
 
 int LOGGER_LEVEL = LEVEL_ALL;
@@ -155,16 +156,17 @@ int main(int argc, char* argv[])
 	//PLC_CONFIG *config = load_plc_config(fplc);
     PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, &inst_desc);
 	fclose(fplc);
+    io_task_init(io_config);
 
 	//Avoids memory swapping for this program
-	//mlockall(MCL_CURRENT|MCL_FUTURE);
+    mlockall(MCL_CURRENT|MCL_FUTURE);
 
 	//io_task_create();
 	//plc_task_create(plc_task_list, config);
-	//io_task_start(io_config);
+    io_task_start(io_config);
 	//plc_task_start(plc_task_list, config);
-	//pause();
-	//io_task_delete();
+    pause();
+    io_task_delete();
 	//plc_task_delete(plc_task_list, config);
 
 	return 0;
