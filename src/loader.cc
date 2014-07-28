@@ -135,6 +135,12 @@ SERVO_CONFIG *load_servo_config(FILE *fp) {
             return NULL;
         }
 		LOGGER_DBG("axis_count = %d", servo_config->axis_count);
+		fread(&servo_config->update_interval, sizeof(servo_config->update_interval), 1, fp);
+		if (servo_config->update_interval < SYS_MIN_SERVO_INTERVAL) {
+		    LOGGER_ERR(EC_SERVO_INTERVAL, "");
+			return NULL;
+		}
+		LOGGER_DBG("servo_update_interval = %d", servo_config->update_interval);
         servo_config->axis_group = new AXIS_CONFIG[servo_config->axis_count];
 		for (int i = 0; i < servo_config->axis_count; ++i) {
 			servo_config->axis_group[i] = *load_axis_config(fp);

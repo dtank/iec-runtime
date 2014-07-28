@@ -1,6 +1,5 @@
 #include <native/task.h>
 #include <native/heap.h>
-#include "shmem.h"
 #include "iocontroller.h"
 #include "logger.h"
 

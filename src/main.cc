@@ -6,8 +6,8 @@
 #include "loader.h"
 #include "executor.h"
 #include "iocontroller.h"
+#include "axiscontroller.h"
 #include "logger.h"
-#include "shmem.h"
 
 
 int LOGGER_LEVEL = LEVEL_ALL;
@@ -37,12 +37,12 @@ int main(int argc, char* argv[])
 			1,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
 			OPER_MODE_POS,    /* operating mode: POSITION | VELOCITY | TORQUE */
-			0,                /* negtive position limit (unit:) */
-			180,              /* positive position limit (unit:) */
-			100,              /* velocity limit (unit:) */
-			20,               /* accelaration limit (unit:) */
-			20,               /* decelaration limit (unit:) */
-			10                /* jerk limit (unit:) */
+			(double)0.0,                /* negtive position limit (unit:) */
+			(double)180.0,              /* positive position limit (unit:) */
+			(double)100.0,              /* velocity limit (unit:) */
+			(double)20.0,               /* accelaration limit (unit:) */
+			(double)20.0,               /* decelaration limit (unit:) */
+			(double)10.0                /* jerk limit (unit:) */
 		},
 		{	true,             /* combined axis */
 			(uint8_t)strlen("axis2")+1,  /* NOT include '\0' */
@@ -50,16 +50,17 @@ int main(int argc, char* argv[])
 			2,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
 			OPER_MODE_POS,    /* operating mode: POSITION | VELOCITY | TORQUE */
-			0,                /* negtive position limit (unit:) */
-			180,              /* positive position limit (unit:) */
-			100,              /* velocity limit (unit:) */
-			20,               /* accelaration limit (unit:) */
-			20,               /* decelaration limit (unit:) */
-			10                /* jerk limit (unit:) */
+			(double)0.0,                /* negtive position limit (unit:) */
+			(double)180.0,              /* positive position limit (unit:) */
+			(double)100.0,              /* velocity limit (unit:) */
+			(double)20.0,               /* accelaration limit (unit:) */
+			(double)20.0,               /* decelaration limit (unit:) */
+			(double)10.0                /* jerk limit (unit:) */
 		}
 	};
 	OBJ_SCS obj_scs = {
 		2, /* number of axis */
+        4000000, /* update interval */
 		obj_acs
 	};
 /*-----------------------------------------------------------------------------
@@ -156,14 +157,15 @@ int main(int argc, char* argv[])
 	//PLC_CONFIG *config = load_plc_config(fplc);
     PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, &inst_desc);
 	fclose(fplc);
-    io_task_init(io_config);
-
 	//Avoids memory swapping for this program
     mlockall(MCL_CURRENT|MCL_FUTURE);
+    io_task_init(io_config);
+    servo_task_init(servo_config);
 
-	//io_task_create();
-	//plc_task_create(plc_task_list, config);
+
     io_task_start(io_config);
+    servo_task_start(servo_config);
+	//plc_task_create(plc_task_list, config);
 	//plc_task_start(plc_task_list, config);
     pause();
     io_task_delete();

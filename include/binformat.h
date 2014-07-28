@@ -46,17 +46,18 @@ typedef struct {
 	uint8_t node_id;    /* axis id */
 	uint8_t axis_type;  /* axis type: FINITE | MODULO */
 	uint8_t oper_mode;  /* operating mode: POSITION | VELOCITY | TORQUE */
-	float sw_limit_neg; /* negtive position limit (unit:) */
-	float sw_limit_pos; /* positive position limit (unit:) */
-	float max_vel;      /* velocity limit (unit:) */
-	float max_acc;      /* accelaration limit (unit:) */
-	float max_dec;      /* decelaration limit (unit:) */
-	float max_jerk;     /* jerk limit (unit:) */
+	double sw_limit_neg; /* negtive position limit (unit:) */
+	double sw_limit_pos; /* positive position limit (unit:) */
+	double max_vel;      /* velocity limit (unit:) */
+	double max_acc;      /* accelaration limit (unit:) */
+	double max_dec;      /* decelaration limit (unit:) */
+	double max_jerk;     /* jerk limit (unit:) */
 } OBJ_ACS; /* Axis Configuration Segment */
 
 typedef struct {
-	uint8_t axis_count;  /* number of axis */
-	OBJ_ACS *axis_group; /* array of axis */
+	uint8_t axis_count;       /* number of axis */
+	uint32_t update_interval; /* servo data update interval */
+	OBJ_ACS *axis_group;      /* array of axis */
 } OBJ_SCS; /* Servo Configuration Segment */
 
 /*-----------------------------------------------------------------------------

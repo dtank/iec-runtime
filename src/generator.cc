@@ -42,6 +42,7 @@ void generate_obj_acs(FILE *fp, OBJ_ACS *acs) {
 }
 void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
 	fwrite(&scs->axis_count, sizeof(scs->axis_count), 1, fp);
+	fwrite(&scs->update_interval, sizeof(scs->update_interval), 1, fp);
 	for (int i = 0; i < scs->axis_count; ++i) {
 		generate_obj_acs(fp, &(scs->axis_group[i]));
 	}

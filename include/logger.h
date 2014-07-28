@@ -15,21 +15,28 @@ using namespace std;
 
 extern int LOGGER_LEVEL;
 
-#define LOGGER_DBG(msg, ...)                                                                                       \
-	do {                                                                                                     \
-		if (LOGGER_LEVEL >= LEVEL_DBG) {                                                                       \
+#define LOGGER_DBG(msg, ...)                                                                             \
+	do {                                                                                                 \
+		if (LOGGER_LEVEL >= LEVEL_DBG) {                                                                 \
 		    fprintf(stderr, "TRACE: File:%s Line:%d Function:%s()\n", __FILE__, __LINE__, __FUNCTION__); \
-		    fprintf(stderr, msg, __VA_ARGS__);                                                                \
+		    fprintf(stderr, msg, __VA_ARGS__);                                                           \
 		    fprintf(stderr, "\n"); }                                                                     \
 	} while(0)
 
-#define LOGGER_ERR(code, ...)                                                                                       \
-	do {                                                                                                     \
-		if (LOGGER_LEVEL >= LEVEL_ERR) {                                                                       \
-			fprintf(stderr, "ERROR CODE %d: ", code);                              \
-			fprintf(stderr, ec_msg[code]);                              \
-			fprintf(stderr, __VA_ARGS__);                               \
-		    fprintf(stderr, "...\n"); }                                                                     \
+#define LOGGER_ERR(code, ...)                                                                            \
+	do {                                                                                                 \
+		if (LOGGER_LEVEL >= LEVEL_ERR) {                                                                 \
+			fprintf(stderr, "ERROR CODE %d: ", code);                                                    \
+			fprintf(stderr, ec_msg[code]);                                                               \
+			fprintf(stderr, __VA_ARGS__);                                                                \
+		    fprintf(stderr, "...\n"); }                                                                  \
+	} while(0)
+
+#define LOGGER_INF(msg)                                                                                  \
+	do {                                                                                                 \
+		if (LOGGER_LEVEL >= LEVEL_INF) {                                                                 \
+			fprintf(stderr, msg);                                                                        \
+		    fprintf(stderr, "\n"); }                                                                     \
 	} while(0)
 
 enum ERROR_CODE {
@@ -56,6 +63,9 @@ enum ERROR_CODE {
 	EC_AXIS_ID_RANGE,
 	EC_AXIS_TYPE,
 	EC_AXIS_OPER_MODE,
+	EC_SERVO_INTERVAL,
+	EC_SERVO_TASK_CREATE,
+	EC_SERVO_TASK_START,
     /* System PLC Task Error Code */
 	EC_TASK_NAME_SIZE,
 	EC_TASK_PRIORITY,
@@ -85,6 +95,9 @@ static const ec_map_t::value_type ec_data[] = {
 	ec_map_t::value_type(EC_AXIS_ID_RANGE, "Out of range of axis' node id"),
 	ec_map_t::value_type(EC_AXIS_TYPE, "Unknown type of axis"),
 	ec_map_t::value_type(EC_AXIS_OPER_MODE, "Unknown operation mode of axis"),
+	ec_map_t::value_type(EC_SERVO_INTERVAL, "Below minimum servo update interval"),
+	ec_map_t::value_type(EC_IO_TASK_CREATE, "Can't create servo task"),
+	ec_map_t::value_type(EC_IO_TASK_START, "Can't start servo task"),
 	ec_map_t::value_type(EC_TASK_NAME_SIZE, "Over maximum size of plc task name"),
 	ec_map_t::value_type(EC_TASK_PRIORITY, "Out of range of plc task priority"),
 	ec_map_t::value_type(EC_TASK_INTERVAL, "Below minimum interval of plc task"),
