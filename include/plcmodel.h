@@ -71,6 +71,13 @@ typedef struct {
 	AXIS_CONFIG *axis_group;  /* array of axis configuration */
 } SERVO_CONFIG;
 /*-----------------------------------------------------------------------------
+ * Definition of Robot Configuration
+ *---------------------------------------------------------------------------*/
+typedef struct {
+    int axis_count;
+    int stub_param2;
+} RobotConfig;
+/*-----------------------------------------------------------------------------
  * Definition of PLC Task Property
  *---------------------------------------------------------------------------*/
 typedef struct {

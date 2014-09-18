@@ -66,6 +66,9 @@ enum ERROR_CODE {
 	EC_SERVO_INTERVAL,
 	EC_SERVO_TASK_CREATE,
 	EC_SERVO_TASK_START,
+    /* System RC Task Error Code */
+	EC_RC_TASK_CREATE,
+	EC_RC_TASK_START,
     /* System PLC Task Error Code */
 	EC_TASK_NAME_SIZE,
 	EC_TASK_PRIORITY,
@@ -76,13 +79,16 @@ enum ERROR_CODE {
 
 typedef map<ERROR_CODE, const char *> ec_map_t;
 static const ec_map_t::value_type ec_data[] = {
+    /* System Basic Error Code*/
 	ec_map_t::value_type(EC_PLC_FILE, "Incorrect format of PLC object file"),
 	ec_map_t::value_type(EC_SYS_TYPE, "Mismatched system type"),
 	ec_map_t::value_type(EC_BYTE_ORDER, "Inverse byte order of PLC object file"),
 	ec_map_t::value_type(EC_SYS_VERSION, "Incompatible system version"),
 	ec_map_t::value_type(EC_SYS_MACHINE, "Mismatched CPU"),
+    /* System Memory Error Code*/
 	ec_map_t::value_type(EC_FULL_MEM, "Full memory. "),
 	ec_map_t::value_type(EC_BIND_SHM, "Can't bind to shared memory. "),
+    /* System I/O Error Code */
 	ec_map_t::value_type(EC_IO_INTERVAL, "Below minimum i/o update interval"),
 	ec_map_t::value_type(EC_IO_TASK_CREATE, "Can't create i/o task"),
 	ec_map_t::value_type(EC_IO_TASK_START, "Can't start i/o task"),
@@ -90,14 +96,19 @@ static const ec_map_t::value_type ec_data[] = {
 	ec_map_t::value_type(EC_LDO_COUNT, "Over maximum count of local digital output module"),
 	ec_map_t::value_type(EC_LAI_COUNT, "Over maximum count of local analog input module"),
 	ec_map_t::value_type(EC_LAO_COUNT, "Over maximum count of local analog output module"),
+    /* System Servo Error Code */
 	ec_map_t::value_type(EC_AXIS_COUNT, "Over maximum count of axis"),
 	ec_map_t::value_type(EC_AXIS_NAME_SIZE, "Over maximum size of axis name"),
 	ec_map_t::value_type(EC_AXIS_ID_RANGE, "Out of range of axis' node id"),
 	ec_map_t::value_type(EC_AXIS_TYPE, "Unknown type of axis"),
 	ec_map_t::value_type(EC_AXIS_OPER_MODE, "Unknown operation mode of axis"),
 	ec_map_t::value_type(EC_SERVO_INTERVAL, "Below minimum servo update interval"),
-	ec_map_t::value_type(EC_IO_TASK_CREATE, "Can't create servo task"),
-	ec_map_t::value_type(EC_IO_TASK_START, "Can't start servo task"),
+	ec_map_t::value_type(EC_SERVO_TASK_CREATE, "Can't create servo task"),
+	ec_map_t::value_type(EC_SERVO_TASK_START, "Can't start servo task"),
+    /* System RC Task Error Code */
+	ec_map_t::value_type(EC_RC_TASK_CREATE, "Can't create rc task"),
+	ec_map_t::value_type(EC_RC_TASK_START, "Can't start rc task"),
+    /* System PLC Task Error Code */
 	ec_map_t::value_type(EC_TASK_NAME_SIZE, "Over maximum size of plc task name"),
 	ec_map_t::value_type(EC_TASK_PRIORITY, "Out of range of plc task priority"),
 	ec_map_t::value_type(EC_TASK_INTERVAL, "Below minimum interval of plc task"),
