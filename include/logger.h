@@ -47,7 +47,7 @@ enum ERROR_CODE {
 	EC_SYS_VERSION,
 	EC_SYS_MACHINE,
     /* System Memory Error Code*/
-	EC_FULL_MEM,
+	EC_OOM,
     EC_BIND_SHM,
     /* System I/O Error Code */
 	EC_IO_INTERVAL,
@@ -75,6 +75,9 @@ enum ERROR_CODE {
 	EC_TASK_INTERVAL,
 	EC_TASK_DATA_SIZE,
     EC_ARG_VA_INVALID,
+    EC_LOAD_TASK_INST,
+    EC_LOAD_TASK_DATA,
+    EC_LOAD_TASK_CODE,
 };
 
 typedef map<ERROR_CODE, const char *> ec_map_t;
@@ -86,12 +89,12 @@ static const ec_map_t::value_type ec_data[] = {
 	ec_map_t::value_type(EC_SYS_VERSION, "Incompatible system version"),
 	ec_map_t::value_type(EC_SYS_MACHINE, "Mismatched CPU"),
     /* System Memory Error Code*/
-	ec_map_t::value_type(EC_FULL_MEM, "Full memory. "),
-	ec_map_t::value_type(EC_BIND_SHM, "Can't bind to shared memory. "),
+	ec_map_t::value_type(EC_OOM, "Out of memory. "),
+	ec_map_t::value_type(EC_BIND_SHM, "Failed to bind to shared memory. "),
     /* System I/O Error Code */
 	ec_map_t::value_type(EC_IO_INTERVAL, "Below minimum i/o update interval"),
-	ec_map_t::value_type(EC_IO_TASK_CREATE, "Can't create i/o task"),
-	ec_map_t::value_type(EC_IO_TASK_START, "Can't start i/o task"),
+	ec_map_t::value_type(EC_IO_TASK_CREATE, "Failed to create i/o task"),
+	ec_map_t::value_type(EC_IO_TASK_START, "Failed to start i/o task"),
 	ec_map_t::value_type(EC_LDI_COUNT, "Over maximum count of local digital input module"),
 	ec_map_t::value_type(EC_LDO_COUNT, "Over maximum count of local digital output module"),
 	ec_map_t::value_type(EC_LAI_COUNT, "Over maximum count of local analog input module"),
@@ -103,18 +106,20 @@ static const ec_map_t::value_type ec_data[] = {
 	ec_map_t::value_type(EC_AXIS_TYPE, "Unknown type of axis"),
 	ec_map_t::value_type(EC_AXIS_OPER_MODE, "Unknown operation mode of axis"),
 	ec_map_t::value_type(EC_SERVO_INTERVAL, "Below minimum servo update interval"),
-	ec_map_t::value_type(EC_SERVO_TASK_CREATE, "Can't create servo task"),
-	ec_map_t::value_type(EC_SERVO_TASK_START, "Can't start servo task"),
+	ec_map_t::value_type(EC_SERVO_TASK_CREATE, "Failed to create servo task"),
+	ec_map_t::value_type(EC_SERVO_TASK_START, "Failed to start servo task"),
     /* System RC Task Error Code */
-	ec_map_t::value_type(EC_RC_TASK_CREATE, "Can't create rc task"),
-	ec_map_t::value_type(EC_RC_TASK_START, "Can't start rc task"),
+	ec_map_t::value_type(EC_RC_TASK_CREATE, "Failed to create rc task"),
+	ec_map_t::value_type(EC_RC_TASK_START, "Failed to start rc task"),
     /* System PLC Task Error Code */
 	ec_map_t::value_type(EC_TASK_NAME_SIZE, "Over maximum size of plc task name"),
 	ec_map_t::value_type(EC_TASK_PRIORITY, "Out of range of plc task priority"),
 	ec_map_t::value_type(EC_TASK_INTERVAL, "Below minimum interval of plc task"),
 	ec_map_t::value_type(EC_TASK_DATA_SIZE, "Over maximum size of plc task data segment"),
 	ec_map_t::value_type(EC_ARG_VA_INVALID, "Invalid virtual address of instruction argument"),
-
+	ec_map_t::value_type(EC_LOAD_TASK_INST, "Failed to load plc task instruction"),
+	ec_map_t::value_type(EC_LOAD_TASK_DATA, "Failed to load plc task data"),
+	ec_map_t::value_type(EC_LOAD_TASK_CODE, "Failed to load plc task code"),
 };
 static const uint32_t ec_count = sizeof ec_data / sizeof ec_data[0];
 static const ec_map_t ec_map(ec_data, ec_data + ec_count);

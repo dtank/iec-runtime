@@ -76,45 +76,30 @@ typedef struct {
 typedef struct {
     int axis_count;
     int stub_param2;
-} RobotConfig;
+} ROBOT_CONFIG;
 /*-----------------------------------------------------------------------------
- * Definition of PLC Task Property
- *---------------------------------------------------------------------------*/
-typedef struct {
-	char name[SYS_MAX_TASK_NAME_SIZE];
-	uint8_t priority;
-	uint32_t interval;
-	//uint32_t data_size;
-	//uint32_t inst_count;
-} PLC_TASK_PROP;
-/*-----------------------------------------------------------------------------
- * Definition of PLC Task Data
- *---------------------------------------------------------------------------*/
-typedef char PLC_TASK_DATA;
-/*-----------------------------------------------------------------------------
- * Definition of PLC Task Code
+ * Definition of PLC Task
  *---------------------------------------------------------------------------*/
 typedef struct {
     uint16_t id;      /* instruction id */
     char **arg_addr; /* actual address of instruction's arguments */
-} PLC_TASK_INST;
+} PLC_INST;
 
 typedef struct {
-    PLC_TASK_INST **inst;
-} PLC_TASK_CODE;
-
+	char name[SYS_MAX_TASK_NAME_SIZE];
+	uint8_t priority;
+	uint32_t interval;
+    char *data; /* task data */
+    PLC_INST *code; /* task code */
+} PLC_TASK;
 /*-----------------------------------------------------------------------------
- * Definition of PLC Task List
+ * Definition of PLC Task
  *---------------------------------------------------------------------------*/
 typedef struct {
-    PLC_TASK_PROP property; /* task property */
-    PLC_TASK_DATA *data; /* task data */
-    PLC_TASK_CODE code; /* task code */
-} PLC_TASK; /* PLC Task Segment */
-
-typedef struct {
+    IO_CONFIG io_config;
+    AXIS_CONFIG axis_config;
     RT_TASK *rt_task;
     PLC_TASK *plc_task;
-} PLC_TASK_LIST;
+} PLC_MODEL;
 
 #endif

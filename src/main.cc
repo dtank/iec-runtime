@@ -148,14 +148,14 @@ int main(int argc, char* argv[])
 	generate_obj_file(fplc, &obj_file, &inst_desc);
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
-	OBJ_HEADER *myobj_header = load_obj_header(fplc);
+	check_obj_file(fplc);
 	IO_CONFIG *io_config = load_io_config(fplc);
 	SERVO_CONFIG *servo_config = load_servo_config(fplc);
 	//OBJ_PTCS *myobj_ptcs = load_obj_ptcs(fplc);
 	//PLC_TASK_PROP *plc_task_prop = load_plc_task_property(fplc);
     //PLC_TASK_DATA *plc_task_data = load_plc_task_data(fplc);
 	//PLC_CONFIG *config = load_plc_config(fplc);
-    PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, &inst_desc);
+    //PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, &inst_desc);
 	fclose(fplc);
 	//Avoids memory swapping for this program
     mlockall(MCL_CURRENT|MCL_FUTURE);

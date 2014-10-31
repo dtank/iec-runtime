@@ -8,7 +8,7 @@
 /*-----------------------------------------------------------------------------
  * PLC Object File Header Loader
  *---------------------------------------------------------------------------*/
-OBJ_HEADER *load_obj_header(FILE *fp);
+int check_obj_file(FILE *fp);
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
@@ -19,23 +19,16 @@ IO_CONFIG *load_io_config(FILE *fp);
 AXIS_CONFIG *load_axis_config(FILE *fp);
 SERVO_CONFIG *load_servo_config(FILE *fp);
 /*-----------------------------------------------------------------------------
- * PLC Task Property Loader
+ * PLC Task Loader
  *---------------------------------------------------------------------------*/
-PLC_TASK_PROP *load_plc_task_property(FILE *fp);
-/*-----------------------------------------------------------------------------
- * PLC Task Data Loader
- *---------------------------------------------------------------------------*/
-PLC_TASK_DATA *load_plc_task_data(FILE *fp);
-/*-----------------------------------------------------------------------------
- * PLC Task Code Loader
- *---------------------------------------------------------------------------*/
-char *load_inst_arg_addr(FILE *fp, PLC_TASK_DATA *data);
-PLC_TASK_INST *load_plc_task_inst(FILE *fp, PLC_TASK_DATA *data, inst_desc_map_t inst_desc);
-PLC_TASK_CODE *load_plc_task_code(FILE *fp, PLC_TASK_CODE *data, inst_desc_map_t *inst_desc);
-/*-----------------------------------------------------------------------------
- * PLC Task List Loader
- *---------------------------------------------------------------------------*/
+char *load_plc_task_data(FILE *fp);
+char *load_inst_arg_addr(FILE *fp, char *data);
+PLC_INST *load_plc_task_inst(FILE *fp, char *data, inst_desc_map_t *inst_desc);
+PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_desc);
 PLC_TASK *load_plc_task(FILE *fp, inst_desc_map_t *inst_desc);
-PLC_TASK_LIST *load_plc_task_list(FILE *fp, inst_desc_map_t *inst_desc);
+/*-----------------------------------------------------------------------------
+ * PLC Model Loader
+ *---------------------------------------------------------------------------*/
+//OBJ_FILE *load_obj_file(FILE *fp, inst_desc_map_t *inst_desc);
 
 #endif

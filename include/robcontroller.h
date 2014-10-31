@@ -1,5 +1,5 @@
-#ifndef __rc_CONTROLLER_H__
-#define __rc_CONTROLLER_H__
+#ifndef __RC_CONTROLLER_H__
+#define __RC_CONTROLLER_H__
 
 #include "plcmodel.h"
 
@@ -14,14 +14,14 @@ typedef struct {
     double actual_pos;
     double actual_vel;
     double actual_acc;
-} InterpData; /* Single axis interpolation command & actual data from RC */
+} INTERP_DATA; /* Single axis interpolation command & actual data from RC */
 
 
 //static void interp_input_update();
 //static void interp_output_update();
 static void interp_calculate(void *config); /* TODO NOTE single/multiple axis interpolation */
 static void rc_task_create();
-void rc_task_init(RobotConfig *config);
-void rc_task_start(RobotConfig *config);
+void rc_task_init(ROBOT_CONFIG *config);
+void rc_task_start(ROBOT_CONFIG *config);
 void rc_task_delete();
 #endif

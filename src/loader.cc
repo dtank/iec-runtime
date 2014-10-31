@@ -7,41 +7,33 @@ extern ec_map_t ec_msg;
 /*-----------------------------------------------------------------------------
  * PLC Object File Header Loader
  *---------------------------------------------------------------------------*/
-OBJ_HEADER *load_obj_header(FILE *fp) {
-	OBJ_HEADER *header = new OBJ_HEADER;
-	if (header != NULL) {
-		fread(header->magic, MAGIC_SIZE, 1, fp); /* read magic number */
-		if (strcmp(header->magic, MAGIC) != 0) {
-		    LOGGER_ERR(EC_PLC_FILE, "");
-			return NULL;
-		}
-		fread(&header->type, sizeof(header->type), 1, fp);
-		if (header->type != SYS_TYPE) {
-		    LOGGER_ERR(EC_SYS_TYPE, "");
-			return NULL;
-		}
-		fread(&header->order, sizeof(header->order), 1, fp);
-		if (header->order != SYS_BYTE_ORDER) {
-		    LOGGER_ERR(EC_BYTE_ORDER, "");
-			return NULL;
-		}
-		fread(&header->version, sizeof(header->version), 1, fp);
-		if (SYS_VERSION < header->version) {
-		    LOGGER_ERR(EC_SYS_VERSION, "");
-			return NULL;
-		}
-		fread(&header->machine, sizeof(header->machine), 1, fp);
-		if (header->machine != SYS_MACHINE) {
-		    LOGGER_ERR(EC_SYS_MACHINE, "");
-			return NULL;
-		}
-		LOGGER_DBG(
-			"OBJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
-			header->magic, header->type, header->order, header->version, header->machine);
-		return header;
+int check_obj_file(FILE *fp) {
+    OBJ_HEADER header;
+	fread(&header, sizeof(header), 1, fp);
+	if (strcmp(header.magic, MAGIC) != 0) {
+	    LOGGER_ERR(EC_PLC_FILE, "");
+		return -1;
 	}
-    LOGGER_ERR(EC_FULL_MEM, "Can't load PLC object file header");
-	return NULL;
+	if (header.type != SYS_TYPE) {
+	    LOGGER_ERR(EC_SYS_TYPE, "");
+		return -1;
+	}
+	if (header.order != SYS_BYTE_ORDER) {
+	    LOGGER_ERR(EC_BYTE_ORDER, "");
+		return -1;
+	}
+	if (SYS_VERSION < header.version) {
+	    LOGGER_ERR(EC_SYS_VERSION, "");
+		return -1;
+	}
+	if (header.machine != SYS_MACHINE) {
+	    LOGGER_ERR(EC_SYS_MACHINE, "");
+		return -1;
+	}
+	LOGGER_DBG(
+		"OBJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
+		header.magic, header.type, header.order, header.version, header.machine);
+	return 0;
 }
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
@@ -79,7 +71,7 @@ IO_CONFIG *load_io_config(FILE *fp) {
 			io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
 		return io_config;
 	}
-    LOGGER_ERR(EC_FULL_MEM, "Can't load i/o configuration");
+    LOGGER_ERR(EC_OOM, "Can't load i/o configuration");
 	return NULL;
 }
 /*-----------------------------------------------------------------------------
@@ -123,7 +115,7 @@ AXIS_CONFIG *load_axis_config(FILE *fp) {
 
 		return axis_config;
 	}
-    LOGGER_ERR(EC_FULL_MEM, "Can't load axis configuration");
+    LOGGER_ERR(EC_OOM, "Can't load axis configuration");
 	return NULL;
 }
 SERVO_CONFIG *load_servo_config(FILE *fp) {
@@ -147,69 +139,37 @@ SERVO_CONFIG *load_servo_config(FILE *fp) {
 		}
 		return servo_config;
 	}
-    LOGGER_ERR(EC_FULL_MEM, "Can't load servo configuration");
+    LOGGER_ERR(EC_OOM, "Can't load servo configuration");
 	return NULL;
 }
-/*-----------------------------------------------------------------------------
- * PLC Task Property Loader
- *---------------------------------------------------------------------------*/
-PLC_TASK_PROP *load_plc_task_property(FILE *fp) {
-	uint8_t name_size;
-    fread(&name_size, sizeof(name_size), 1, fp);
-	PLC_TASK_PROP *property = new PLC_TASK_PROP;
-	if (property != NULL) {
-    	fread(property->name, name_size, 1, fp);
-        if (SYS_MAX_TASK_NAME_SIZE < name_size) {
-            LOGGER_ERR(EC_TASK_NAME_SIZE, "");
-            return NULL;
-        }
-    	fread(&property->priority, sizeof(property->priority), 1, fp);
-        if (property->priority < SYS_MIN_TASK_PRIORITY || SYS_MAX_TASK_PRIORITY < property->priority) {
-            LOGGER_ERR(EC_TASK_PRIORITY, "");
-            return NULL;
-        }
-    	fread(&property->interval, sizeof(property->interval), 1, fp);
-        if (property->interval < SYS_MAX_TASK_NAME_SIZE) {
-            LOGGER_ERR(EC_TASK_INTERVAL, "");
-            return NULL;
-        }
-        //fread(&property->data_size, sizeof(property->data_size), 1, fp);
-        //fread(&property->inst_count, sizeof(property->inst_count), 1, fp);
-		LOGGER_DBG("PLC_TASK_PROP:\n .name = %s\n .priority = %d\n .interval = %d", property->name, property->priority, property->interval);
-		return property;
-	}
-    LOGGER_ERR(EC_FULL_MEM, "Can't load plc task property");
-	return NULL;
-}
+
 /*-----------------------------------------------------------------------------
  * PLC Task Data Loader
  *---------------------------------------------------------------------------*/
-PLC_TASK_DATA *load_plc_task_data(FILE *fp) {
-    uint32_t size;
-    fread(&size, sizeof(size), 1, fp);
-    if (SYS_MAX_TASK_DATA_SIZE < size) {
+char *load_plc_task_data(FILE *fp) {
+    uint32_t data_size;
+    fread(&data_size, sizeof(data_size), 1, fp);
+    if (SYS_MAX_TASK_DATA_SIZE < data_size) {
         LOGGER_ERR(EC_TASK_DATA_SIZE, "");
         return NULL;
     }
-    PLC_TASK_DATA *data = new PLC_TASK_DATA[size];
-    if (data != NULL) {
-        fread(data, size, 1, fp);
-        LOGGER_DBG("PLC_TASK_DATA:\n .addr = %d, .first = %d, .last = %d", data, data[0], data[size-1]);
-        return data;
+    char *data = new char[data_size];
+    if (data == NULL) {
+        LOGGER_ERR(EC_OOM, "Can't load plc task data");
+        return NULL;
     }
-    LOGGER_ERR(EC_FULL_MEM, "Can't load plc task data");
-    return NULL;
+    fread(data, data_size, 1, fp);
+    return data;
 }
 /*-----------------------------------------------------------------------------
  * PLC Task Code Loader
  *---------------------------------------------------------------------------*/
-char *load_inst_arg_addr(FILE *fp, PLC_TASK_DATA *data) {
+char *load_inst_arg_addr(FILE *fp, char *data) {
     uint32_t arg_va;
     fread(&arg_va, sizeof(arg_va), 1, fp);
     int flag = arg_va & ARG_ADDR_FLAG_MASK;
     uint32_t arg_addr_offset = arg_va >> ARG_ADDR_FLAG_SIZE;
     char *arg_addr;
-    LOGGER_DBG("data size = %d", sizeof(data));
     switch (flag) {
         // TODO Error checker
         case ARG_ADDR_DATA: arg_addr = &data[arg_addr_offset];break;
@@ -219,45 +179,89 @@ char *load_inst_arg_addr(FILE *fp, PLC_TASK_DATA *data) {
     LOGGER_DBG("inst_arg_addr = %d", arg_addr);
     return arg_addr;
 }
-PLC_TASK_INST *load_plc_task_inst(FILE *fp, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
-    PLC_TASK_INST *inst = new PLC_TASK_INST;
+
+PLC_INST *load_plc_task_inst(FILE *fp, char *data, inst_desc_map_t *inst_desc) {
+    PLC_INST *inst = new PLC_INST;
+    if (inst == NULL) {
+        LOGGER_ERR(EC_OOM, "Can't load plc task instruction");
+        return NULL;
+    }
     fread(&inst->id, sizeof(inst->id), 1, fp);
-    LOGGER_DBG("inst_id = %d", inst->id);
     inst->arg_addr = new char*[(*inst_desc)[inst->id].args_count];
+    if (inst->arg_addr == NULL) {
+        LOGGER_ERR(EC_OOM, "Can't load instruction arguments");
+        delete inst;
+        return NULL;
+    }
     for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
+        //TODO Error Checker
         inst->arg_addr[i] = load_inst_arg_addr(fp, data);
     }
     return inst;
 }
-PLC_TASK_CODE *load_plc_task_code(FILE *fp, PLC_TASK_DATA *data, inst_desc_map_t *inst_desc) {
+PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_desc) {
     uint32_t inst_count;
     fread(&inst_count, sizeof(inst_count), 1, fp);
-    PLC_TASK_CODE *code = new PLC_TASK_CODE;
-    code->inst = new PLC_TASK_INST*[inst_count];
+    PLC_INST *code = new PLC_INST[inst_count];
+    if (code == NULL) {
+        LOGGER_ERR(EC_OOM, "Can't load plc task code");
+        return NULL;
+    }
+    PLC_INST *inst = NULL;
     for (uint32_t i = 0; i < inst_count; ++i) {
-        code->inst[i] = load_plc_task_inst(fp, data, inst_desc);
+        if ((inst=load_plc_task_inst(fp, data, inst_desc)) == NULL) {
+            LOGGER_ERR(EC_LOAD_TASK_INST, "");
+            delete code;
+            return NULL;
+        }
+        code[i].id = inst->id;
+        code[i].arg_addr = inst->arg_addr;
     }
     return code;
 }
 
 /*-----------------------------------------------------------------------------
- * PLC Task List Loader
+ * PLC Task Loader
  *---------------------------------------------------------------------------*/
 PLC_TASK *load_plc_task(FILE *fp, inst_desc_map_t *inst_desc) {
     PLC_TASK *task = new PLC_TASK;
-    task->property = *load_plc_task_property(fp);
-    task->data = load_plc_task_data(fp);
-    task->code = *load_plc_task_code(fp, task->data, inst_desc);
+    if (task == NULL) {
+        LOGGER_ERR(EC_OOM, "Can't load plc task");
+        return NULL;
+    }
+    /* PLC Task Property */
+	uint8_t name_size;
+    fread(&name_size, sizeof(name_size), 1, fp);
+    if (SYS_MAX_TASK_NAME_SIZE < name_size) {
+        LOGGER_ERR(EC_TASK_NAME_SIZE, "");
+        delete task;
+        return NULL;
+    }
+    fread(task->name, name_size, 1, fp);
+    fread(&task->priority, sizeof(task->priority), 1, fp);
+    if (task->priority < SYS_MIN_TASK_PRIORITY || SYS_MAX_TASK_PRIORITY < task->priority) {
+        LOGGER_ERR(EC_TASK_PRIORITY, "");
+        delete task;
+        return NULL;
+    }
+    fread(&task->interval, sizeof(task->interval), 1, fp);
+    if (task->interval < SYS_MAX_TASK_NAME_SIZE) {
+        LOGGER_ERR(EC_TASK_INTERVAL, "");
+        delete task;
+        return NULL;
+    }
+    /* PLC Task Data */
+    if ((task->data=load_plc_task_data(fp)) == NULL) {
+        LOGGER_ERR(EC_LOAD_TASK_DATA, "");
+        delete task;
+        return NULL;
+    }
+    /* PLC Task Code */
+    if ((task->code=load_plc_task_code(fp, task->data, inst_desc)) == NULL) {
+        LOGGER_ERR(EC_LOAD_TASK_CODE, "");
+        delete task;
+        return NULL;
+    }
     return task;
 }
-PLC_TASK_LIST *load_plc_task_list(FILE *fp, inst_desc_map_t *inst_desc) {
-    uint8_t task_count;
-    fread(&task_count, sizeof(task_count), 1, fp);
-    PLC_TASK_LIST *task_list = new PLC_TASK_LIST;
-    task_list->rt_task = new RT_TASK[task_count];
-    task_list->plc_task = new PLC_TASK[task_count];
-    for (int i = 0; i < task_count; ++i) {
-        task_list->plc_task[i] = *load_plc_task(fp, inst_desc);
-    }
-    return task_list;
-}
+
