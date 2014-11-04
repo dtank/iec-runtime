@@ -28,8 +28,7 @@ void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs) {
  *---------------------------------------------------------------------------*/
 void generate_obj_acs(FILE *fp, OBJ_ACS *acs) {
 	fwrite(&acs->is_combined, sizeof(acs->is_combined), 1, fp);
-	fwrite(&acs->name_size, sizeof(acs->name_size), 1, fp);
-	fwrite(acs->name, acs->name_size, 1, fp); /* including '\0' */
+	fwrite(acs->name, MAX_NAME_SIZE, 1, fp); /* including '\0' */
 	fwrite(&acs->node_id, sizeof(acs->node_id), 1, fp);
 	fwrite(&acs->axis_type, sizeof(acs->axis_type), 1, fp);
 	fwrite(&acs->oper_mode, sizeof(acs->oper_mode), 1, fp);

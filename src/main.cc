@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
 	};
 	OBJ_ACS obj_acs[] = {
 		{	false,            /* independent axis */
-			(uint8_t)strlen("axis1")+1,  /* include '\0' */
 			"axis1",          /* axis name */
 			1,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
@@ -45,7 +44,6 @@ int main(int argc, char* argv[])
 			(double)10.0                /* jerk limit (unit:) */
 		},
 		{	true,             /* combined axis */
-			(uint8_t)strlen("axis2")+1,  /* include '\0' */
 			"axis2",          /* axis name */
 			2,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */

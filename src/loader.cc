@@ -57,12 +57,12 @@ AXIS_CONFIG *load_axis_config(FILE *fp) {
     	return NULL;
     }
 	fread(&axis_config->is_combined, sizeof(axis_config->is_combined), 1, fp);
-	fread(&name_size, sizeof(name_size), 1, fp);
-	if (SYS_MAX_AXIS_NAME_SIZE < name_size) {
-		LOGGER_ERR(EC_AXIS_NAME_SIZE, "");
-		return NULL;
-	}
-	fread(axis_config->name, name_size, 1, fp);
+	//fread(&name_size, sizeof(name_size), 1, fp);
+	//if (SYS_MAX_AXIS_NAME_SIZE < name_size) {
+		//LOGGER_ERR(EC_AXIS_NAME_SIZE, "");
+		//return NULL;
+	//}
+	fread(axis_config->name, SYS_MAX_AXIS_NAME_SIZE, 1, fp);
 	fread(&axis_config->node_id, sizeof(axis_config->node_id), 1, fp);
 	if (axis_config->node_id < SYS_MIN_AXIS_NODE_ID || SYS_MAX_AXIS_NODE_ID < axis_config->node_id) {
 		LOGGER_ERR(EC_AXIS_ID_RANGE, "");

@@ -38,10 +38,10 @@ typedef struct {
 #define OPER_MODE_POS 1
 #define OPER_MODE_VEL 2
 #define OPER_MODE_TOR 3
+#define MAX_NAME_SIZE 16
 typedef struct {
 	bool is_combined;   /* independent axis | combined axis */
-	uint8_t name_size;  /* including '\0' */
-	char *name;         /* axis name */
+	char name[MAX_NAME_SIZE];         /* axis name */
 	uint8_t node_id;    /* axis id */
 	uint8_t axis_type;  /* axis type: FINITE | MODULO */
 	uint8_t oper_mode;  /* operating mode: POSITION | VELOCITY | TORQUE */
