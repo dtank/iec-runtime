@@ -1,78 +1,50 @@
 #include <string.h>
+#include <map>
 #include "loader.h"
 #include "logger.h"
 
+using namespace std;
 extern char *io_shm;
 extern ec_map_t ec_msg;
-/*-----------------------------------------------------------------------------
- * PLC Object File Header Loader
- *---------------------------------------------------------------------------*/
-int check_obj_file(FILE *fp) {
-    OBJ_HEADER header;
-	fread(&header, sizeof(header), 1, fp);
-	if (strcmp(header.magic, MAGIC) != 0) {
-	    LOGGER_ERR(EC_PLC_FILE, "");
-		return -1;
-	}
-	if (header.type != SYS_TYPE) {
-	    LOGGER_ERR(EC_SYS_TYPE, "");
-		return -1;
-	}
-	if (header.order != SYS_BYTE_ORDER) {
-	    LOGGER_ERR(EC_BYTE_ORDER, "");
-		return -1;
-	}
-	if (SYS_VERSION < header.version) {
-	    LOGGER_ERR(EC_SYS_VERSION, "");
-		return -1;
-	}
-	if (header.machine != SYS_MACHINE) {
-	    LOGGER_ERR(EC_SYS_MACHINE, "");
-		return -1;
-	}
-	LOGGER_DBG(
-		"OBJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
-		header.magic, header.type, header.order, header.version, header.machine);
-	return 0;
-}
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
 IO_CONFIG *load_io_config(FILE *fp) {
 	IO_CONFIG *io_config = new IO_CONFIG;
-	if (io_config != NULL) {
-		fread(&io_config->update_interval, sizeof(io_config->update_interval), 1, fp);
-		if (io_config->update_interval < SYS_MIN_IO_INTERVAL) {
-		    LOGGER_ERR(EC_IO_INTERVAL, "");
-			return NULL;
-		}
-		fread(&io_config->ldi_count, sizeof(io_config->ldi_count), 1, fp);
-		if (SYS_MAX_LDI_COUNT < io_config->ldi_count) {
-		    LOGGER_ERR(EC_LDI_COUNT, "");
-			return NULL;
-		}
-		fread(&io_config->ldo_count, sizeof(io_config->ldo_count), 1, fp);
-		if (SYS_MAX_LDO_COUNT < io_config->ldo_count) {
-		    LOGGER_ERR(EC_LDO_COUNT, "");
-			return NULL;
-		}
-		fread(&io_config->lai_count, sizeof(io_config->lai_count), 1, fp);
-		if (SYS_MAX_LAI_COUNT < io_config->lai_count) {
-		    LOGGER_ERR(EC_LAI_COUNT, "");
-			return NULL;
-		}
-		fread(&io_config->lao_count, sizeof(io_config->lao_count), 1, fp);
-		if (SYS_MAX_LAO_COUNT < io_config->lao_count) {
-		    LOGGER_ERR(EC_LAO_COUNT, "");
-			return NULL;
-		}
-		LOGGER_DBG(
-			"IO_CONFIG:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
-			io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
-		return io_config;
+	if (io_config == NULL) {
+        LOGGER_ERR(EC_OOM, "Can't load i/o configuration");
+        return NULL;
+    }
+	fread(io_config, sizeof(*io_config), 1, fp);
+    if (io_config->update_interval < SYS_MIN_IO_INTERVAL) {
+        LOGGER_ERR(EC_IO_INTERVAL, "");
+        delete io_config;
+        return NULL;
+    }
+    if (SYS_MAX_LDI_COUNT < io_config->ldi_count) {
+        LOGGER_ERR(EC_LDI_COUNT, "");
+        delete io_config;
+        return NULL;
+    }
+	if (SYS_MAX_LDO_COUNT < io_config->ldo_count) {
+	    LOGGER_ERR(EC_LDO_COUNT, "");
+        delete io_config;
+		return NULL;
 	}
-    LOGGER_ERR(EC_OOM, "Can't load i/o configuration");
-	return NULL;
+	if (SYS_MAX_LAI_COUNT < io_config->lai_count) {
+	    LOGGER_ERR(EC_LAI_COUNT, "");
+        delete io_config;
+		return NULL;
+	}
+	if (SYS_MAX_LAO_COUNT < io_config->lao_count) {
+	    LOGGER_ERR(EC_LAO_COUNT, "");
+        delete io_config;
+		return NULL;
+	}
+	LOGGER_DBG(
+		"IO_CONFIG:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
+		io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
+	return io_config;
 }
 /*-----------------------------------------------------------------------------
  * Servo Configuration Loader
@@ -80,43 +52,43 @@ IO_CONFIG *load_io_config(FILE *fp) {
 AXIS_CONFIG *load_axis_config(FILE *fp) {
 	AXIS_CONFIG *axis_config = new AXIS_CONFIG;
 	uint8_t name_size;
-	if (axis_config != NULL) {
-		fread(&axis_config->is_combined, sizeof(axis_config->is_combined), 1, fp);
-		fread(&name_size, sizeof(name_size), 1, fp);
-		if (SYS_MAX_AXIS_NAME_SIZE < name_size) {
-			LOGGER_ERR(EC_AXIS_NAME_SIZE, "");
-			return NULL;
-		}
-		fread(axis_config->name, name_size, 1, fp);
-		fread(&axis_config->node_id, sizeof(axis_config->node_id), 1, fp);
-		if (axis_config->node_id < SYS_MIN_AXIS_NODE_ID || SYS_MAX_AXIS_NODE_ID < axis_config->node_id) {
-			LOGGER_ERR(EC_AXIS_ID_RANGE, "");
-			return NULL;
-		}
-		fread(&axis_config->axis_type, sizeof(axis_config->axis_type), 1, fp);
-		if (axis_config->axis_type != AXIS_TYPE_FINITE && axis_config->axis_type != AXIS_TYPE_MODULO) {
-			LOGGER_ERR(EC_AXIS_TYPE, "");
-			return NULL;
-		}
-		fread(&axis_config->oper_mode, sizeof(axis_config->oper_mode), 1, fp);
-		if (axis_config->oper_mode != OPER_MODE_POS && axis_config->oper_mode != OPER_MODE_VEL && axis_config->oper_mode != OPER_MODE_TOR) {
-			LOGGER_ERR(EC_AXIS_OPER_MODE, "");
-			return NULL;
-		}
-		fread(&axis_config->sw_limit_neg, sizeof(axis_config->sw_limit_neg), 1, fp);
-		fread(&axis_config->sw_limit_pos, sizeof(axis_config->sw_limit_pos), 1, fp);
-		fread(&axis_config->max_vel, sizeof(axis_config->max_vel), 1, fp);
-		fread(&axis_config->max_acc, sizeof(axis_config->max_acc), 1, fp);
-		fread(&axis_config->max_dec, sizeof(axis_config->max_dec), 1, fp);
-		fread(&axis_config->max_jerk, sizeof(axis_config->max_jerk), 1, fp);
-		LOGGER_DBG(
-			"AXIS_CONFIG:\n .is_combined = %d\n .name = %s\n .node_id = %d\n .axis_type = %d\n .oper_mode = %d\n .sw_limit_neg = %f\n .sw_limit_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
-			axis_config->is_combined, axis_config->name, axis_config->node_id, axis_config->axis_type, axis_config->oper_mode, axis_config->sw_limit_neg, axis_config->sw_limit_pos, axis_config->max_vel, axis_config->max_acc, axis_config->max_dec, axis_config->max_jerk);
-
-		return axis_config;
+	if (axis_config == NULL) {
+        LOGGER_ERR(EC_OOM, "Can't load axis configuration");
+    	return NULL;
+    }
+	fread(&axis_config->is_combined, sizeof(axis_config->is_combined), 1, fp);
+	fread(&name_size, sizeof(name_size), 1, fp);
+	if (SYS_MAX_AXIS_NAME_SIZE < name_size) {
+		LOGGER_ERR(EC_AXIS_NAME_SIZE, "");
+		return NULL;
 	}
-    LOGGER_ERR(EC_OOM, "Can't load axis configuration");
-	return NULL;
+	fread(axis_config->name, name_size, 1, fp);
+	fread(&axis_config->node_id, sizeof(axis_config->node_id), 1, fp);
+	if (axis_config->node_id < SYS_MIN_AXIS_NODE_ID || SYS_MAX_AXIS_NODE_ID < axis_config->node_id) {
+		LOGGER_ERR(EC_AXIS_ID_RANGE, "");
+		return NULL;
+	}
+	fread(&axis_config->axis_type, sizeof(axis_config->axis_type), 1, fp);
+	if (axis_config->axis_type != AXIS_TYPE_FINITE && axis_config->axis_type != AXIS_TYPE_MODULO) {
+		LOGGER_ERR(EC_AXIS_TYPE, "");
+		return NULL;
+	}
+	fread(&axis_config->oper_mode, sizeof(axis_config->oper_mode), 1, fp);
+	if (axis_config->oper_mode != OPER_MODE_POS && axis_config->oper_mode != OPER_MODE_VEL && axis_config->oper_mode != OPER_MODE_TOR) {
+		LOGGER_ERR(EC_AXIS_OPER_MODE, "");
+		return NULL;
+	}
+	fread(&axis_config->sw_limit_neg, sizeof(axis_config->sw_limit_neg), 1, fp);
+	fread(&axis_config->sw_limit_pos, sizeof(axis_config->sw_limit_pos), 1, fp);
+	fread(&axis_config->max_vel, sizeof(axis_config->max_vel), 1, fp);
+	fread(&axis_config->max_acc, sizeof(axis_config->max_acc), 1, fp);
+	fread(&axis_config->max_dec, sizeof(axis_config->max_dec), 1, fp);
+	fread(&axis_config->max_jerk, sizeof(axis_config->max_jerk), 1, fp);
+	LOGGER_DBG(
+		"AXIS_CONFIG:\n .is_combined = %d\n .name = %s\n .node_id = %d\n .axis_type = %d\n .oper_mode = %d\n .sw_limit_neg = %f\n .sw_limit_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
+		axis_config->is_combined, axis_config->name, axis_config->node_id, axis_config->axis_type, axis_config->oper_mode, axis_config->sw_limit_neg, axis_config->sw_limit_pos, axis_config->max_vel, axis_config->max_acc, axis_config->max_dec, axis_config->max_jerk);
+
+	return axis_config;
 }
 SERVO_CONFIG *load_servo_config(FILE *fp) {
 	SERVO_CONFIG *servo_config = new SERVO_CONFIG;
@@ -214,8 +186,7 @@ PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_desc) {
             delete code;
             return NULL;
         }
-        code[i].id = inst->id;
-        code[i].arg_addr = inst->arg_addr;
+        code[i] = *inst;
     }
     return code;
 }
@@ -264,4 +235,77 @@ PLC_TASK *load_plc_task(FILE *fp, inst_desc_map_t *inst_desc) {
     }
     return task;
 }
-
+/*-----------------------------------------------------------------------------
+ * PLC Model Loader
+ *---------------------------------------------------------------------------*/
+bool obj_is_valid(FILE *fp) {
+    OBJ_HEADER header;
+	fread(&header, sizeof(header), 1, fp);
+    if (strcmp(header.magic, MAGIC) != 0) {
+        LOGGER_ERR(EC_PLC_FILE, "");
+        return false;
+    }
+    if (header.type != SYS_TYPE) {
+        LOGGER_ERR(EC_SYS_TYPE, "");
+        return false;
+    }
+	if (header.order != SYS_BYTE_ORDER) {
+	    LOGGER_ERR(EC_BYTE_ORDER, "");
+		return false;
+	}
+	if (SYS_VERSION < header.version) {
+	    LOGGER_ERR(EC_SYS_VERSION, "");
+		return false;
+	}
+	if (header.machine != SYS_MACHINE) {
+	    LOGGER_ERR(EC_SYS_MACHINE, "");
+		return false;
+	}
+	LOGGER_DBG(
+		"OBJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
+		header.magic, header.type, header.order, header.version, header.machine);
+	return true;
+}
+PLC_MODEL *load_plc_model(FILE *fp, inst_desc_map_t *inst_desc) {
+    if (!obj_is_valid(fp)) {
+        return NULL;
+    }
+    PLC_MODEL *model = new PLC_MODEL;
+    if (model == NULL) {
+        LOGGER_ERR(EC_OOM, "");
+        return NULL;
+    }
+    IO_CONFIG *io_config = load_io_config(fp);
+    if (io_config == NULL) {
+        //TODO LOGGER_ERR
+        return NULL;
+    }
+    model->io_config = *io_config;
+    SERVO_CONFIG *servo_config = load_servo_config(fp);
+    if (servo_config == NULL) {
+        //TODO LOGGER_ERR
+        return NULL;
+    }
+    model->servo_config = *servo_config;
+    uint8_t task_count;
+    fread(&task_count, sizeof(task_count), 1, fp);
+    if (task_count <= 0) {
+        //TODO LOGGER_ERR
+        return NULL;
+    }
+    model->rt_task = new RT_TASK[task_count];
+    model->plc_task = new PLC_TASK[task_count];
+    if (model->rt_task == NULL || model->plc_task == NULL) {
+        LOGGER_ERR(EC_OOM, "");
+        return NULL;
+    }
+    PLC_TASK *plc_task = NULL;
+    for (int i = 0; i < task_count; ++i) {
+        if ((plc_task=load_plc_task(fp, inst_desc)) == NULL) {
+            //TODO LOGGER_ERR
+            return NULL;
+        }
+        model->plc_task[i] = *plc_task;
+    }
+    return model;
+}

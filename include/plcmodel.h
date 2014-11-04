@@ -93,11 +93,11 @@ typedef struct {
     PLC_INST *code; /* task code */
 } PLC_TASK;
 /*-----------------------------------------------------------------------------
- * Definition of PLC Task
+ * Definition of PLC Medel
  *---------------------------------------------------------------------------*/
 typedef struct {
     IO_CONFIG io_config;
-    AXIS_CONFIG axis_config;
+    SERVO_CONFIG servo_config;
     RT_TASK *rt_task;
     PLC_TASK *plc_task;
 } PLC_MODEL;

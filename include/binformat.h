@@ -23,7 +23,6 @@ typedef struct {
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration Segment
  *---------------------------------------------------------------------------*/
-typedef uint32_t io_refresh_interval_t;
 typedef struct {
 	uint32_t update_interval; /* I/O data update interval */
 	uint8_t ldi_count;        /* number of local digital input module */

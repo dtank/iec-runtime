@@ -6,10 +6,6 @@
 #include "instruction.h"
 
 /*-----------------------------------------------------------------------------
- * PLC Object File Header Loader
- *---------------------------------------------------------------------------*/
-int check_obj_file(FILE *fp);
-/*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
 IO_CONFIG *load_io_config(FILE *fp);
@@ -29,6 +25,7 @@ PLC_TASK *load_plc_task(FILE *fp, inst_desc_map_t *inst_desc);
 /*-----------------------------------------------------------------------------
  * PLC Model Loader
  *---------------------------------------------------------------------------*/
-//OBJ_FILE *load_obj_file(FILE *fp, inst_desc_map_t *inst_desc);
+bool obj_is_valid(FILE *fp);
+PLC_MODEL *load_plc_model(FILE *fp, inst_desc_map_t *inst_desc);
 
 #endif

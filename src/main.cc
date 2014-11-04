@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	};
 	OBJ_ACS obj_acs[] = {
 		{	false,            /* independent axis */
-			(uint8_t)strlen("axis1")+1,  /* NOT include '\0' */
+			(uint8_t)strlen("axis1")+1,  /* include '\0' */
 			"axis1",          /* axis name */
 			1,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 			(double)10.0                /* jerk limit (unit:) */
 		},
 		{	true,             /* combined axis */
-			(uint8_t)strlen("axis2")+1,  /* NOT include '\0' */
+			(uint8_t)strlen("axis2")+1,  /* include '\0' */
 			"axis2",          /* axis name */
 			2,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
@@ -145,30 +145,23 @@ int main(int argc, char* argv[])
     };
 
 	FILE *fplc = fopen("plc.bin", "wb");
-	generate_obj_file(fplc, &obj_file, &inst_desc);
+    generate_obj_file(fplc, &obj_file, &inst_desc);
 	fclose(fplc);
 	fplc = fopen("plc.bin", "rb");
-	check_obj_file(fplc);
-	IO_CONFIG *io_config = load_io_config(fplc);
-	SERVO_CONFIG *servo_config = load_servo_config(fplc);
-	//OBJ_PTCS *myobj_ptcs = load_obj_ptcs(fplc);
-	//PLC_TASK_PROP *plc_task_prop = load_plc_task_property(fplc);
-    //PLC_TASK_DATA *plc_task_data = load_plc_task_data(fplc);
-	//PLC_CONFIG *config = load_plc_config(fplc);
-    //PLC_TASK_LIST *plc_task_list = load_plc_task_list(fplc, &inst_desc);
+    PLC_MODEL *model = load_plc_model(fplc, &inst_desc);
 	fclose(fplc);
 	//Avoids memory swapping for this program
     mlockall(MCL_CURRENT|MCL_FUTURE);
-    io_task_init(io_config);
-    servo_task_init(servo_config);
+    //io_task_init(io_config);
+    //servo_task_init(servo_config);
 
 
-    io_task_start(io_config);
-    servo_task_start(servo_config);
+    //io_task_start(io_config);
+    //servo_task_start(servo_config);
 	//plc_task_create(plc_task_list, config);
 	//plc_task_start(plc_task_list, config);
-    pause();
-    io_task_delete();
+    //pause();
+    //io_task_delete();
 	//plc_task_delete(plc_task_list, config);
 
 	return 0;
