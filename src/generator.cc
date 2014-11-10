@@ -27,8 +27,8 @@ void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs) {
  * Servo Configuration Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_acs(FILE *fp, OBJ_ACS *acs) {
-	fwrite(&acs->is_combined, sizeof(acs->is_combined), 1, fp);
 	fwrite(acs->name, MAX_NAME_SIZE, 1, fp); /* including '\0' */
+	fwrite(&acs->is_combined, sizeof(acs->is_combined), 1, fp);
 	fwrite(&acs->node_id, sizeof(acs->node_id), 1, fp);
 	fwrite(&acs->axis_type, sizeof(acs->axis_type), 1, fp);
 	fwrite(&acs->oper_mode, sizeof(acs->oper_mode), 1, fp);
@@ -50,8 +50,7 @@ void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
  * PLC Task Property Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
-	fwrite(&ptps->name_size, sizeof(ptps->name_size), 1, fp);
-	fwrite(ptps->name, ptps->name_size, 1, fp);
+	fwrite(ptps->name, MAX_NAME_SIZE, 1, fp);
 	fwrite(&ptps->priority, sizeof(ptps->priority), 1, fp);
 	fwrite(&ptps->interval, sizeof(ptps->interval), 1, fp);
 	//fwrite(&ptps->ptds_size, sizeof(ptcs->ptds_size), 1, fp);

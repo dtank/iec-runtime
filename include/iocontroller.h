@@ -5,9 +5,9 @@
 
 /* I/O Shared Memory Definition */
 #define LDI_ADDR_OFFSET 0
-#define LDO_ADDR_OFFSET (LDI_ADDR_OFFSET+config->ldi_count*SYS_LDI_WORDSIZE)
-#define LAI_ADDR_OFFSET (LDO_ADDR_OFFSET+config->ldo_count*SYS_LDO_WORDSIZE)
-#define LAO_ADDR_OFFSET (LAI_ADDR_OFFSET+config->lai_count*SYS_LAI_WORDSIZE)
+#define LDO_ADDR_OFFSET (LDI_ADDR_OFFSET+config->ldi_count*LDI_WORDSIZE)
+#define LAI_ADDR_OFFSET (LDO_ADDR_OFFSET+config->ldo_count*LDO_WORDSIZE)
+#define LAO_ADDR_OFFSET (LAI_ADDR_OFFSET+config->lai_count*LAI_WORDSIZE)
 
 #define IO_TASK_NAME "io_task"
 #define IO_TASK_PRIORITY 99

@@ -40,8 +40,8 @@ typedef struct {
 #define OPER_MODE_TOR 3
 #define MAX_NAME_SIZE 16
 typedef struct {
-	bool is_combined;   /* independent axis | combined axis */
 	char name[MAX_NAME_SIZE];         /* axis name */
+	bool is_combined;   /* independent axis | combined axis */
 	uint8_t node_id;    /* axis id */
 	uint8_t axis_type;  /* axis type: FINITE | MODULO */
 	uint8_t oper_mode;  /* operating mode: POSITION | VELOCITY | TORQUE */
@@ -63,8 +63,7 @@ typedef struct {
  * Definition of PLC Task Property Segment
  *---------------------------------------------------------------------------*/
 typedef struct {
-	uint8_t name_size;   /* size of plc task name, including '\0' */
-	char *name;          /* plc task name */
+	char name[MAX_NAME_SIZE];          /* plc task name */
 	uint8_t priority;    /* plc task priority */
 	uint32_t interval;   /* plc task period interval (unit: ns) */
 	//uint32_t ptds_size;  [> size of plc task data segment <]

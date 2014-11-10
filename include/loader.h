@@ -8,24 +8,25 @@
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
-IO_CONFIG *load_io_config(FILE *fp);
+static int load_io_config(FILE *fp, IO_CONFIG *io_config);
 /*-----------------------------------------------------------------------------
  * Servo Configuration Loader
  *---------------------------------------------------------------------------*/
-AXIS_CONFIG *load_axis_config(FILE *fp);
-SERVO_CONFIG *load_servo_config(FILE *fp);
+static int load_axis_config(FILE *fp, AXIS_CONFIG *axis_config);
+static int load_servo_config(FILE *fp, SERVO_CONFIG *servo_config);
 /*-----------------------------------------------------------------------------
  * PLC Task Loader
  *---------------------------------------------------------------------------*/
-char *load_plc_task_data(FILE *fp);
-char *load_inst_arg_addr(FILE *fp, char *data);
-PLC_INST *load_plc_task_inst(FILE *fp, char *data, inst_desc_map_t *inst_desc);
-PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_desc);
-PLC_TASK *load_plc_task(FILE *fp, inst_desc_map_t *inst_desc);
+static char *load_plc_task_data(FILE *fp);
+static char *load_inst_arg_addr(FILE *fp, char *data);
+// TODO change to memcpy type
+static PLC_INST *load_plc_task_inst(FILE *fp, char *data, inst_desc_map_t *inst_desc);
+static PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_desc);
+static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc);
 /*-----------------------------------------------------------------------------
  * PLC Model Loader
  *---------------------------------------------------------------------------*/
-bool obj_is_valid(FILE *fp);
+static bool obj_is_valid(FILE *fp);
 PLC_MODEL *load_plc_model(FILE *fp, inst_desc_map_t *inst_desc);
 
 #endif

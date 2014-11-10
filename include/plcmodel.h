@@ -13,31 +13,35 @@
 #define SYS_VERSION 1
 #define SYS_MACHINE MACH_CORTEX_A8
 /* I/O */
-#define SYS_MAX_LDI_COUNT 1
-#define SYS_MAX_LDO_COUNT 1
-#define SYS_MAX_LAI_COUNT 1
-#define SYS_MAX_LAO_COUNT 1
-#define SYS_MIN_IO_INTERVAL 2000000 /* unit: ns */
-#define SYS_LDI_WORDSIZE 1 /* unit: Byte */
-#define SYS_LDO_WORDSIZE 1 /* unit: Byte */
-#define SYS_LAI_WORDSIZE 1 /* unit: Byte */
-#define SYS_LAO_WORDSIZE 1 /* unit: Byte */
-#define SYS_MAX_IO_MEM_SIZE (SYS_MAX_LDI_COUNT*SYS_LDI_WORDSIZE + \
-        SYS_MAX_LDO_COUNT*SYS_LDO_WORDSIZE + \
-        SYS_MAX_LAI_COUNT*SYS_LAI_WORDSIZE + \
-        SYS_MAX_LAO_COUNT*SYS_LAO_WORDSIZE)
+#define MAX_LDI_COUNT 1
+#define MAX_LDO_COUNT 1
+#define MAX_LAI_COUNT 1
+#define MAX_LAO_COUNT 1
+#define MIN_IO_INTERVAL 2000000 /* unit: ns */
+#define LDI_WORDSIZE 1 /* unit: Byte */
+#define LDO_WORDSIZE 1 /* unit: Byte */
+#define LAI_WORDSIZE 1 /* unit: Byte */
+#define LAO_WORDSIZE 1 /* unit: Byte */
+#define MAX_IO_MEM_SIZE (MAX_LDI_COUNT*LDI_WORDSIZE + \
+        MAX_LDO_COUNT*LDO_WORDSIZE + \
+        MAX_LAI_COUNT*LAI_WORDSIZE + \
+        MAX_LAO_COUNT*LAO_WORDSIZE)
 /* Servo */
-#define SYS_MAX_AXIS_COUNT 8
-#define SYS_MAX_AXIS_NAME_SIZE 16
-#define SYS_MIN_AXIS_NODE_ID 1
-#define SYS_MAX_AXIS_NODE_ID SYS_MAX_AXIS_COUNT
-#define SYS_MIN_SERVO_INTERVAL 2000000 /* unit: ns */
+#define MAX_AXIS_COUNT 8
+#define MAX_AXIS_NAME_SIZE 16
+#define MIN_AXIS_NODE_ID 1
+#define MAX_AXIS_NODE_ID MAX_AXIS_COUNT
+//#define MIN_AXIS_
+#define MIN_SERVO_INTERVAL 2000000 /* unit: ns */
 /* PLC Task */
-#define SYS_MAX_TASK_NAME_SIZE 16
-#define SYS_MAX_TASK_PRIORITY 90
-#define SYS_MIN_TASK_PRIORITY 50
-#define SYS_MIN_TASK_INTERVAL 8000000
-#define SYS_MAX_TASK_DATA_SIZE 65535
+#define MAX_TASK_COUNT 64
+#define MAX_TASK_NAME_SIZE 16
+#define MAX_TASK_PRIORITY 90
+#define MIN_TASK_PRIORITY 50
+#define MIN_TASK_INTERVAL 8000000
+#define MAX_TASK_DATA_SIZE 65535 /* uint16_t */
+#define MAX_INST_ID 65535 /* uint16_t */
+
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration
  *---------------------------------------------------------------------------*/
@@ -52,8 +56,8 @@ typedef struct {
  * Definition of Servo Configuration
  *---------------------------------------------------------------------------*/
 typedef struct {
+	char name[MAX_AXIS_NAME_SIZE];         /* axis name, including '\0' */
 	bool is_combined;   /* independent axis | combined axis */
-	char name[SYS_MAX_AXIS_NAME_SIZE];         /* axis name, including '\0' */
 	uint8_t node_id;    /* axis id */
 	uint8_t axis_type;  /* axis type: FINITE | MODULO */
 	uint8_t oper_mode;  /* operating mode: POSITION | VELOCITY | TORQUE */
@@ -86,7 +90,7 @@ typedef struct {
 } PLC_INST;
 
 typedef struct {
-	char name[SYS_MAX_TASK_NAME_SIZE];
+	char name[MAX_TASK_NAME_SIZE];
 	uint8_t priority;
 	uint32_t interval;
     char *data; /* task data */

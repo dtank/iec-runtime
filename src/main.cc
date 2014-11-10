@@ -31,8 +31,8 @@ int main(int argc, char* argv[])
 		0          /* number of local analog output module */
 	};
 	OBJ_ACS obj_acs[] = {
-		{	false,            /* independent axis */
-			"axis1",          /* axis name */
+        {	"axis1",          /* axis name */
+			false,            /* independent axis */
 			1,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
 			OPER_MODE_POS,    /* operating mode: POSITION | VELOCITY | TORQUE */
@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
 			(double)20.0,               /* decelaration limit (unit:) */
 			(double)10.0                /* jerk limit (unit:) */
 		},
-		{	true,             /* combined axis */
-			"axis2",          /* axis name */
+        {	"axis2",          /* axis name */
+			true,             /* combined axis */
 			2,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
 			OPER_MODE_POS,    /* operating mode: POSITION | VELOCITY | TORQUE */
@@ -65,7 +65,6 @@ int main(int argc, char* argv[])
  * PLC Task 1
  **---------------------------------------------------------------------------*/
 	OBJ_PTPS task1_ptps = {
-		(uint8_t)strlen("task1")+1, /* size of plc task name, including '\0' */
 		"task1",                    /* plc task name */
 		80,                         /* plc task priority */
 		100000000u,                 /* plc task period interval (unit: ns) */
@@ -98,7 +97,6 @@ int main(int argc, char* argv[])
  * PLC Task 2
  **---------------------------------------------------------------------------*/
     OBJ_PTPS task2_ptps = {
-		(uint8_t)strlen("task2")+1, /* size of plc task name, including '\0' */
 		"task2",                    /* plc task name */
 		90,                         /* plc task priority */
 		500000000u,                 /* plc task period interval (unit: ns) */
