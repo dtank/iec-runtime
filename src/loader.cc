@@ -138,6 +138,8 @@ static int load_task_prop(FILE *fp, TASK_PROP *task_prop) {
         return -1;
     }
     fread(&task_prop->inst_count, sizeof(task_prop->inst_count), 1, fp); /* NOT need error checker */
+    LOGGER_DBG("TASK_PROP:\n .name = %s\n .priority = %d\n .interval = %d\n .data_size = %d\n .inst_count = %d\n",
+        task_prop->name, task_prop->priority, task_prop->interval, task_prop->data_size, task_prop->inst_count);
     return 0;
 }
 static int load_task_config(FILE *fp, TASK_CONFIG *task_config) {
@@ -238,19 +240,6 @@ static PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_
  * PLC Task Loader
  *---------------------------------------------------------------------------*/
 static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
-    fread(task->name, MAX_TASK_NAME_SIZE, 1, fp);
-    fread(&task->priority, sizeof(task->priority), 1, fp);
-    if (task->priority < MIN_TASK_PRIORITY || MAX_TASK_PRIORITY < task->priority) {
-        LOGGER_ERR(EC_TASK_PRIORITY, "");
-        return -1;
-    }
-    fread(&task->interval, sizeof(task->interval), 1, fp);
-    if (task->interval < MIN_TASK_INTERVAL) {
-        LOGGER_ERR(EC_TASK_INTERVAL, "");
-        return -1;
-    }
-    fread(&task->data_size, sizeof(task->data_size), 1, fp); /* NOT need error checker */
-    fread(&task->inst_count, sizeof(task->inst_count), 1, fp); /* NOT need error checker */
     if ((task->data=load_plc_task_data(fp)) == NULL) {
         LOGGER_ERR(EC_LOAD_TASK_DATA, "");
         return -1;
@@ -259,8 +248,6 @@ static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
         LOGGER_ERR(EC_LOAD_TASK_CODE, "");
         return -1;
     }
-    LOGGER_DBG("PLC_TASK:\n .name = %s\n .priority = %d\n .interval = %d\n .data_size = %d\n .inst_count = %d\n",
-        task->name, task->priority, task->interval, task->data_size, task->inst_count);
     return 0;
 }
 /*-----------------------------------------------------------------------------

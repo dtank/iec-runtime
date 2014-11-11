@@ -79,13 +79,6 @@ int main(int argc, char* argv[])
 /*-----------------------------------------------------------------------------
  * PLC Task 1
  **---------------------------------------------------------------------------*/
-	OBJ_PTPS task1_ptps = {
-		"task1",                    /* plc task name */
-		80,                         /* plc task priority */
-		100000000u,                 /* plc task period interval (unit: ns) */
-        20,                         /* size of plc task data segment */
-        3                           /* number of plc task instructions */
-	};
     char task1_data[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
     OBJ_PTDS task1_ptds = {
         20,
@@ -104,20 +97,12 @@ int main(int argc, char* argv[])
         task1_inst
     };
     OBJ_PTS task1_pts = {
-        task1_ptps,
         task1_ptds,
         task1_ptcs
     };
 /*-----------------------------------------------------------------------------
  * PLC Task 2
  **---------------------------------------------------------------------------*/
-    OBJ_PTPS task2_ptps = {
-		"task2",                    /* plc task name */
-		90,                         /* plc task priority */
-		500000000u,                 /* plc task period interval (unit: ns) */
-        20,                         /* size of plc task data segment */
-        3                           /* number of plc task instructions */
-	};
     char task2_data[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
     OBJ_PTDS task2_ptds = {
         20,
@@ -136,7 +121,6 @@ int main(int argc, char* argv[])
         task2_inst
     };
     OBJ_PTS task2_pts = {
-        task2_ptps,
         task2_ptds,
         task2_ptcs
     };

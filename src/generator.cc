@@ -88,7 +88,6 @@ void generate_obj_ptcs(FILE *fp, OBJ_PTCS *ptcs, inst_desc_map_t *inst_desc) {
  * PLC Task List Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_pts(FILE *fp, OBJ_PTS *pts, inst_desc_map_t *inst_desc) {
-    generate_obj_ptps(fp, &pts->prop);
     generate_obj_ptds(fp, &pts->data);
     generate_obj_ptcs(fp, &pts->code, inst_desc);
 }

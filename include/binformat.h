@@ -76,7 +76,6 @@ typedef struct {
     uint8_t task_count;
     OBJ_PTPS task_prop[MAX_TASK_COUNT];
 } OBJ_TCS; /* PLC Task Configuration Segment */
-// TODO generator
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Data Segment
  *---------------------------------------------------------------------------*/
@@ -100,7 +99,6 @@ typedef struct {
  * Definition of PLC Task List Segment
  *---------------------------------------------------------------------------*/
 typedef struct {
-    OBJ_PTPS prop; /* task property */
     OBJ_PTDS data; /* task data */
     OBJ_PTCS code; /* task code */
 } OBJ_PTS; /* PLC Task Segment */
