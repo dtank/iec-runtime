@@ -53,8 +53,8 @@ void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
 	fwrite(ptps->name, MAX_NAME_SIZE, 1, fp);
 	fwrite(&ptps->priority, sizeof(ptps->priority), 1, fp);
 	fwrite(&ptps->interval, sizeof(ptps->interval), 1, fp);
-	//fwrite(&ptps->ptds_size, sizeof(ptcs->ptds_size), 1, fp);
-	//fwrite(&ptps->inst_count, sizeof(ptcs->inst_count), 1, fp);
+    fwrite(&ptps->data_size, sizeof(ptps->data_size), 1, fp);
+    fwrite(&ptps->inst_count, sizeof(ptps->inst_count), 1, fp);
 }
 /*-----------------------------------------------------------------------------
  * PLC Task Data Segment Generator

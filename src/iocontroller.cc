@@ -57,6 +57,5 @@ void io_task_start(IO_CONFIG *config) {
 
 void io_task_delete() {
 	if (rt_task_delete(&io_task)) {
-		//LOGGER(LOGGER_ERR, "ERROR: deleting io task...", 0);
 	}
 }

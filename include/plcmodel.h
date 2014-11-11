@@ -93,6 +93,8 @@ typedef struct {
 	char name[MAX_TASK_NAME_SIZE];
 	uint8_t priority;
 	uint32_t interval;
+	uint32_t data_size;
+	uint32_t inst_count;
     char *data; /* task data */
     PLC_INST *code; /* task code */
 } PLC_TASK;

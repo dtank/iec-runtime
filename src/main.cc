@@ -68,8 +68,8 @@ int main(int argc, char* argv[])
 		"task1",                    /* plc task name */
 		80,                         /* plc task priority */
 		100000000u,                 /* plc task period interval (unit: ns) */
-		//20,                         [> size of plc task data segment <]
-		//3                           [> number of plc task instructions <]
+        20,                         /* size of plc task data segment */
+        3                           /* number of plc task instructions */
 	};
     char task1_data[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
     OBJ_PTDS task1_ptds = {
@@ -100,8 +100,8 @@ int main(int argc, char* argv[])
 		"task2",                    /* plc task name */
 		90,                         /* plc task priority */
 		500000000u,                 /* plc task period interval (unit: ns) */
-		//20,                         [> size of plc task data segment <]
-		//3                           [> number of plc task instructions <]
+        20,                         /* size of plc task data segment */
+        3                           /* number of plc task instructions */
 	};
     char task2_data[20] = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13};
     OBJ_PTDS task2_ptds = {
@@ -148,17 +148,15 @@ int main(int argc, char* argv[])
 	fclose(fplc);
 	//Avoids memory swapping for this program
     mlockall(MCL_CURRENT|MCL_FUTURE);
-    //io_task_init(io_config);
-    //servo_task_init(servo_config);
+    io_task_init(&model->io_config);
+    servo_task_init(&model->servo_config);
 
 
-    //io_task_start(io_config);
-    //servo_task_start(servo_config);
-	//plc_task_create(plc_task_list, config);
-	//plc_task_start(plc_task_list, config);
+    //io_task_start(&model->io_config);
+    //servo_task_start(&model->servo_config);
     //pause();
     //io_task_delete();
-	//plc_task_delete(plc_task_list, config);
+    //servo_task_delete();
 
 	return 0;
 }

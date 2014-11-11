@@ -210,6 +210,8 @@ static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
         LOGGER_ERR(EC_TASK_INTERVAL, "");
         return -1;
     }
+    fread(&task->data_size, sizeof(task->data_size), 1, fp); /* NOT need error checker */
+    fread(&task->inst_count, sizeof(task->inst_count), 1, fp); /* NOT need error checker */
     if ((task->data=load_plc_task_data(fp)) == NULL) {
         LOGGER_ERR(EC_LOAD_TASK_DATA, "");
         return -1;
@@ -218,8 +220,8 @@ static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
         LOGGER_ERR(EC_LOAD_TASK_CODE, "");
         return -1;
     }
-    LOGGER_DBG("PLC_TASK:\n .name = %s\n .priority = %d\n .interval = %d\n .data(base) = %d\n .code(base) = %d\n",
-        task->name, task->priority, task->interval, task->data, task->code);
+    LOGGER_DBG("PLC_TASK:\n .name = %s\n .priority = %d\n .interval = %d\n .data_size = %d\n .inst_count = %d\n",
+        task->name, task->priority, task->interval, task->data_size, task->inst_count);
     return 0;
 }
 /*-----------------------------------------------------------------------------

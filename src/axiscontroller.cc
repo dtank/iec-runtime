@@ -38,6 +38,5 @@ void servo_task_start(SERVO_CONFIG *config) {
 
 void servo_task_delete() {
 	if (rt_task_delete(&servo_task)) {
-		//LOGGER(LOGGER_ERR, "ERROR: deleting io task...", 0);
 	}
 }

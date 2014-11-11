@@ -66,8 +66,8 @@ typedef struct {
 	char name[MAX_NAME_SIZE];          /* plc task name */
 	uint8_t priority;    /* plc task priority */
 	uint32_t interval;   /* plc task period interval (unit: ns) */
-	//uint32_t ptds_size;  [> size of plc task data segment <]
-	//uint32_t inst_count; [> number of plc task instructions <]
+    uint32_t data_size;  /* size of plc task data segment */
+    uint32_t inst_count; /* number of plc task instructions */
 } OBJ_PTPS; /* PLC Task Property Segment */
 
 /*-----------------------------------------------------------------------------

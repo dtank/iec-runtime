@@ -29,6 +29,5 @@ void rc_task_start(ROBOT_CONFIG *config) {
 }
 void rc_task_delete() {
 	if (rt_task_delete(&rc_task)) {
-		//LOGGER(LOGGER_ERR, "ERROR: deleting io task...", 0);
 	}
 }
