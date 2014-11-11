@@ -63,12 +63,6 @@ void generate_obj_tcs(FILE *fp, OBJ_TCS *tcs) {
     }
 }
 /*-----------------------------------------------------------------------------
- * PLC Task Data Segment Generator
- *---------------------------------------------------------------------------*/
-void generate_obj_ptds(FILE *fp, OBJ_PTDS *ptds, OBJ_PTPS *ptps) {
-	fwrite(ptds->data, ptps->data_size, 1, fp);
-}
-/*-----------------------------------------------------------------------------
  * PLC Task Code Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_map_t *inst_desc) {
@@ -87,7 +81,7 @@ void generate_obj_ptcs(FILE *fp, OBJ_PTCS *ptcs, inst_desc_map_t *inst_desc) {
  * PLC Task List Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_pts(FILE *fp, OBJ_PTS *pts, OBJ_PTPS *ptps, inst_desc_map_t *inst_desc) {
-    generate_obj_ptds(fp, &pts->data, ptps);
+	fwrite(pts->data, ptps->data_size, 1, fp);
     generate_obj_ptcs(fp, &pts->code, inst_desc);
 }
 void generate_obj_ptls(FILE *fp, OBJ_PTLS *ptls, OBJ_TCS *tcs, inst_desc_map_t *inst_desc) {
