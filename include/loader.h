@@ -19,12 +19,12 @@ static int load_task_config(FILE *fp, TASK_CONFIG *task_config);
 /*-----------------------------------------------------------------------------
  * PLC Task Loader
  *---------------------------------------------------------------------------*/
-static char *load_plc_task_data(FILE *fp);
+static char *load_plc_task_data(FILE *fp, TASK_PROP *prop);
 static char *load_inst_arg_addr(FILE *fp, char *data);
 // TODO change to memcpy type
 static PLC_INST *load_plc_task_inst(FILE *fp, char *data, inst_desc_map_t *inst_desc);
 static PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_desc);
-static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc);
+static int load_plc_task(FILE *fp, TASK_PROP *prop, PLC_TASK *task, inst_desc_map_t *inst_desc);
 /*-----------------------------------------------------------------------------
  * PLC Model Loader
  *---------------------------------------------------------------------------*/

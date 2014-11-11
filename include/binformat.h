@@ -64,6 +64,7 @@ typedef struct {
  * Definition of PLC Task Property Segment
  *---------------------------------------------------------------------------*/
 #define MAX_TASK_COUNT 64
+#define MAX_DATA_SIZE 65536
 typedef struct {
 	char name[MAX_NAME_SIZE];          /* plc task name */
 	uint8_t priority;    /* plc task priority */
@@ -80,8 +81,7 @@ typedef struct {
  * Definition of PLC Task Data Segment
  *---------------------------------------------------------------------------*/
 typedef struct {
-	uint32_t size; /* size of plc task data segment */
-	char *data;    /* starting address of plc task data segment */
+	char data[MAX_DATA_SIZE];    /* starting address of plc task data segment */
 } OBJ_PTDS; /* PLC Task Data Segment */
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Code Segment
