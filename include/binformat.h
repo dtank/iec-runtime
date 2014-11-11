@@ -63,9 +63,10 @@ typedef struct {
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Property Segment
  *---------------------------------------------------------------------------*/
-#define MAX_TASK_COUNT 64
-#define MAX_DATA_SIZE 65536
-#define MAX_INST_COUNT 65536
+#define MAX_ARG_COUNT 8
+#define MAX_TASK_COUNT 4
+#define MAX_DATA_SIZE 64
+#define MAX_INST_COUNT 256
 typedef struct {
 	char name[MAX_NAME_SIZE];          /* plc task name */
 	uint8_t priority;    /* plc task priority */
@@ -83,7 +84,7 @@ typedef struct {
  *---------------------------------------------------------------------------*/
 typedef struct {
     uint16_t id;      /* instruction id */
-    uint32_t *arg_va; /* vitual address(AKA index) of instruction's arguments */
+    uint32_t arg_va[MAX_ARG_COUNT]; /* vitual address(AKA index) of instruction's arguments */
 } OBJ_INST;
 
 /*-----------------------------------------------------------------------------
@@ -102,7 +103,7 @@ typedef struct {
     OBJ_IOCS iocs;
     OBJ_SCS scs;
     OBJ_TCS tcs;
-    OBJ_PTS *task;
+    OBJ_PTS task[MAX_TASK_COUNT];
 } OBJ_FILE;
 
 #define ARG_ADDR_INVALID 0x00

@@ -16,104 +16,31 @@ ec_map_t ec_msg = ec_map;
 
 int main(int argc, char* argv[])
 {
-	OBJ_HEADER obj_header = {
-		MAGIC,          /* magic number */
-		SYS_TYPE_32,    /* type of object file: 32BIT | 64BIT */
-		BYTE_ORDER_LIT, /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
-		1,              /* version of object file */
-		MACH_CORTEX_A8  /* CPU platform */
-	};
-	OBJ_IOCS obj_iocs = {
-		4000000,   /* I/O data update interval */
-		0,         /* number of local digital input module */
-		1,         /* number of local digital output module */
-		0,         /* number of local analog input module */
-		0          /* number of local analog output module */
-	};
-	OBJ_SCS obj_scs = {
-		2, /* number of axis */
-        4000000, /* update interval */
-        {{
-            "axis1",          /* axis name */
-			false,            /* independent axis */
-			1,                /* axis id */
-			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
-			OPER_MODE_POS,    /* operating mode: POSITION | VELOCITY | TORQUE */
-			(double)0.0,                /* negtive position limit (unit:) */
-			(double)180.0,              /* positive position limit (unit:) */
-			(double)100.0,              /* velocity limit (unit:) */
-			(double)20.0,               /* accelaration limit (unit:) */
-			(double)20.0,               /* decelaration limit (unit:) */
-			(double)10.0                /* jerk limit (unit:) */
-		},
-        {
-            "axis2",          /* axis name */
-			true,             /* combined axis */
-			2,                /* axis id */
-			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
-			OPER_MODE_POS,    /* operating mode: POSITION | VELOCITY | TORQUE */
-			(double)0.0,                /* negtive position limit (unit:) */
-			(double)180.0,              /* positive position limit (unit:) */
-			(double)100.0,              /* velocity limit (unit:) */
-			(double)20.0,               /* accelaration limit (unit:) */
-			(double)20.0,               /* decelaration limit (unit:) */
-			(double)10.0                /* jerk limit (unit:) */
-		}}
-	};
-    OBJ_TCS obj_tcs = {
-        2,
-        {{
-            "task1",
-            80,
-            100000000u,
-            20,
-            3
-         },{
-            "task2",
-            90,
-            500000000u,
-            20,
-            3
-        }}
-    };
-/*-----------------------------------------------------------------------------
- * PLC Task 1
- **---------------------------------------------------------------------------*/
-    uint32_t task1_inst1_args[] = {0x00000001, 0x00000006, 0x00000006};
-    uint32_t task1_inst2_args[] = {0x00000001, 0x00000006, 0x00000006};
-    uint32_t task1_inst3_args[] = {0x00000001, 0x00000006, 0x00000006};
-    OBJ_PTS task1_pts = {
-        {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},
-        {
-            {STD_ADD, task1_inst1_args},
-            {STD_ADD, task1_inst2_args},
-            {STD_ADD, task1_inst3_args}
-        }
-    };
-/*-----------------------------------------------------------------------------
- * PLC Task 2
- **---------------------------------------------------------------------------*/
-    uint32_t task2_inst1_args[] = {0x00000001, 0x00000006, 0x00000006};
-    uint32_t task2_inst2_args[] = {0x00000001, 0x00000006, 0x00000006};
-    uint32_t task2_inst3_args[] = {0x00000001, 0x00000006, 0x00000006};
-    OBJ_PTS task2_pts = {
-        {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13 },
-        {
-            {STD_ADD, task2_inst1_args},
-            {STD_ADD, task2_inst2_args},
-            {STD_ADD, task2_inst3_args}
-        }
-    };
-    OBJ_PTS obj_tasks[] = {
-        task1_pts,
-        task2_pts
-    };
     OBJ_FILE obj_file = {
-        obj_header,
-        obj_iocs,
-        obj_scs,
-        obj_tcs,
-        obj_tasks
+        {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8}, // file header
+        {4000000, 0, 1, 0, 0}, // io configuration
+        {2, 4000000, { // servo configuration
+            {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,
+			0.0, 180.0, 100.0, 20.0, 20.0, 10.0},
+            {"axis2", true, 2, AXIS_TYPE_FINITE, OPER_MODE_POS,
+			0.0, 180.0, 100.0, 20.0, 20.0, 10.0},
+        }},
+        {2, { // plc task configuration
+            {"task1", 80, 100000000u, 20, 3},
+            {"task2", 90, 500000000u, 20, 3},
+        }},
+        {
+            {{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},{
+            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
+            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
+            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
+            }},
+            {{0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},{
+            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
+            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
+            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
+            }},
+        }
     };
 
 	FILE *fplc = fopen("plc.bin", "wb");
