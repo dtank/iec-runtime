@@ -212,15 +212,13 @@ static int load_plc_task_inst(FILE *fp, PLC_INST *inst, char *data, inst_desc_ma
     }
     return 0;
 }
-static PLC_INST *load_plc_task_code(FILE *fp, char *data, inst_desc_map_t *inst_desc) {
-    uint32_t inst_count;
-    fread(&inst_count, sizeof(inst_count), 1, fp);
-    PLC_INST *code = new PLC_INST[inst_count];
+static PLC_INST *load_plc_task_code(FILE *fp, TASK_PROP *prop, char *data, inst_desc_map_t *inst_desc) {
+    PLC_INST *code = new PLC_INST[prop->inst_count];
     if (code == NULL) {
         LOGGER_ERR(EC_OOM, "loading plc task code");
         return NULL;
     }
-    for (uint32_t i = 0; i < inst_count; ++i) {
+    for (uint32_t i = 0; i < prop->inst_count; ++i) {
         if (load_plc_task_inst(fp, &code[i], data, inst_desc) < 0) {
             LOGGER_ERR(EC_LOAD_TASK_INST, "");
             delete code;
@@ -238,7 +236,7 @@ static int load_plc_task(FILE *fp, TASK_PROP *prop, PLC_TASK *task, inst_desc_ma
         LOGGER_ERR(EC_LOAD_TASK_DATA, "");
         return -1;
     }
-    if ((task->code=load_plc_task_code(fp, task->data, inst_desc)) == NULL) {
+    if ((task->code=load_plc_task_code(fp, prop, task->data, inst_desc)) == NULL) {
         LOGGER_ERR(EC_LOAD_TASK_CODE, "");
         return -1;
     }

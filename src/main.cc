@@ -82,18 +82,13 @@ int main(int argc, char* argv[])
     uint32_t task1_inst1_args[] = {0x00000001, 0x00000006, 0x00000006};
     uint32_t task1_inst2_args[] = {0x00000001, 0x00000006, 0x00000006};
     uint32_t task1_inst3_args[] = {0x00000001, 0x00000006, 0x00000006};
-    OBJ_INST task1_inst[] = {
-        {STD_ADD, task1_inst1_args},
-        {STD_ADD, task1_inst2_args},
-        {STD_ADD, task1_inst3_args}
-    };
-    OBJ_PTCS task1_ptcs = {
-        3,
-        task1_inst
-    };
     OBJ_PTS task1_pts = {
         {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},
-        task1_ptcs
+        {
+            {STD_ADD, task1_inst1_args},
+            {STD_ADD, task1_inst2_args},
+            {STD_ADD, task1_inst3_args}
+        }
     };
 /*-----------------------------------------------------------------------------
  * PLC Task 2
@@ -101,18 +96,13 @@ int main(int argc, char* argv[])
     uint32_t task2_inst1_args[] = {0x00000001, 0x00000006, 0x00000006};
     uint32_t task2_inst2_args[] = {0x00000001, 0x00000006, 0x00000006};
     uint32_t task2_inst3_args[] = {0x00000001, 0x00000006, 0x00000006};
-    OBJ_INST task2_inst[] = {
-        {STD_ADD, task2_inst1_args},
-        {STD_ADD, task2_inst2_args},
-        {STD_ADD, task2_inst3_args}
-    };
-    OBJ_PTCS task2_ptcs = {
-        3,
-        task2_inst
-    };
     OBJ_PTS task2_pts = {
         {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13 },
-        task2_ptcs
+        {
+            {STD_ADD, task2_inst1_args},
+            {STD_ADD, task2_inst2_args},
+            {STD_ADD, task2_inst3_args}
+        }
     };
     OBJ_PTS obj_tasks[] = {
         task1_pts,

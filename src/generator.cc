@@ -71,18 +71,14 @@ void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_map_t *inst_desc) {
         fwrite(&inst->arg_va[i], sizeof(inst->arg_va[0]), 1, fp);
     }
 }
-void generate_obj_ptcs(FILE *fp, OBJ_PTCS *ptcs, inst_desc_map_t *inst_desc) {
-    fwrite(&ptcs->inst_count, sizeof(ptcs->inst_count), 1, fp);
-    for (int i = 0; i < ptcs->inst_count; ++i) {
-        generate_obj_inst(fp, &ptcs->inst[i], inst_desc);
-    }
-}
 /*-----------------------------------------------------------------------------
  * PLC Task List Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_pts(FILE *fp, OBJ_PTS *pts, OBJ_PTPS *ptps, inst_desc_map_t *inst_desc) {
 	fwrite(pts->data, ptps->data_size, 1, fp);
-    generate_obj_ptcs(fp, &pts->code, inst_desc);
+    for (uint32_t i = 0; i < ptps->inst_count; ++i) {
+        generate_obj_inst(fp, &pts->inst[i], inst_desc);
+    }
 }
 void generate_obj_ptls(FILE *fp, OBJ_PTLS *ptls, OBJ_TCS *tcs, inst_desc_map_t *inst_desc) {
     fwrite(&ptls->task_count, sizeof(ptls->task_count), 1, fp);

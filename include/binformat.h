@@ -86,16 +86,12 @@ typedef struct {
     uint32_t *arg_va; /* vitual address(AKA index) of instruction's arguments */
 } OBJ_INST;
 
-typedef struct {
-    uint32_t inst_count; /* number of instructions */
-    OBJ_INST *inst;      /* list of instructions */
-} OBJ_PTCS; /* PLC Task Code Segment */
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task List Segment
  *---------------------------------------------------------------------------*/
 typedef struct {
 	char data[MAX_DATA_SIZE];    /* plc task data segment */
-    OBJ_PTCS code; /* task code */
+    OBJ_INST inst[MAX_INST_COUNT];      /* list of instructions */
 } OBJ_PTS; /* PLC Task Segment */
 
 typedef struct {
