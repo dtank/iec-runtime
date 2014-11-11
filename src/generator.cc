@@ -47,7 +47,7 @@ void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
 	}
 }
 /*-----------------------------------------------------------------------------
- * PLC Task Property Segment Generator
+ * PLC Task Configuration Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
 	fwrite(ptps->name, MAX_NAME_SIZE, 1, fp);
@@ -63,7 +63,7 @@ void generate_obj_tcs(FILE *fp, OBJ_TCS *tcs) {
     }
 }
 /*-----------------------------------------------------------------------------
- * PLC Task Code Segment Generator
+ * PLC Task Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_map_t *inst_desc) {
     fwrite(&inst->id, sizeof(inst->id), 1, fp);
@@ -71,19 +71,10 @@ void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_map_t *inst_desc) {
         fwrite(&inst->arg_va[i], sizeof(inst->arg_va[0]), 1, fp);
     }
 }
-/*-----------------------------------------------------------------------------
- * PLC Task List Segment Generator
- *---------------------------------------------------------------------------*/
 void generate_obj_pts(FILE *fp, OBJ_PTS *pts, OBJ_PTPS *ptps, inst_desc_map_t *inst_desc) {
 	fwrite(pts->data, ptps->data_size, 1, fp);
     for (uint32_t i = 0; i < ptps->inst_count; ++i) {
         generate_obj_inst(fp, &pts->inst[i], inst_desc);
-    }
-}
-void generate_obj_ptls(FILE *fp, OBJ_PTLS *ptls, OBJ_TCS *tcs, inst_desc_map_t *inst_desc) {
-    fwrite(&ptls->task_count, sizeof(ptls->task_count), 1, fp);
-    for (int i = 0; i < ptls->task_count; ++i) {
-        generate_obj_pts(fp, &ptls->task[i], &tcs->task_prop[i], inst_desc);
     }
 }
 /*-----------------------------------------------------------------------------
@@ -94,5 +85,7 @@ void generate_obj_file(FILE *fp, OBJ_FILE *file, inst_desc_map_t *inst_desc) {
     generate_obj_iocs(fp, &file->iocs);
     generate_obj_scs(fp, &file->scs);
     generate_obj_tcs(fp, &file->tcs);
-    generate_obj_ptls(fp, &file->ptls, &file->tcs, inst_desc);
+    for (int i = 0; i < file->tcs.task_count; ++i) {
+        generate_obj_pts(fp, &file->task[i], &file->tcs.task_prop[i], inst_desc);
+    }
 }

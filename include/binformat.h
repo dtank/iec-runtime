@@ -94,10 +94,6 @@ typedef struct {
     OBJ_INST inst[MAX_INST_COUNT];      /* list of instructions */
 } OBJ_PTS; /* PLC Task Segment */
 
-typedef struct {
-    uint8_t task_count; /* number of plc task */
-    OBJ_PTS *task;      /* list of plc task */
-} OBJ_PTLS; /* PLC Task List Segment */
 /*-----------------------------------------------------------------------------
  * Definition of PLC Object File
  *---------------------------------------------------------------------------*/
@@ -106,7 +102,7 @@ typedef struct {
     OBJ_IOCS iocs;
     OBJ_SCS scs;
     OBJ_TCS tcs;
-    OBJ_PTLS ptls;
+    OBJ_PTS *task;
 } OBJ_FILE;
 
 #define ARG_ADDR_INVALID 0x00

@@ -81,6 +81,9 @@ typedef struct {
     int axis_count;
     int stub_param2;
 } ROBOT_CONFIG;
+/*-----------------------------------------------------------------------------
+ * Definition of PLC Task Configuration
+ *---------------------------------------------------------------------------*/
 typedef struct {
 	char name[MAX_TASK_NAME_SIZE];
 	uint8_t priority;
@@ -88,6 +91,7 @@ typedef struct {
 	uint32_t data_size;
 	uint32_t inst_count;
 } TASK_PROP;
+
 typedef struct {
     uint8_t task_count;
     TASK_PROP *task_prop;

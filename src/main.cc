@@ -108,16 +108,12 @@ int main(int argc, char* argv[])
         task1_pts,
         task2_pts
     };
-    OBJ_PTLS obj_ptls = {
-        2,
-        obj_tasks
-    };
     OBJ_FILE obj_file = {
         obj_header,
         obj_iocs,
         obj_scs,
         obj_tcs,
-        obj_ptls
+        obj_tasks
     };
 
 	FILE *fplc = fopen("plc.bin", "wb");
