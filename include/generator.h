@@ -22,6 +22,7 @@ void generate_obj_scs(FILE *fp, OBJ_SCS *scs);
  * PLC Task Property Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps);
+void generate_obj_tcs(FILE *fp, OBJ_TCS *tcs);
 /*-----------------------------------------------------------------------------
  * PLC Task Data Segment Generator
  *---------------------------------------------------------------------------*/

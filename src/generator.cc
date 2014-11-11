@@ -56,6 +56,12 @@ void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
     fwrite(&ptps->data_size, sizeof(ptps->data_size), 1, fp);
     fwrite(&ptps->inst_count, sizeof(ptps->inst_count), 1, fp);
 }
+void generate_obj_tcs(FILE *fp, OBJ_TCS *tcs) {
+    fwrite(&tcs->task_count, sizeof(tcs->task_count), 1, fp);
+    for (int i = 0; i < tcs->task_count; ++i) {
+        generate_obj_ptps(fp, &tcs->task_prop[i]);
+    }
+}
 /*-----------------------------------------------------------------------------
  * PLC Task Data Segment Generator
  *---------------------------------------------------------------------------*/
@@ -99,5 +105,6 @@ void generate_obj_file(FILE *fp, OBJ_FILE *file, inst_desc_map_t *inst_desc) {
     generate_obj_header(fp, &file->header);
     generate_obj_iocs(fp, &file->iocs);
     generate_obj_scs(fp, &file->scs);
+    generate_obj_tcs(fp, &file->tcs);
     generate_obj_ptls(fp, &file->ptls, inst_desc);
 }

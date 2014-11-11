@@ -89,6 +89,8 @@ enum ERROR_CODE {
     EC_LOAD_TASK_INST,
     EC_LOAD_TASK_DATA,
     EC_LOAD_TASK_CODE,
+    EC_LOAD_TASK_PROP,
+    EC_LOAD_TASK_CONFIG,
     EC_LOAD_PLC_TASK,
 };
 
@@ -143,6 +145,8 @@ static const ec_map_t::value_type ec_data[] = {
 	ec_map_t::value_type(EC_LOAD_TASK_INST, "Failed to load plc task instruction"),
 	ec_map_t::value_type(EC_LOAD_TASK_DATA, "Failed to load plc task data"),
 	ec_map_t::value_type(EC_LOAD_TASK_CODE, "Failed to load plc task code"),
+	ec_map_t::value_type(EC_LOAD_TASK_PROP, "Failed to load plc task property"),
+	ec_map_t::value_type(EC_LOAD_TASK_CONFIG, "Failed to load plc task configuration"),
 	ec_map_t::value_type(EC_LOAD_PLC_TASK, "Failed to load plc task"),
 };
 static const uint32_t ec_count = sizeof ec_data / sizeof ec_data[0];

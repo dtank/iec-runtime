@@ -30,8 +30,11 @@ int main(int argc, char* argv[])
 		0,         /* number of local analog input module */
 		0          /* number of local analog output module */
 	};
-	OBJ_ACS obj_acs[] = {
-        {	"axis1",          /* axis name */
+	OBJ_SCS obj_scs = {
+		2, /* number of axis */
+        4000000, /* update interval */
+        {{
+            "axis1",          /* axis name */
 			false,            /* independent axis */
 			1,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
@@ -43,7 +46,8 @@ int main(int argc, char* argv[])
 			(double)20.0,               /* decelaration limit (unit:) */
 			(double)10.0                /* jerk limit (unit:) */
 		},
-        {	"axis2",          /* axis name */
+        {
+            "axis2",          /* axis name */
 			true,             /* combined axis */
 			2,                /* axis id */
 			AXIS_TYPE_FINITE, /* axis type: FINITE | MODULO */
@@ -54,13 +58,24 @@ int main(int argc, char* argv[])
 			(double)20.0,               /* accelaration limit (unit:) */
 			(double)20.0,               /* decelaration limit (unit:) */
 			(double)10.0                /* jerk limit (unit:) */
-		}
+		}}
 	};
-	OBJ_SCS obj_scs = {
-		2, /* number of axis */
-        4000000, /* update interval */
-		obj_acs
-	};
+    OBJ_TCS obj_tcs = {
+        2,
+        {{
+            "task1",
+            80,
+            100000000u,
+            20,
+            3
+         },{
+            "task2",
+            90,
+            500000000u,
+            20,
+            3
+        }}
+    };
 /*-----------------------------------------------------------------------------
  * PLC Task 1
  **---------------------------------------------------------------------------*/
@@ -137,6 +152,7 @@ int main(int argc, char* argv[])
         obj_header,
         obj_iocs,
         obj_scs,
+        obj_tcs,
         obj_ptls
     };
 

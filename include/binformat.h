@@ -39,6 +39,7 @@ typedef struct {
 #define OPER_MODE_VEL 2
 #define OPER_MODE_TOR 3
 #define MAX_NAME_SIZE 16
+#define MAX_AXIS_COUNT 8
 typedef struct {
 	char name[MAX_NAME_SIZE];         /* axis name */
 	bool is_combined;   /* independent axis | combined axis */
@@ -56,12 +57,13 @@ typedef struct {
 typedef struct {
 	uint8_t axis_count;       /* number of axis */
 	uint32_t update_interval; /* servo data update interval */
-	OBJ_ACS *axis_group;      /* array of axis */
+	OBJ_ACS axis_group[MAX_AXIS_COUNT];      /* array of axis */
 } OBJ_SCS; /* Servo Configuration Segment */
 
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Property Segment
  *---------------------------------------------------------------------------*/
+#define MAX_TASK_COUNT 64
 typedef struct {
 	char name[MAX_NAME_SIZE];          /* plc task name */
 	uint8_t priority;    /* plc task priority */
@@ -70,6 +72,11 @@ typedef struct {
     uint32_t inst_count; /* number of plc task instructions */
 } OBJ_PTPS; /* PLC Task Property Segment */
 
+typedef struct {
+    uint8_t task_count;
+    OBJ_PTPS task_prop[MAX_TASK_COUNT];
+} OBJ_TCS; /* PLC Task Configuration Segment */
+// TODO generator
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Data Segment
  *---------------------------------------------------------------------------*/
@@ -109,6 +116,7 @@ typedef struct {
     OBJ_HEADER header;
     OBJ_IOCS iocs;
     OBJ_SCS scs;
+    OBJ_TCS tcs;
     OBJ_PTLS ptls;
 } OBJ_FILE;
 

@@ -120,6 +120,45 @@ static int load_servo_config(FILE *fp, SERVO_CONFIG *servo_config) {
 	return 0;
 }
 
+static int load_task_prop(FILE *fp, TASK_PROP *task_prop) {
+    fread(task_prop->name, MAX_TASK_NAME_SIZE, 1, fp);
+    fread(&task_prop->priority, sizeof(task_prop->priority), 1, fp);
+    if (task_prop->priority < MIN_TASK_PRIORITY || MAX_TASK_PRIORITY < task_prop->priority) {
+        LOGGER_ERR(EC_TASK_PRIORITY, "");
+        return -1;
+    }
+    fread(&task_prop->interval, sizeof(task_prop->interval), 1, fp);
+    if (task_prop->interval < MIN_TASK_INTERVAL) {
+        LOGGER_ERR(EC_TASK_INTERVAL, "");
+        return -1;
+    }
+    fread(&task_prop->data_size, sizeof(task_prop->data_size), 1, fp);
+    if (MAX_TASK_DATA_SIZE < task_prop->data_size) {
+        LOGGER_ERR(EC_TASK_DATA_SIZE, "");
+        return -1;
+    }
+    fread(&task_prop->inst_count, sizeof(task_prop->inst_count), 1, fp); /* NOT need error checker */
+    return 0;
+}
+static int load_task_config(FILE *fp, TASK_CONFIG *task_config) {
+    fread(&task_config->task_count, sizeof(task_config->task_count), 1, fp);
+    if (MAX_TASK_COUNT < task_config->task_count) {
+        LOGGER_ERR(EC_TASK_COUNT, "");
+        return -1;
+    }
+    task_config->task_prop = new TASK_PROP[task_config->task_count];
+    if (task_config->task_prop == NULL) {
+        LOGGER_ERR(EC_OOM, "loading plc task property");
+        return -1;
+    }
+    for (int i = 0; i < task_config->task_count; ++i) {
+        if (load_task_prop(fp, &task_config->task_prop[i]) < 0) {
+            LOGGER_ERR(EC_LOAD_TASK_PROP, "");
+            return -1;
+        }
+    }
+    return 0;
+}
 /*-----------------------------------------------------------------------------
  * PLC Task Data Loader
  *---------------------------------------------------------------------------*/
@@ -271,6 +310,11 @@ PLC_MODEL *load_plc_model(FILE *fp, inst_desc_map_t *inst_desc) {
     }
     if (load_servo_config(fp, &model->servo_config) < 0) {
         LOGGER_ERR(EC_LOAD_SERVO_CONFIG, "");
+        delete model;
+        return NULL;
+    }
+    if (load_task_config(fp, &model->task_config) < 0) {
+        LOGGER_ERR(EC_LOAD_TASK_CONFIG, "");
         delete model;
         return NULL;
     }
