@@ -15,7 +15,6 @@ static int load_io_config(FILE *fp, IO_CONFIG *io_config);
 static int load_axis_config(FILE *fp, AXIS_CONFIG *axis_config);
 static int load_servo_config(FILE *fp, SERVO_CONFIG *servo_config);
 static int load_task_prop(FILE *fp, TASK_PROP *task_prop);
-static int load_task_config(FILE *fp, TASK_CONFIG *task_config);
 /*-----------------------------------------------------------------------------
  * PLC Task Loader
  *---------------------------------------------------------------------------*/

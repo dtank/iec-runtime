@@ -4,9 +4,11 @@
 
 extern inst_desc_map_t inst_desc;
 extern char *io_shm;
+extern ec_map_t ec_msg;
 
-//static void plc_task_execute(void *plc_task) {
-    //PLC_TASK *task = (PLC_TASK *)plc_task;
+// TODO property data code MUST together
+static void plc_task_execute(void *plc_model) {
+    //PLC_MODEL *model = (PLC_MODEL *)plc_model;
     //rt_task_set_periodic(NULL, TM_NOW, task->property->interval);
     //while (1) {
         //rt_task_wait_period(NULL);
@@ -18,20 +20,19 @@ extern char *io_shm;
             //LOGGER(LOGGER_DBG, "arg1_value = %d", *(uint32_t *)task->code->inst[i]->arg_addr[0]);
         //}
     //}
-//}
+}
 
-//void plc_task_create(PLC_TASK_LIST *task_list, PLC_CONFIG *config) {
-    //for (int i = 0; i < config->task_count; ++i) {
-        //if (rt_task_create(&task_list->rt_task[i], task_list->plc_task[i]->property->name, 0, task_list->plc_task[i]->property->priority, 0)) {
-            //LOGGER(LOGGER_ERR, "ERROR: creating PLC task \"%s\"\n", task_list->plc_task[i]->property->name);
+//void plc_task_init(PLC_MODEL *model) {
+    //for (int i = 0; i < model->task_config.task_count; ++i) {
+        //if (rt_task_create(&model->rt_task[i], model->task_config.task_prop[i].name, 0, model->task_config.task_prop[i].priority, 0)) {
+            //LOGGER_ERR(EC_PLC_TASK_CREATE, "(\"%s\")", model->task_config.task_prop[i].name);
         //}
     //}
 //}
-
-//void plc_task_start(PLC_TASK_LIST *task_list, PLC_CONFIG *config) {
-    //for (int i = 0; i < config->task_count; ++i) {
-        //if (rt_task_start(&task_list->rt_task[i], &plc_task_execute, (void *)task_list->plc_task[i])) {
-            //LOGGER(LOGGER_ERR, "ERROR: starting PLC task \"%s\"\n", task_list->plc_task[i]->property->name);
+//void plc_task_start(PLC_MODEL *model) {
+    //for (int i = 0; i < model->task_config.task_count; ++i) {
+        //if (rt_task_start(&model->rt_task[i], &plc_task_execute, (void *)model)) {
+            //LOGGER_ERR(EC_PLC_TASK_START, "(\"%s\")", model->task_config.task_prop[i].name);
         //}
     //}
 //}

@@ -82,7 +82,7 @@ typedef struct {
     int stub_param2;
 } ROBOT_CONFIG;
 /*-----------------------------------------------------------------------------
- * Definition of PLC Task Configuration
+ * Definition of PLC Task
  *---------------------------------------------------------------------------*/
 typedef struct {
 	char name[MAX_TASK_NAME_SIZE];
@@ -93,18 +93,12 @@ typedef struct {
 } TASK_PROP;
 
 typedef struct {
-    uint8_t task_count;
-    TASK_PROP *task_prop;
-} TASK_CONFIG;
-/*-----------------------------------------------------------------------------
- * Definition of PLC Task
- *---------------------------------------------------------------------------*/
-typedef struct {
     uint16_t id;      /* instruction id */
     char **arg_addr; /* actual address of instruction's arguments */
 } PLC_INST;
 
 typedef struct {
+    TASK_PROP prop;
     char *data; /* task data */
     PLC_INST *code; /* task code */
 } PLC_TASK;
@@ -114,7 +108,7 @@ typedef struct {
 typedef struct {
     IO_CONFIG io_config;
     SERVO_CONFIG servo_config;
-    TASK_CONFIG task_config;
+    uint8_t task_count;
     RT_TASK *rt_task;
     PLC_TASK *plc_task;
 } PLC_MODEL;

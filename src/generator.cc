@@ -47,7 +47,7 @@ void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
 	}
 }
 /*-----------------------------------------------------------------------------
- * PLC Task Configuration Segment Generator
+ * PLC Task Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
 	fwrite(ptps->name, MAX_NAME_SIZE, 1, fp);
@@ -56,24 +56,16 @@ void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
     fwrite(&ptps->data_size, sizeof(ptps->data_size), 1, fp);
     fwrite(&ptps->inst_count, sizeof(ptps->inst_count), 1, fp);
 }
-void generate_obj_tcs(FILE *fp, OBJ_TCS *tcs) {
-    fwrite(&tcs->task_count, sizeof(tcs->task_count), 1, fp);
-    for (int i = 0; i < tcs->task_count; ++i) {
-        generate_obj_ptps(fp, &tcs->task_prop[i]);
-    }
-}
-/*-----------------------------------------------------------------------------
- * PLC Task Segment Generator
- *---------------------------------------------------------------------------*/
 void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_map_t *inst_desc) {
     fwrite(&inst->id, sizeof(inst->id), 1, fp);
     for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
         fwrite(&inst->arg_va[i], sizeof(inst->arg_va[0]), 1, fp);
     }
 }
-void generate_obj_pts(FILE *fp, OBJ_PTS *pts, OBJ_PTPS *ptps, inst_desc_map_t *inst_desc) {
-	fwrite(pts->data, ptps->data_size, 1, fp);
-    for (uint32_t i = 0; i < ptps->inst_count; ++i) {
+void generate_obj_pts(FILE *fp, OBJ_PTS *pts, inst_desc_map_t *inst_desc) {
+    generate_obj_ptps(fp, &pts->prop);
+	fwrite(pts->data, pts->prop.data_size, 1, fp);
+    for (uint32_t i = 0; i < pts->prop.inst_count; ++i) {
         generate_obj_inst(fp, &pts->inst[i], inst_desc);
     }
 }
@@ -84,8 +76,8 @@ void generate_obj_file(FILE *fp, OBJ_FILE *file, inst_desc_map_t *inst_desc) {
     generate_obj_header(fp, &file->header);
     generate_obj_iocs(fp, &file->iocs);
     generate_obj_scs(fp, &file->scs);
-    generate_obj_tcs(fp, &file->tcs);
-    for (int i = 0; i < file->tcs.task_count; ++i) {
-        generate_obj_pts(fp, &file->task[i], &file->tcs.task_prop[i], inst_desc);
+    fwrite(&file->task_count, sizeof(file->task_count), 1, fp);
+    for (int i = 0; i < file->task_count; ++i) {
+        generate_obj_pts(fp, &file->task[i], inst_desc);
     }
 }

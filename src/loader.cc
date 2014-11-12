@@ -142,25 +142,6 @@ static int load_task_prop(FILE *fp, TASK_PROP *task_prop) {
         task_prop->name, task_prop->priority, task_prop->interval, task_prop->data_size, task_prop->inst_count);
     return 0;
 }
-static int load_task_config(FILE *fp, TASK_CONFIG *task_config) {
-    fread(&task_config->task_count, sizeof(task_config->task_count), 1, fp);
-    if (MAX_TASK_COUNT < task_config->task_count) {
-        LOGGER_ERR(EC_TASK_COUNT, "");
-        return -1;
-    }
-    task_config->task_prop = new TASK_PROP[task_config->task_count];
-    if (task_config->task_prop == NULL) {
-        LOGGER_ERR(EC_OOM, "loading plc task property");
-        return -1;
-    }
-    for (int i = 0; i < task_config->task_count; ++i) {
-        if (load_task_prop(fp, &task_config->task_prop[i]) < 0) {
-            LOGGER_ERR(EC_LOAD_TASK_PROP, "");
-            return -1;
-        }
-    }
-    return 0;
-}
 /*-----------------------------------------------------------------------------
  * PLC Task Data Loader
  *---------------------------------------------------------------------------*/
@@ -231,15 +212,21 @@ static PLC_INST *load_plc_task_code(FILE *fp, TASK_PROP *prop, char *data, inst_
 /*-----------------------------------------------------------------------------
  * PLC Task Loader
  *---------------------------------------------------------------------------*/
-static int load_plc_task(FILE *fp, TASK_PROP *prop, PLC_TASK *task, inst_desc_map_t *inst_desc) {
-    if ((task->data=load_plc_task_data(fp, prop)) == NULL) {
+static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
+    if (load_task_prop(fp, &task->prop) < 0) {
+        LOGGER_ERR(EC_LOAD_TASK_PROP, "");
+        return -1;
+    }
+    if ((task->data=load_plc_task_data(fp, &task->prop)) == NULL) {
         LOGGER_ERR(EC_LOAD_TASK_DATA, "");
         return -1;
     }
-    if ((task->code=load_plc_task_code(fp, prop, task->data, inst_desc)) == NULL) {
+    if ((task->code=load_plc_task_code(fp, &task->prop, task->data, inst_desc)) == NULL) {
         LOGGER_ERR(EC_LOAD_TASK_CODE, "");
         return -1;
     }
+    LOGGER_DBG("PLC_TASK:\n .data[0] = %d .data[n] = %d\n .instruction[0].id = %d",
+        task->data[0], task->data[task->prop.data_size-1], task->code[0].id);
     return 0;
 }
 /*-----------------------------------------------------------------------------
@@ -292,27 +279,21 @@ PLC_MODEL *load_plc_model(FILE *fp, inst_desc_map_t *inst_desc) {
         delete model;
         return NULL;
     }
-    if (load_task_config(fp, &model->task_config) < 0) {
-        LOGGER_ERR(EC_LOAD_TASK_CONFIG, "");
-        delete model;
-        return NULL;
-    }
-    uint8_t task_count;
-    fread(&task_count, sizeof(task_count), 1, fp);
-    if (MAX_TASK_COUNT < task_count) {
+    fread(&model->task_count, sizeof(model->task_count), 1, fp);
+    if (MAX_TASK_COUNT < model->task_count) {
         LOGGER_ERR(EC_TASK_COUNT, "");
         delete model;
         return NULL;
     }
-    model->rt_task = new RT_TASK[task_count];
-    model->plc_task = new PLC_TASK[task_count];
+    model->rt_task = new RT_TASK[model->task_count];
+    model->plc_task = new PLC_TASK[model->task_count];
     if (model->rt_task == NULL || model->plc_task == NULL) {
         LOGGER_ERR(EC_OOM, "loading plc task");
         delete model;
         return NULL;
     }
-    for (int i = 0; i < task_count; ++i) {
-        if (load_plc_task(fp, &model->task_config.task_prop[i], &model->plc_task[i], inst_desc) < 0) {
+    for (int i = 0; i < model->task_count; ++i) {
+        if (load_plc_task(fp, &model->plc_task[i], inst_desc) < 0) {
             LOGGER_ERR(EC_LOAD_PLC_TASK, "");
             delete model->rt_task;
             delete model->plc_task;

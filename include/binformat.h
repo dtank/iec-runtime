@@ -75,10 +75,6 @@ typedef struct {
     uint32_t inst_count; /* number of plc task instructions */
 } OBJ_PTPS; /* PLC Task Property Segment */
 
-typedef struct {
-    uint8_t task_count;
-    OBJ_PTPS task_prop[MAX_TASK_COUNT];
-} OBJ_TCS; /* PLC Task Configuration Segment */
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Code Segment
  *---------------------------------------------------------------------------*/
@@ -91,6 +87,7 @@ typedef struct {
  * Definition of PLC Task List Segment
  *---------------------------------------------------------------------------*/
 typedef struct {
+    OBJ_PTPS prop;
 	char data[MAX_DATA_SIZE];    /* plc task data segment */
     OBJ_INST inst[MAX_INST_COUNT];      /* list of instructions */
 } OBJ_PTS; /* PLC Task Segment */
@@ -102,7 +99,7 @@ typedef struct {
     OBJ_HEADER header;
     OBJ_IOCS iocs;
     OBJ_SCS scs;
-    OBJ_TCS tcs;
+    uint8_t task_count;
     OBJ_PTS task[MAX_TASK_COUNT];
 } OBJ_FILE;
 
