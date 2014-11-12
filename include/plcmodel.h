@@ -18,10 +18,10 @@
 #define MAX_LAI_COUNT 1
 #define MAX_LAO_COUNT 1
 #define MIN_IO_INTERVAL 2000000 /* unit: ns */
-#define LDI_WORDSIZE 1 /* unit: Byte */
-#define LDO_WORDSIZE 1 /* unit: Byte */
-#define LAI_WORDSIZE 1 /* unit: Byte */
-#define LAO_WORDSIZE 1 /* unit: Byte */
+#define LDI_WORDSIZE 4 /* unit: Byte */
+#define LDO_WORDSIZE 4 /* unit: Byte */
+#define LAI_WORDSIZE 4 /* unit: Byte */
+#define LAO_WORDSIZE 4 /* unit: Byte */
 #define MAX_IO_MEM_SIZE (MAX_LDI_COUNT*LDI_WORDSIZE + \
         MAX_LDO_COUNT*LDO_WORDSIZE + \
         MAX_LAI_COUNT*LAI_WORDSIZE + \

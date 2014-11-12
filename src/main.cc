@@ -17,6 +17,27 @@ IO_CONFIG io_config;
 SERVO_CONFIG servo_config;
 TASK_LIST plc_task;
 
+void sys_init() {
+    FILE *fplc = fopen("plc.bin", "rb");
+    obj_is_valid(fplc);
+    load_io_config(fplc, &io_config);
+    io_task_init(&io_config);
+    load_servo_config(fplc, &servo_config);
+    servo_task_init(&servo_config);
+    load_plc_task_list(fplc, &plc_task, &inst_desc);
+    plc_task_init(&plc_task);
+	fclose(fplc);
+}
+void sys_start() {
+    io_task_start(&io_config);
+    servo_task_start(&servo_config);
+    plc_task_start(&plc_task);
+}
+void sys_exit() {
+    io_task_delete();
+    servo_task_delete();
+    plc_task_delete(&plc_task);
+}
 int main(int argc, char* argv[])
 {
     OBJ_FILE obj_file = {
@@ -28,20 +49,17 @@ int main(int argc, char* argv[])
             {"axis2", true, 2, AXIS_TYPE_FINITE, OPER_MODE_POS,
 			0.0, 180.0, 100.0, 20.0, 20.0, 10.0},
         }},
-        2, // plc task count
+        1, // plc task count
         {
-            {{"task1", 80, 100000000u, 20, 3},
-            {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},{
-            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
-            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
-            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
+            {{"task1", 80, 100000000u, 20, 2},
+            {0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},{
+            {STD_ADD, {0x00000001, 0x00000002, 0x00000002}},
+            {STD_ADD, {0x00000001, 0x00000011, 0x00000001}},
             }},
-            {{"task2", 90, 500000000u, 20, 3},
-            {0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},{
-            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
-            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
-            {STD_ADD, {0x00000001, 0x00000006, 0x00000006}},
-            }},
+            //{{"task2", 90, 500000000u, 20, 1},
+            //{0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13},{
+            //{STD_ADD, {0x00000001, 0x00000011, 0x00000001}},
+            //}},
         }
     };
 
@@ -51,24 +69,11 @@ int main(int argc, char* argv[])
 	FILE *fplc = fopen("plc.bin", "wb");
     generate_obj_file(fplc, &obj_file, &inst_desc);
 	fclose(fplc);
-	fplc = fopen("plc.bin", "rb");
-    obj_is_valid(fplc);
-    load_io_config(fplc, &io_config);
-    io_task_init(&io_config);
-    load_servo_config(fplc, &servo_config);
-    servo_task_init(&servo_config);
-    load_plc_task_list(fplc, &plc_task, &inst_desc);
-    plc_task_init(&plc_task);
-	fclose(fplc);
+	sys_init();
 
-
-    io_task_start(&io_config);
-    servo_task_start(&servo_config);
-    plc_task_start(&plc_task);
+    sys_start();
     pause();
-    io_task_delete();
-    servo_task_delete();
-    plc_task_delete(&plc_task);
+    sys_exit();
 
 	return 0;
 }

@@ -16,7 +16,7 @@ static void plc_task_execute(void *plc_task) {
                 (void *)task->code[i].arg_addr[0],
                 (void *)task->code[i].arg_addr[1],
                 (void *)task->code[i].arg_addr[2]);
-            //LOGGER_DBG("arg3_value = %d", *(uint32_t *)task->code[i].arg_addr[2]);
+            //LOGGER_DBG("inst_id = %d, arg3_value = %d",task->code[i].id, *(uint32_t *)task->code[i].arg_addr[2]);
         }
     }
 }
