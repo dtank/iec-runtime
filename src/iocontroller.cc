@@ -13,7 +13,7 @@ static void local_di_update(IO_CONFIG *config) {
 }
 
 static void local_do_update(IO_CONFIG *config) {
-    LOGGER_DBG("STUB: io_shm .local_do = %d", *(uint8_t *)&io_shm[LDO_ADDR_OFFSET]);
+    //LOGGER_DBG("STUB: io_shm .local_do = %d", *(uint8_t *)&io_shm[LDO_ADDR_OFFSET]);
 }
 
 static void local_ai_update(IO_CONFIG *config) {
@@ -45,7 +45,7 @@ static void io_task_create() {
 void io_task_init(IO_CONFIG *config) {
     int size = config->ldi_count * LDI_WORDSIZE + config->ldo_count * LDO_WORDSIZE +
         config->lai_count * LAI_WORDSIZE + config->lao_count * LAO_WORDSIZE;
-	rt_heap_create(&io_heap_desc, "io_shm", size, H_SHARED);
+    rt_heap_create(&io_heap_desc, "io_shm", size, H_SHARED);
     rt_heap_alloc(&io_heap_desc, size, TM_INFINITE, (void **)&io_shm);
     io_task_create();
 }

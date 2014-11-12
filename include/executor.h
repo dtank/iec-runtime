@@ -3,8 +3,8 @@
 
 #include "plcmodel.h"
 
-//static void plc_task_execute(void *model);
-//void plc_task_init(PLC_MODEL *model);
-//void plc_task_start(PLC_MODEL *model);
-//void plc_task_delete(PLC_TASK_LIST *task_list, PLC_CONFIG *config);
+static void plc_task_execute(void *task);
+void plc_task_init(TASK_LIST *task);
+void plc_task_start(TASK_LIST *task);
+void plc_task_delete(TASK_LIST *task);
 #endif

@@ -63,10 +63,10 @@ typedef struct {
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task Property Segment
  *---------------------------------------------------------------------------*/
-#define MAX_ARG_COUNT 8
-#define MAX_TASK_COUNT 4
+#define MAX_ARG_COUNT 4
+#define MAX_TASK_COUNT 2
 #define MAX_DATA_SIZE 64
-#define MAX_INST_COUNT 256
+#define MAX_INST_COUNT 10
 typedef struct {
 	char name[MAX_NAME_SIZE];          /* plc task name */
 	uint8_t priority;    /* plc task priority */

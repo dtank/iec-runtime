@@ -9,7 +9,7 @@ extern ec_map_t ec_msg;
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
-static int load_io_config(FILE *fp, IO_CONFIG *io_config) {
+int load_io_config(FILE *fp, IO_CONFIG *io_config) {
 	fread(io_config, sizeof(IO_CONFIG), 1, fp); /* rely on alignment */
     if (io_config->update_interval < MIN_IO_INTERVAL) {
         LOGGER_ERR(EC_IO_INTERVAL, "");
@@ -93,7 +93,7 @@ static int load_axis_config(FILE *fp, AXIS_CONFIG *axis_config) {
 
 	return 0;
 }
-static int load_servo_config(FILE *fp, SERVO_CONFIG *servo_config) {
+int load_servo_config(FILE *fp, SERVO_CONFIG *servo_config) {
     fread(&servo_config->axis_count, sizeof(servo_config->axis_count), 1, fp);
     if (servo_config->axis_count < 0 || MAX_AXIS_COUNT < servo_config->axis_count) {
         LOGGER_ERR(EC_AXIS_COUNT, "");
@@ -169,7 +169,7 @@ static char *load_inst_arg_addr(FILE *fp, char *data) {
         case ARG_ADDR_IO:   arg_addr = &io_shm[arg_addr_offset];break;
         default: LOGGER_ERR(EC_ARG_VA_INVALID, "");break;
     }
-    //LOGGER_DBG("inst_arg_addr = %d", arg_addr);
+    //LOGGER_DBG("io_shm_addr = %d\ninst_arg_addr = %d", io_shm, arg_addr);
     return arg_addr;
 }
 
@@ -232,7 +232,7 @@ static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
 /*-----------------------------------------------------------------------------
  * PLC Model Loader
  *---------------------------------------------------------------------------*/
-static bool obj_is_valid(FILE *fp) {
+bool obj_is_valid(FILE *fp) {
     OBJ_HEADER header;
 	fread(&header, sizeof(header), 1, fp);
     if (strcmp(header.magic, MAGIC) != 0) {
@@ -260,46 +260,25 @@ static bool obj_is_valid(FILE *fp) {
 		header.magic, header.type, header.order, header.version, header.machine);
 	return true;
 }
-PLC_MODEL *load_plc_model(FILE *fp, inst_desc_map_t *inst_desc) {
-    if (!obj_is_valid(fp)) {
-        return NULL;
-    }
-    PLC_MODEL *model = new PLC_MODEL;
-    if (model == NULL) {
-        LOGGER_ERR(EC_OOM, "loading plc modle");
-        return NULL;
-    }
-    if (load_io_config(fp, &model->io_config) < 0) {
-        LOGGER_ERR(EC_LOAD_IO_CONFIG, "");
-        delete model;
-        return NULL;
-    }
-    if (load_servo_config(fp, &model->servo_config) < 0) {
-        LOGGER_ERR(EC_LOAD_SERVO_CONFIG, "");
-        delete model;
-        return NULL;
-    }
-    fread(&model->task_count, sizeof(model->task_count), 1, fp);
-    if (MAX_TASK_COUNT < model->task_count) {
+int load_plc_task_list(FILE *fp, TASK_LIST *task, inst_desc_map_t *inst_desc) {
+    fread(&task->task_count, sizeof(task->task_count), 1, fp);
+    if (MAX_TASK_COUNT < task->task_count) {
         LOGGER_ERR(EC_TASK_COUNT, "");
-        delete model;
-        return NULL;
+        return -1;
     }
-    model->rt_task = new RT_TASK[model->task_count];
-    model->plc_task = new PLC_TASK[model->task_count];
-    if (model->rt_task == NULL || model->plc_task == NULL) {
+    task->rt_task = new RT_TASK[task->task_count];
+    task->plc_task = new PLC_TASK[task->task_count];
+    if (task->rt_task == NULL || task->plc_task == NULL) {
         LOGGER_ERR(EC_OOM, "loading plc task");
-        delete model;
-        return NULL;
+        return -1;
     }
-    for (int i = 0; i < model->task_count; ++i) {
-        if (load_plc_task(fp, &model->plc_task[i], inst_desc) < 0) {
+    for (int i = 0; i < task->task_count; ++i) {
+        if (load_plc_task(fp, &task->plc_task[i], inst_desc) < 0) {
             LOGGER_ERR(EC_LOAD_PLC_TASK, "");
-            delete model->rt_task;
-            delete model->plc_task;
-            delete model;
-            return NULL;
+            delete task->rt_task;
+            delete task->plc_task;
+            return -1;
         }
     }
-    return model;
+    return 0;
 }

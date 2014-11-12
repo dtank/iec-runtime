@@ -106,11 +106,9 @@ typedef struct {
  * Definition of PLC Medel
  *---------------------------------------------------------------------------*/
 typedef struct {
-    IO_CONFIG io_config;
-    SERVO_CONFIG servo_config;
     uint8_t task_count;
     RT_TASK *rt_task;
     PLC_TASK *plc_task;
-} PLC_MODEL;
+} TASK_LIST;
 
 #endif
