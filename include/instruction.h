@@ -17,6 +17,19 @@ enum INST_ID {
     STD_GT,
     STD_LT,
     STD_EQ,
+    /* Mathematics */
+    STD_ABS,
+    STD_SQRT,
+    STD_SIN,
+    STD_COS,
+    STD_TAN,
+    /* Bit Operation */
+    STD_SHL,
+    STD_SHR,
+    STD_AND,
+    STD_OR,
+    STD_XOR,
+    STD_NOT,
 };
 
 typedef struct {
@@ -38,6 +51,19 @@ static const inst_desc_map_t::value_type inst_desc_data[] = {
 	inst_desc_map_t::value_type(STD_GT, {3u, (void *)std_gt}),
 	inst_desc_map_t::value_type(STD_LT, {3u, (void *)std_lt}),
 	inst_desc_map_t::value_type(STD_EQ, {3u, (void *)std_eq}),
+    /* Mathematics */
+	inst_desc_map_t::value_type(STD_ABS, {2u, (void *)std_abs}),
+	inst_desc_map_t::value_type(STD_SQRT, {2u, (void *)std_sqrt}),
+	inst_desc_map_t::value_type(STD_SIN, {2u, (void *)std_sin}),
+	inst_desc_map_t::value_type(STD_COS, {2u, (void *)std_cos}),
+	inst_desc_map_t::value_type(STD_TAN, {2u, (void *)std_tan}),
+    /* Bit Operation */
+	inst_desc_map_t::value_type(STD_SHL, {3u, (void *)std_shl}),
+	inst_desc_map_t::value_type(STD_SHR, {3u, (void *)std_shr}),
+	inst_desc_map_t::value_type(STD_AND, {3u, (void *)std_and}),
+	inst_desc_map_t::value_type(STD_OR, {3u, (void *)std_or}),
+	inst_desc_map_t::value_type(STD_XOR, {3u, (void *)std_xor}),
+	inst_desc_map_t::value_type(STD_NOT, {2u, (void *)std_not}),
 };
 static const uint32_t inst_desc_count = sizeof inst_desc_data / sizeof inst_desc_data[0];
 static const inst_desc_map_t inst_desc_map(inst_desc_data, inst_desc_data + inst_desc_count);
