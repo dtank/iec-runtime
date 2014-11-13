@@ -14,7 +14,7 @@ static void servo_update(void *config) {
 	rt_task_set_periodic(NULL, TM_NOW, servo_config->update_interval);
 	while (1) {
 		rt_task_wait_period(NULL);
-        LOGGER_INF("STUB: Update servo data...");
+        LOGGER_INF("STUB: Update servo data...", 0);
 	}
 }
 static void servo_task_create() {
@@ -24,7 +24,7 @@ static void servo_task_create() {
 }
 
 void servo_task_init(SERVO_CONFIG *config) {
-    LOGGER_INF("STUB: Configure servo driver...");
+    LOGGER_INF("STUB: Configure servo driver...", 0);
     int size = config->axis_count * sizeof(AXIS_DATA);
 	rt_heap_create(&servo_heap_desc, "servo_shm", size, H_SHARED);
     rt_heap_alloc(&servo_heap_desc, size, TM_INFINITE, (void **)&servo_shm);

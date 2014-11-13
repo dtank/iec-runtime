@@ -9,7 +9,7 @@ char *rc_shm;
 extern ec_map_t ec_msg;
 
 static void interp_calculate(void *config) {
-    LOGGER_INF("STUB: Calculate interpolation value...");
+    LOGGER_INF("STUB: Calculate interpolation value...", 0);
 }
 static void rc_task_create() {
 	if (rt_task_create(&rc_task, RC_TASK_NAME, 0, RC_TASK_PRIORITY, 0)) {

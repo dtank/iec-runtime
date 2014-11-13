@@ -9,19 +9,19 @@ char *io_shm;
 extern ec_map_t ec_msg;
 
 static void local_di_update(IO_CONFIG *config) {
-    LOGGER_DBG("STUB: io_shm .local_di = %d", *(uint32_t *)&io_shm[LDI_ADDR_OFFSET]);
+    LOGGER_INF("STUB: io_shm .local_di = %d", *(uint32_t *)&io_shm[LDI_ADDR_OFFSET]);
 }
 
 static void local_do_update(IO_CONFIG *config) {
-    LOGGER_DBG("STUB: io_shm .local_do = %d", *(uint32_t *)&io_shm[LDO_ADDR_OFFSET]);
+    LOGGER_INF("STUB: io_shm .local_do = %d", *(uint32_t *)&io_shm[LDO_ADDR_OFFSET]);
 }
 
 static void local_ai_update(IO_CONFIG *config) {
-    LOGGER_DBG("STUB: io_shm .local_ai = %d", *(uint32_t *)&io_shm[LAI_ADDR_OFFSET]);
+    LOGGER_INF("STUB: io_shm .local_ai = %d", *(uint32_t *)&io_shm[LAI_ADDR_OFFSET]);
 }
 
 static void local_ao_update(IO_CONFIG *config) {
-    LOGGER_DBG("STUB: io_shm .local_ao = %d", *(uint32_t *)&io_shm[LAO_ADDR_OFFSET]);
+    LOGGER_INF("STUB: io_shm .local_ao = %d", *(uint32_t *)&io_shm[LAO_ADDR_OFFSET]);
 }
 
 static void io_update(void *config) {

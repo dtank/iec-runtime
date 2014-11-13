@@ -32,10 +32,10 @@ extern int LOGGER_LEVEL;
 		    fprintf(stderr, "...\n"); }                                                                  \
 	} while(0)
 
-#define LOGGER_INF(msg)                                                                                  \
+#define LOGGER_INF(msg, ...)                                                                                  \
 	do {                                                                                                 \
 		if (LOGGER_LEVEL >= LEVEL_INF) {                                                                 \
-			fprintf(stderr, msg);                                                                        \
+			fprintf(stderr, msg, __VA_ARGS__);                                                                        \
 		    fprintf(stderr, "\n"); }                                                                     \
 	} while(0)
 
