@@ -2,7 +2,7 @@
 #define __PLC_MODEL_H__
 
 #include <native/task.h>
-#include "binformat.h"
+#include "objdef.h"
 
 /*-----------------------------------------------------------------------------
  * Definition of Runtime System Environment

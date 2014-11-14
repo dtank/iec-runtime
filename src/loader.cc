@@ -1,6 +1,7 @@
 #include <string.h>
 #include <map>
 #include "loader.h"
+#include "objdef.h"
 #include "logger.h"
 
 using namespace std;

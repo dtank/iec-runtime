@@ -1,7 +1,5 @@
 #include <string.h>
 #include "generator.h"
-#include "logger.h"
-
 
 /*-----------------------------------------------------------------------------
  * PLC Object File Header Generator
@@ -56,13 +54,13 @@ void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
     fwrite(&ptps->data_size, sizeof(ptps->data_size), 1, fp);
     fwrite(&ptps->inst_count, sizeof(ptps->inst_count), 1, fp);
 }
-void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_map_t *inst_desc) {
+void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_t *inst_desc) {
     fwrite(&inst->id, sizeof(inst->id), 1, fp);
     for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
         fwrite(&inst->arg_va[i], sizeof(inst->arg_va[0]), 1, fp);
     }
 }
-void generate_obj_pts(FILE *fp, OBJ_PTS *pts, inst_desc_map_t *inst_desc) {
+void generate_obj_pts(FILE *fp, OBJ_PTS *pts, inst_desc_t *inst_desc) {
     generate_obj_ptps(fp, &pts->prop);
 	fwrite(pts->data, pts->prop.data_size, 1, fp);
     for (uint32_t i = 0; i < pts->prop.inst_count; ++i) {
@@ -72,7 +70,7 @@ void generate_obj_pts(FILE *fp, OBJ_PTS *pts, inst_desc_map_t *inst_desc) {
 /*-----------------------------------------------------------------------------
  * PLC Object File Generator
  *---------------------------------------------------------------------------*/
-void generate_obj_file(FILE *fp, OBJ_FILE *file, inst_desc_map_t *inst_desc) {
+void generate_obj_file(FILE *fp, OBJ_FILE *file, inst_desc_t *inst_desc) {
     generate_obj_header(fp, &file->header);
     generate_obj_iocs(fp, &file->iocs);
     generate_obj_scs(fp, &file->scs);

@@ -13,6 +13,7 @@ enum INST_ID {
 	STD_SUB,
 	STD_MUL,
 	STD_DIV,
+	STD_MOV,
     /* Comparation */
     STD_GT,
     STD_LT,
@@ -47,6 +48,7 @@ static const inst_desc_map_t::value_type inst_desc_data[] = {
 	inst_desc_map_t::value_type(STD_SUB, {3u, (void *)std_sub}),
 	inst_desc_map_t::value_type(STD_MUL, {3u, (void *)std_mul}),
 	inst_desc_map_t::value_type(STD_DIV, {3u, (void *)std_div}),
+	inst_desc_map_t::value_type(STD_MOV, {2u, (void *)std_mov}),
     /* Comparation */
 	inst_desc_map_t::value_type(STD_GT, {3u, (void *)std_gt}),
 	inst_desc_map_t::value_type(STD_LT, {3u, (void *)std_lt}),

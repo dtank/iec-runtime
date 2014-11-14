@@ -3,7 +3,6 @@
 
 #include "plcmodel.h"
 
-
 #define SERVO_TASK_NAME "servo_task"
 #define SERVO_TASK_PRIORITY 98
 typedef struct {

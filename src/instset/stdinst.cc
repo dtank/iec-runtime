@@ -16,6 +16,9 @@ void std_mul(void *in1, void *in2, void *out) {
 void std_div(void *in1, void *in2, void *out) {
 	*(int32_t *)out = *(int32_t *)in1 / *(int32_t *)in2;
 }
+void std_mov(void *in, void *out) {
+	*(int32_t *)out = *(int32_t *)in;
+}
 /* Comparation */
 void std_gt(void *in1, void *in2, void *out) {
 	*(bool *)out = *(int32_t *)in1 > *(int32_t *)in2;

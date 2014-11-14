@@ -1,7 +1,6 @@
 #ifndef __LOADER_H__
 #define __LOADER_H__
 
-#include "binformat.h"
 #include "plcmodel.h"
 #include "instruction.h"
 
