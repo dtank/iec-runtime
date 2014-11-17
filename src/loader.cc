@@ -226,8 +226,8 @@ static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
         LOGGER_ERR(EC_LOAD_TASK_CODE, "");
         return -1;
     }
-    LOGGER_DBG("PLC_TASK:\n .data[0] = %d .data[n] = %d\n .instruction[0].id = %d",
-        task->data[0], task->data[task->prop.data_size-1], task->code[0].id);
+    //LOGGER_DBG("PLC_TASK:\n .data[0] = %d .data[n] = %d\n .instruction[0].id = %d",
+        //task->data[0], task->data[task->prop.data_size-1], task->code[0].id);
     return 0;
 }
 /*-----------------------------------------------------------------------------

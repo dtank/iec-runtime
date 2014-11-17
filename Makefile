@@ -1,4 +1,4 @@
-.PHONY : all clean rebuild
+.PHONY : all clean rebuild genobj runtime
 
 all:
 	@make -C src
@@ -9,3 +9,9 @@ clean:
 	@make clean -C test
 
 rebuild: clean all
+
+genobj:
+	@make rebuild -C test
+
+runtime:
+	@make rebuild -C src
