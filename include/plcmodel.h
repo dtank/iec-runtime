@@ -3,6 +3,7 @@
 
 #include <native/task.h>
 #include "objdef.h"
+#include "limits.h"
 
 /*-----------------------------------------------------------------------------
  * Definition of Runtime System Environment
@@ -12,35 +13,6 @@
 #define SYS_BYTE_ORDER BYTE_ORDER_LIT
 #define SYS_VERSION 1
 #define SYS_MACHINE MACH_CORTEX_A8
-/* I/O */
-#define MAX_LDI_COUNT 1
-#define MAX_LDO_COUNT 1
-#define MAX_LAI_COUNT 1
-#define MAX_LAO_COUNT 1
-#define MIN_IO_INTERVAL 2000000 /* unit: ns */
-#define LDI_WORDSIZE 4 /* unit: Byte */
-#define LDO_WORDSIZE 4 /* unit: Byte */
-#define LAI_WORDSIZE 4 /* unit: Byte */
-#define LAO_WORDSIZE 4 /* unit: Byte */
-#define MAX_IO_MEM_SIZE (MAX_LDI_COUNT*LDI_WORDSIZE + \
-        MAX_LDO_COUNT*LDO_WORDSIZE + \
-        MAX_LAI_COUNT*LAI_WORDSIZE + \
-        MAX_LAO_COUNT*LAO_WORDSIZE)
-/* Servo */
-#define MAX_AXIS_COUNT 8
-#define MAX_AXIS_NAME_SIZE 16
-#define MIN_AXIS_NODE_ID 1
-#define MAX_AXIS_NODE_ID MAX_AXIS_COUNT
-//#define MIN_AXIS_
-#define MIN_SERVO_INTERVAL 2000000 /* unit: ns */
-/* PLC Task */
-#define MAX_TASK_COUNT 64
-#define MAX_TASK_NAME_SIZE 16
-#define MAX_TASK_PRIORITY 90
-#define MIN_TASK_PRIORITY 50
-#define MIN_TASK_INTERVAL 8000000
-#define MAX_TASK_DATA_SIZE 65535 /* uint16_t */
-#define MAX_INST_ID 65535 /* uint16_t */
 
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration

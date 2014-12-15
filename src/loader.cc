@@ -134,7 +134,7 @@ static int load_task_prop(FILE *fp, TASK_PROP *task_prop) {
         return -1;
     }
     fread(&task_prop->data_size, sizeof(task_prop->data_size), 1, fp);
-    if (MAX_TASK_DATA_SIZE < task_prop->data_size) {
+    if (MAX_TASK_GLOB_COUNT < task_prop->data_size) {
         LOGGER_ERR(EC_TASK_DATA_SIZE, "");
         return -1;
     }
@@ -176,7 +176,7 @@ static char *load_inst_arg_addr(FILE *fp, char *data) {
 
 static int load_plc_task_inst(FILE *fp, PLC_INST *inst, char *data, inst_desc_map_t *inst_desc) {
     fread(&inst->id, sizeof(inst->id), 1, fp);
-    if (inst->id < 0 || MAX_INST_ID < inst->id) {
+    if (inst->id < 0 || MAX_TASK_INST_COUNT < inst->id) {
         LOGGER_ERR(EC_INST_ID_RANGE, "");
         return -1;
     }
