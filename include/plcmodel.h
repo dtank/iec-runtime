@@ -4,15 +4,7 @@
 #include <native/task.h>
 #include "objdef.h"
 #include "limits.h"
-
-/*-----------------------------------------------------------------------------
- * Definition of Runtime System Environment
- *---------------------------------------------------------------------------*/
-/* Basic */
-#define SYS_TYPE SYS_TYPE_32
-#define SYS_BYTE_ORDER BYTE_ORDER_LIT
-#define SYS_VERSION 1
-#define SYS_MACHINE MACH_CORTEX_A8
+#include "sysdef.h"
 
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration
