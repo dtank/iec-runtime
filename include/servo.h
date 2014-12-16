@@ -17,7 +17,7 @@ typedef struct {
 
 static void servo_update(void *config);
 static void servo_task_create();
-void servo_task_init(SERVO_CONFIG *config);
-void servo_task_start(SERVO_CONFIG *config);
+void servo_task_init(ServoConfig *config);
+void servo_task_start(ServoConfig *config);
 void servo_task_delete();
 #endif

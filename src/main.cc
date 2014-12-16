@@ -11,13 +11,13 @@
 int LOGGER_LEVEL = LEVEL_ALL;
 inst_desc_map_t inst_desc = inst_desc_map;
 ec_map_t ec_msg = ec_map;
-IO_CONFIG io_config;
-SERVO_CONFIG servo_config;
+IOConfig io_config;
+ServoConfig servo_config;
 TASK_LIST plc_task;
 
 void sys_init() {
     FILE *fplc = fopen("plc.bin", "rb");
-    obj_is_valid(fplc);
+    verify_obj(fplc);
     load_io_config(fplc, &io_config);
     io_task_init(&io_config);
     load_servo_config(fplc, &servo_config);

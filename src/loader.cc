@@ -11,8 +11,8 @@ extern ec_map_t ec_msg;
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
-int load_io_config(FILE *fp, IO_CONFIG *io_config) {
-	fread(io_config, sizeof(IO_CONFIG), 1, fp); /* rely on alignment */
+int load_io_config(FILE *fp, IOConfig *io_config) {
+	fread(io_config, sizeof(IOConfig), 1, fp); /* rely on alignment */
     if (io_config->update_interval < MIN_IO_INTERVAL) {
         LOGGER_ERR(EC_IO_INTERVAL, "");
         return -1;
@@ -34,14 +34,14 @@ int load_io_config(FILE *fp, IO_CONFIG *io_config) {
 		return -1;
 	}
 	LOGGER_DBG(
-		"IO_CONFIG:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
+		"IOConfig:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
 		io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
 	return 0;
 }
 /*-----------------------------------------------------------------------------
  * Servo Configuration Loader
  *---------------------------------------------------------------------------*/
-static int load_axis_config(FILE *fp, AXIS_CONFIG *axis_config) {
+static int load_axis_config(FILE *fp, AxisConfig *axis_config) {
     fread(axis_config->name, MAX_AXIS_NAME_SIZE, 1, fp);
     fread(&axis_config->is_combined, sizeof(axis_config->is_combined), 1, fp);
     if (axis_config->is_combined != false && axis_config->is_combined != true) {
@@ -90,12 +90,12 @@ static int load_axis_config(FILE *fp, AXIS_CONFIG *axis_config) {
         return -1;
     }
 	LOGGER_DBG(
-		"AXIS_CONFIG:\n .is_combined = %d\n .name = %s\n .node_id = %d\n .axis_type = %d\n .oper_mode = %d\n .sw_limit_neg = %f\n .sw_limit_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
+		"AxisConfig:\n .is_combined = %d\n .name = %s\n .node_id = %d\n .axis_type = %d\n .oper_mode = %d\n .sw_limit_neg = %f\n .sw_limit_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
 		axis_config->is_combined, axis_config->name, axis_config->node_id, axis_config->axis_type, axis_config->oper_mode, axis_config->sw_limit_neg, axis_config->sw_limit_pos, axis_config->max_vel, axis_config->max_acc, axis_config->max_dec, axis_config->max_jerk);
 
 	return 0;
 }
-int load_servo_config(FILE *fp, SERVO_CONFIG *servo_config) {
+int load_servo_config(FILE *fp, ServoConfig *servo_config) {
     fread(&servo_config->axis_count, sizeof(servo_config->axis_count), 1, fp);
     if (servo_config->axis_count < 0 || MAX_AXIS_COUNT < servo_config->axis_count) {
         LOGGER_ERR(EC_AXIS_COUNT, "");
@@ -106,12 +106,12 @@ int load_servo_config(FILE *fp, SERVO_CONFIG *servo_config) {
 	    LOGGER_ERR(EC_SERVO_INTERVAL, "");
 		return -1;
 	}
-    servo_config->axis_group = new AXIS_CONFIG[servo_config->axis_count];
+    servo_config->axis_group = new AxisConfig[servo_config->axis_count];
 	if (servo_config->axis_group == NULL) {
         LOGGER_ERR(EC_OOM, "loading axis configuration");
     	return -1;
     }
-	LOGGER_DBG("SERVO_CONFIG:\n .axis_count = %d\n .update_interval = %d",
+	LOGGER_DBG("ServoConfig:\n .axis_count = %d\n .update_interval = %d",
         servo_config->axis_count, servo_config->update_interval);
 	for (int i = 0; i < servo_config->axis_count; ++i) {
         if (load_axis_config(fp, &servo_config->axis_group[i]) < 0) {
@@ -234,7 +234,7 @@ static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
 /*-----------------------------------------------------------------------------
  * PLC Model Loader
  *---------------------------------------------------------------------------*/
-bool obj_is_valid(FILE *fp) {
+bool verify_obj(FILE *fp) {
     OBJHeader header;
 	fread(&header, sizeof(header), 1, fp);
     if (strcmp(header.magic, MAGIC) != 0) {

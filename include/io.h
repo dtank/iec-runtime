@@ -12,13 +12,13 @@
 #define IO_TASK_NAME "io_task"
 #define IO_TASK_PRIORITY 99
 
-static void local_di_update(IO_CONFIG *config);
-static void local_do_update(IO_CONFIG *config);
-static void local_ai_update(IO_CONFIG *config);
-static void local_ao_update(IO_CONFIG *config);
+static void local_di_update(IOConfig *config);
+static void local_do_update(IOConfig *config);
+static void local_ai_update(IOConfig *config);
+static void local_ao_update(IOConfig *config);
 static void io_update(void *config);
 static void io_task_create();
-void io_task_init(IO_CONFIG *config);
-void io_task_start(IO_CONFIG *config);
+void io_task_init(IOConfig *config);
+void io_task_start(IOConfig *config);
 void io_task_delete();
 #endif

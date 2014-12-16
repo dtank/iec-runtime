@@ -13,7 +13,7 @@ typedef struct {
 	uint8_t ldo_count;        /* number of local digital output module */
 	uint8_t lai_count;        /* number of local analog input module */
 	uint8_t lao_count;        /* number of local analog output module */
-} IO_CONFIG;
+} IOConfig;
 /*-----------------------------------------------------------------------------
  * Definition of Servo Configuration
  *---------------------------------------------------------------------------*/
@@ -29,20 +29,20 @@ typedef struct {
 	double max_acc;      /* accelaration limit (unit:) */
 	double max_dec;      /* decelaration limit (unit:) */
 	double max_jerk;     /* jerk limit (unit:) */
-} AXIS_CONFIG;
+} AxisConfig;
 
 typedef struct {
 	uint8_t axis_count;       /* number of axis */
 	uint32_t update_interval; /* Servo data update interval */
-	AXIS_CONFIG *axis_group;  /* array of axis configuration */
-} SERVO_CONFIG;
+	AxisConfig *axis_group;  /* array of axis configuration */
+} ServoConfig;
 /*-----------------------------------------------------------------------------
  * Definition of Robot Configuration
  *---------------------------------------------------------------------------*/
 typedef struct {
     int axis_count;
     int stub_param2;
-} ROBOT_CONFIG;
+} RobotConfig;
 /*-----------------------------------------------------------------------------
  * Definition of PLC Task
  *---------------------------------------------------------------------------*/

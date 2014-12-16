@@ -16,13 +16,13 @@ static void rc_task_create() {
         LOGGER_ERR(EC_RC_TASK_CREATE, "");
 	}
 }
-void rc_task_init(ROBOT_CONFIG *config) {
+void rc_task_init(RobotConfig *config) {
     int size = config->axis_count * sizeof(INTERP_DATA);
 	rt_heap_create(&rc_heap_desc, "rc_shm", size, H_SHARED);
     rt_heap_alloc(&rc_heap_desc, size, TM_INFINITE, (void **)&rc_shm);
     rc_task_create();
 }
-void rc_task_start(ROBOT_CONFIG *config) {
+void rc_task_start(RobotConfig *config) {
 	if (rt_task_start(&rc_task, &interp_calculate, (void *)config)) {
         LOGGER_ERR(EC_RC_TASK_START, "");
 	}

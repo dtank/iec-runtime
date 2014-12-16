@@ -21,7 +21,7 @@ typedef struct {
 //static void interp_output_update();
 static void interp_calculate(void *config); /* TODO NOTE single/multiple axis interpolation */
 static void rc_task_create();
-void rc_task_init(ROBOT_CONFIG *config);
-void rc_task_start(ROBOT_CONFIG *config);
+void rc_task_init(RobotConfig *config);
+void rc_task_start(RobotConfig *config);
 void rc_task_delete();
 #endif
