@@ -1,6 +1,6 @@
 #include <math.h>
 #include <stdint.h>
-#include "stdinst.h"
+#include "libsys.h"
 //#include "instruction.h"
 
 /* Arithmetic */

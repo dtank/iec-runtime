@@ -23,6 +23,6 @@ void generate_obj_pts(FILE *fp, OBJ_PTS *pts, inst_desc_t *inst_desc);
 /*-----------------------------------------------------------------------------
  * PLC Object File Generator
  *---------------------------------------------------------------------------*/
-void generate_obj_header(FILE *fp, OBJ_HEADER *header);
+void generate_obj_header(FILE *fp, OBJHeader *header);
 void generate_obj_file(FILE *fp, OBJ_FILE *file, inst_desc_t *inst_desc);
 #endif

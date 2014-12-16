@@ -91,7 +91,7 @@ typedef struct {
  * Definition of PLC Object File
  *---------------------------------------------------------------------------*/
 typedef struct {
-    OBJ_HEADER header;
+    OBJHeader header;
     OBJ_IOCS iocs;
     OBJ_SCS scs;
     uint8_t task_count;

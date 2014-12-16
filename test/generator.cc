@@ -4,7 +4,7 @@
 /*-----------------------------------------------------------------------------
  * PLC Object File Header Generator
  *---------------------------------------------------------------------------*/
-void generate_obj_header(FILE *fp, OBJ_HEADER *header) {
+void generate_obj_header(FILE *fp, OBJHeader *header) {
 	fwrite(header->magic, MAGIC_SIZE, 1, fp);
 	fwrite(&header->type, sizeof(header->type), 1, fp);
 	fwrite(&header->order, sizeof(header->order), 1, fp);

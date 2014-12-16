@@ -235,7 +235,7 @@ static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
  * PLC Model Loader
  *---------------------------------------------------------------------------*/
 bool obj_is_valid(FILE *fp) {
-    OBJ_HEADER header;
+    OBJHeader header;
 	fread(&header, sizeof(header), 1, fp);
     if (strcmp(header.magic, MAGIC) != 0) {
         LOGGER_ERR(EC_PLC_FILE, "");
@@ -258,7 +258,7 @@ bool obj_is_valid(FILE *fp) {
 		return false;
 	}
 	LOGGER_DBG(
-		"OBJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
+		"/BJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
 		header.magic, header.type, header.order, header.version, header.machine);
 	return true;
 }
