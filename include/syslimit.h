@@ -1,5 +1,5 @@
-#ifndef __LIMITS_H__
-#define __LIMITS_H__
+#ifndef __SYSLIMIT_H__
+#define __SYSLIMIT_H__
 
 /* I/O Limitations */
 #define MAX_LDI_COUNT 1

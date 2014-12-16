@@ -1,7 +1,8 @@
 #ifndef __OBJ_CASE_H__
 #define __OBJ_CASE_H__
 
-#include "objdef.h"
+#include "objfile.h"
+#include "sysenv.h"
 
 #define OBJ_ARITHMETIC {                                     \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8}, \

@@ -2,7 +2,7 @@
 #define __BIN_FORMAT_H__
 
 #include <stdint.h>
-#include "objdef.h"
+#include "objfile.h"
 
 #define MAGIC_SIZE 5 /* including '\0' */
 #define MAX_NAME_SIZE 16

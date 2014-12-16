@@ -2,9 +2,7 @@
 #define __PLC_MODEL_H__
 
 #include <native/task.h>
-#include "objdef.h"
-#include "limits.h"
-#include "sysdef.h"
+#include "syslimit.h"
 
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration

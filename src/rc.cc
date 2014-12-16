@@ -1,6 +1,6 @@
 #include <native/task.h>
 #include <native/heap.h>
-#include "robcontroller.h"
+#include "rc.h"
 #include "logger.h"
 
 static RT_TASK rc_task;

@@ -1,5 +1,5 @@
-#ifndef __STD_INST_H__
-#define __STD_INST_H__
+#ifndef __LIBSYS_H__
+#define __LIBSYS_H__
 
 /* Arithmetic */
 void std_add(void *in1, void *in2, void *out);

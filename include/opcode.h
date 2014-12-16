@@ -1,9 +1,9 @@
-#ifndef __INSTRUCTION_H__
-#define __INSTRUCTION_H__
+#ifndef __OPCODE_H__
+#define __OPCODE_H__
 
 #include <map>
 #include <stdint.h>
-#include "stdinst.h"
+#include "libsys.h"
 
 using namespace std;
 

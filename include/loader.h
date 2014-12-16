@@ -2,7 +2,7 @@
 #define __LOADER_H__
 
 #include "plcmodel.h"
-#include "instruction.h"
+#include "opcode.h"
 
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader

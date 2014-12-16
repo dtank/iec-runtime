@@ -1,5 +1,5 @@
-#ifndef __SERVO_CONTROLLER_H__
-#define __SERVO_CONTROLLER_H__
+#ifndef __SERVO_H__
+#define __SERVO_H__
 
 #include "plcmodel.h"
 

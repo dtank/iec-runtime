@@ -1,5 +1,5 @@
-#ifndef __IO_CONTROLLER_H__
-#define __IO_CONTROLLER_H__
+#ifndef __IO_H__
+#define __IO_H__
 
 #include "plcmodel.h"
 

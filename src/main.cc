@@ -3,8 +3,8 @@
 
 #include "loader.h"
 #include "executor.h"
-#include "iocontroller.h"
-#include "axiscontroller.h"
+#include "io.h"
+#include "servo.h"
 #include "logger.h"
 
 

@@ -1,11 +1,9 @@
-#ifndef __SYSDEF_H__
-#define __SYSDEF_H__
+#ifndef __SYSENV_H__
+#define __SYSENV_H__
 
 /*-----------------------------------------------------------------------------
  * PLC Object File Header
  *---------------------------------------------------------------------------*/
-#define MAGIC "\x7FPLC"
-#define MAGIC_SIZE 5 /* including '\0' */
 #define SYS_TYPE_32 1
 #define SYS_TYPE_64 2
 #define BYTE_ORDER_LIT 1

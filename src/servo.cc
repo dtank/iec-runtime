@@ -1,6 +1,6 @@
 #include <native/task.h>
 #include <native/heap.h>
-#include "axiscontroller.h"
+#include "servo.h"
 #include "logger.h"
 
 static RT_TASK servo_task;

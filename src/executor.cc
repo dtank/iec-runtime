@@ -1,5 +1,5 @@
 #include "executor.h"
-#include "instruction.h"
+#include "opcode.h"
 #include "logger.h"
 
 extern inst_desc_map_t inst_desc;

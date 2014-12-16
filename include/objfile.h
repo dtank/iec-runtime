@@ -1,8 +1,10 @@
-#ifndef __OBJDEF_H__
-#define __OBJDEF_H__
+#ifndef __OBJFILE_H__
+#define __OBJFILE_H__
 
 #include <stdint.h>
-#include "sysdef.h"
+
+#define MAGIC "\x7FPLC"
+#define MAGIC_SIZE 5 /* including '\0' */
 /*-----------------------------------------------------------------------------
  * Definition of PLC Object File Header
  *---------------------------------------------------------------------------*/

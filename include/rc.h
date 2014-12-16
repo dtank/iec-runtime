@@ -1,5 +1,5 @@
-#ifndef __RC_CONTROLLER_H__
-#define __RC_CONTROLLER_H__
+#ifndef __RC_H__
+#define __RC_H__
 
 #include "plcmodel.h"
 
