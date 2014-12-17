@@ -2,9 +2,11 @@
 #define __LOADER_H__
 
 #include "plcmodel.h"
-#include "opcode.h"
 
-bool verify_obj(FILE *fp);
+/*-----------------------------------------------------------------------------
+ * Object File Verifier
+ *---------------------------------------------------------------------------*/
+int verify_obj(FILE *fp);
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
@@ -17,13 +19,10 @@ int load_servo_config(FILE *fp, ServoConfig *servo_config);
 /*-----------------------------------------------------------------------------
  * PLC Task List Loader
  *---------------------------------------------------------------------------*/
-static int load_task_prop(FILE *fp, TASK_PROP *task_prop);
-static char *load_plc_task_data(FILE *fp, TASK_PROP *prop);
-static char *load_inst_arg_addr(FILE *fp, char *data);
-// TODO change to memcpy type
-static PLC_INST *load_plc_task_inst(FILE *fp, char *data, inst_desc_map_t *inst_desc);
-static PLC_INST *load_plc_task_code(FILE *fp, TASK_PROP *prop, char *data, inst_desc_map_t *inst_desc);
-static int load_plc_task(FILE *fp, TASK_PROP *prop, PLC_TASK *task, inst_desc_map_t *inst_desc);
-int load_plc_task_list(FILE *fp, TASK_LIST *task, inst_desc_map_t *inst_desc);
+static int load_task_desc(FILE *fp, TaskDesc *task_desc);
+static int load_pou_desc(FILE *fp, POUDesc *pou_desc);
+static int load_value(FILE *fp, IValue *value);
+static int load_plc_task(FILE *fp, PLCTask *task);
+int load_task_list(FILE *fp, TaskList *task_list);
 
 #endif

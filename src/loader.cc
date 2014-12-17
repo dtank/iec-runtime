@@ -8,31 +8,40 @@
 using namespace std;
 extern char *io_shm;
 extern ec_map_t ec_msg;
+
+#define loadv(fp, varp) {fread(varp, sizeof(*varp), 1, fp);}
+#define loadvs(fp, varp, size) {fread(varp, size, 1, fp);}
+#define verify(exp, ecode, msg) {   \
+    if (exp) {                 \
+        LOGGER_ERR(ecode, msg); \
+        return -1;             \
+    }}
+/*-----------------------------------------------------------------------------
+ * Object File Verifier
+ *---------------------------------------------------------------------------*/
+int verify_obj(FILE *fp) {
+    OBJHeader header;
+    loadv(fp, &header); /* rely on byte alignment */
+    verify(strcmp(header.magic, MAGIC) != 0, EC_PLC_FILE, "");
+    verify(header.type != SYS_TYPE, EC_SYS_TYPE, "");
+    verify(header.order != SYS_BYTE_ORDER, EC_BYTE_ORDER, "");
+    verify(SYS_VERSION < header.version, EC_SYS_VERSION, "");
+    verify(header.machine != SYS_MACHINE, EC_SYS_MACHINE, "");
+	LOGGER_DBG(
+		"OBJHeader:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
+		header.magic, header.type, header.order, header.version, header.machine);
+	return 0;
+}
 /*-----------------------------------------------------------------------------
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
 int load_io_config(FILE *fp, IOConfig *io_config) {
-	fread(io_config, sizeof(IOConfig), 1, fp); /* rely on alignment */
-    if (io_config->update_interval < MIN_IO_INTERVAL) {
-        LOGGER_ERR(EC_IO_INTERVAL, "");
-        return -1;
-    }
-    if (io_config->ldi_count < 0 || MAX_LDI_COUNT < io_config->ldi_count) {
-        LOGGER_ERR(EC_LDI_COUNT, "");
-        return -1;
-    }
-	if (io_config->ldo_count < 0 || MAX_LDO_COUNT < io_config->ldo_count) {
-	    LOGGER_ERR(EC_LDO_COUNT, "");
-		return -1;
-	}
-	if (io_config->lai_count < 0 || MAX_LAI_COUNT < io_config->lai_count) {
-	    LOGGER_ERR(EC_LAI_COUNT, "");
-		return -1;
-	}
-	if (io_config->lao_count < 0 || MAX_LAO_COUNT < io_config->lao_count) {
-	    LOGGER_ERR(EC_LAO_COUNT, "");
-		return -1;
-	}
+    loadv(fp, io_config); /* rely on byte alignment */
+    verify(io_config->update_interval < MIN_IO_INTERVAL, EC_IO_INTERVAL, "");
+    verify(MAX_LDI_COUNT < io_config->ldi_count, EC_LDI_COUNT, "");
+    verify(MAX_LDO_COUNT < io_config->ldo_count, EC_LDO_COUNT, "");
+    verify(MAX_LAI_COUNT < io_config->lai_count, EC_LAI_COUNT, "");
+    verify(MAX_LAO_COUNT < io_config->lao_count, EC_LAO_COUNT, "");
 	LOGGER_DBG(
 		"IOConfig:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
 		io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
@@ -42,243 +51,158 @@ int load_io_config(FILE *fp, IOConfig *io_config) {
  * Servo Configuration Loader
  *---------------------------------------------------------------------------*/
 static int load_axis_config(FILE *fp, AxisConfig *axis_config) {
-    fread(axis_config->name, MAX_AXIS_NAME_SIZE, 1, fp);
-    fread(&axis_config->is_combined, sizeof(axis_config->is_combined), 1, fp);
-    if (axis_config->is_combined != false && axis_config->is_combined != true) {
-        LOGGER_ERR(EC_AXIS_COMBINE, "");
-        return -1;
-    }
-    fread(&axis_config->node_id, sizeof(axis_config->node_id), 1, fp);
-	if (axis_config->node_id < MIN_AXIS_NODE_ID || MAX_AXIS_NODE_ID < axis_config->node_id) {
-		LOGGER_ERR(EC_AXIS_ID_RANGE, "");
-		return -1;
-	}
-    fread(&axis_config->axis_type, sizeof(axis_config->axis_type), 1, fp);
-	if (axis_config->axis_type != AXIS_TYPE_FINITE && axis_config->axis_type != AXIS_TYPE_MODULO) {
-		LOGGER_ERR(EC_AXIS_TYPE, "");
-		return -1;
-	}
-    fread(&axis_config->oper_mode, sizeof(axis_config->oper_mode), 1, fp);
-	if (axis_config->oper_mode != OPER_MODE_POS && axis_config->oper_mode != OPER_MODE_VEL && axis_config->oper_mode != OPER_MODE_TOR) {
-		LOGGER_ERR(EC_AXIS_OPER_MODE, "");
-		return -1;
-	}
-    fread(&axis_config->sw_limit_neg, sizeof(axis_config->sw_limit_neg), 1, fp);
-    fread(&axis_config->sw_limit_pos, sizeof(axis_config->sw_limit_pos), 1, fp);
-    if (axis_config->sw_limit_pos < axis_config->sw_limit_neg) {
-        LOGGER_ERR(EC_AXIS_SW, "");
-		return -1;
-    }
-    fread(&axis_config->max_vel, sizeof(axis_config->max_vel), 1, fp);
-    if (axis_config->max_vel < 0.0) {
-        LOGGER_ERR(EC_AXIS_MAX_VEL, "");
-        return -1;
-    }
-    fread(&axis_config->max_acc, sizeof(axis_config->max_acc), 1, fp);
-    if (axis_config->max_acc < 0.0) {
-        LOGGER_ERR(EC_AXIS_MAX_ACC, "");
-        return -1;
-    }
-    fread(&axis_config->max_dec, sizeof(axis_config->max_dec), 1, fp);
-    if (axis_config->max_dec < 0.0) {
-        LOGGER_ERR(EC_AXIS_MAX_DEC, "");
-        return -1;
-    }
-    fread(&axis_config->max_jerk, sizeof(axis_config->max_jerk), 1, fp);
-    if (axis_config->max_jerk < 0.0) {
-        LOGGER_ERR(EC_AXIS_MAX_JERK, "");
-        return -1;
-    }
+    /* order sensitive */
+    loadvs(fp, axis_config->name, MAX_AXIS_NAME_SIZE);
+    loadv(fp, &axis_config->is_combined);
+    loadv(fp, &axis_config->node_id);
+    loadv(fp, &axis_config->axis_type);
+    loadv(fp, &axis_config->oper_mode);
+    loadv(fp, &axis_config->sw_limit_neg);
+    loadv(fp, &axis_config->sw_limit_pos);
+    loadv(fp, &axis_config->max_vel);
+    loadv(fp, &axis_config->max_acc);
+    loadv(fp, &axis_config->max_dec);
+    loadv(fp, &axis_config->max_jerk);
+    verify(axis_config->is_combined != false && axis_config->is_combined != true, EC_AXIS_COMBINE, "");
+    verify(axis_config->node_id < MIN_AXIS_NODE_ID || MAX_AXIS_NODE_ID < axis_config->node_id, EC_AXIS_ID_RANGE, "");
+    verify(axis_config->axis_type != AXIS_TYPE_FINITE && axis_config->axis_type != AXIS_TYPE_MODULO, EC_AXIS_TYPE, "");
+    verify(axis_config->oper_mode < OPER_MODE_POS || OPER_MODE_TOR < axis_config->oper_mode, EC_AXIS_OPER_MODE, "");
+    verify(axis_config->sw_limit_pos < axis_config->sw_limit_neg, EC_AXIS_SW, "");
+    verify(axis_config->max_vel < 0.0, EC_AXIS_MAX_VEL, "");
+    verify(axis_config->max_acc < 0.0, EC_AXIS_MAX_ACC, "");
+    verify(axis_config->max_dec < 0.0, EC_AXIS_MAX_DEC, "");
+    verify(axis_config->max_jerk < 0.0, EC_AXIS_MAX_JERK, "");
 	LOGGER_DBG(
-		"AxisConfig:\n .is_combined = %d\n .name = %s\n .node_id = %d\n .axis_type = %d\n .oper_mode = %d\n .sw_limit_neg = %f\n .sw_limit_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
-		axis_config->is_combined, axis_config->name, axis_config->node_id, axis_config->axis_type, axis_config->oper_mode, axis_config->sw_limit_neg, axis_config->sw_limit_pos, axis_config->max_vel, axis_config->max_acc, axis_config->max_dec, axis_config->max_jerk);
-
+		"AxisConfig:\n .is_combined = %d\n .name = %s\n .node_id = %d\n .axis_type = %d\n .oper_mode = %d\n"
+        " .sw_limit_neg = %f\n .sw_limit_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
+		axis_config->is_combined, axis_config->name, axis_config->node_id, axis_config->axis_type, axis_config->oper_mode,
+        axis_config->sw_limit_neg, axis_config->sw_limit_pos, axis_config->max_vel, axis_config->max_acc, axis_config->max_dec, axis_config->max_jerk);
 	return 0;
 }
 int load_servo_config(FILE *fp, ServoConfig *servo_config) {
-    fread(&servo_config->axis_count, sizeof(servo_config->axis_count), 1, fp);
-    if (servo_config->axis_count < 0 || MAX_AXIS_COUNT < servo_config->axis_count) {
-        LOGGER_ERR(EC_AXIS_COUNT, "");
-        return -1;
-    }
-	fread(&servo_config->update_interval, sizeof(servo_config->update_interval), 1, fp);
-	if (servo_config->update_interval < MIN_SERVO_INTERVAL) {
-	    LOGGER_ERR(EC_SERVO_INTERVAL, "");
-		return -1;
-	}
+    /* order sensitive */
+    loadv(fp, &servo_config->axis_count);
+    loadv(fp, &servo_config->update_interval);
+    verify(MAX_AXIS_COUNT < servo_config->axis_count, EC_AXIS_COUNT, "");
+    verify(servo_config->update_interval < MIN_SERVO_INTERVAL, EC_SERVO_INTERVAL, "");
     servo_config->axis_group = new AxisConfig[servo_config->axis_count];
-	if (servo_config->axis_group == NULL) {
-        LOGGER_ERR(EC_OOM, "loading axis configuration");
-    	return -1;
-    }
+    verify(servo_config->axis_group == NULL, EC_OOM, "loading axis configuration");
 	LOGGER_DBG("ServoConfig:\n .axis_count = %d\n .update_interval = %d",
         servo_config->axis_count, servo_config->update_interval);
 	for (int i = 0; i < servo_config->axis_count; ++i) {
         if (load_axis_config(fp, &servo_config->axis_group[i]) < 0) {
-            delete servo_config->axis_group;
+            LOGGER_ERR(EC_LOAD_SERVO_CONFIG, "");
+            delete[] servo_config->axis_group;
             return -1;
         }
 	}
 	return 0;
 }
-
-static int load_task_prop(FILE *fp, TASK_PROP *task_prop) {
-    fread(task_prop->name, MAX_TASK_NAME_SIZE, 1, fp);
-    fread(&task_prop->priority, sizeof(task_prop->priority), 1, fp);
-    if (task_prop->priority < MIN_TASK_PRIORITY || MAX_TASK_PRIORITY < task_prop->priority) {
-        LOGGER_ERR(EC_TASK_PRIORITY, "");
-        return -1;
-    }
-    fread(&task_prop->interval, sizeof(task_prop->interval), 1, fp);
-    if (task_prop->interval < MIN_TASK_INTERVAL) {
-        LOGGER_ERR(EC_TASK_INTERVAL, "");
-        return -1;
-    }
-    fread(&task_prop->data_size, sizeof(task_prop->data_size), 1, fp);
-    if (MAX_TASK_GLOB_COUNT < task_prop->data_size) {
-        LOGGER_ERR(EC_TASK_DATA_SIZE, "");
-        return -1;
-    }
-    fread(&task_prop->inst_count, sizeof(task_prop->inst_count), 1, fp); /* NOT need error checker */
-    LOGGER_DBG("TASK_PROP:\n .name = %s\n .priority = %d\n .interval = %d\n .data_size = %d\n .inst_count = %d",
-        task_prop->name, task_prop->priority, task_prop->interval, task_prop->data_size, task_prop->inst_count);
+/*-----------------------------------------------------------------------------
+ * PLC Task List Loader
+ *---------------------------------------------------------------------------*/
+static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
+    /* order sensitive */
+    loadvs(fp, task_desc->name, MAX_TASK_NAME_SIZE);
+    loadv(fp, &task_desc->priority);
+    loadv(fp, &task_desc->type);
+    loadv(fp, &task_desc->signal);
+    loadv(fp, &task_desc->interval);
+    loadv(fp, &task_desc->pou_count);
+    loadv(fp, &task_desc->const_count);
+    loadv(fp, &task_desc->global_count);
+    loadv(fp, &task_desc->sframe_count);
+    loadv(fp, &task_desc->inst_count);
+    verify(task_desc->priority < MIN_TASK_PRIORITY || MAX_TASK_PRIORITY < task_desc->priority, EC_TASK_PRIORITY, "");
+    verify(task_desc->type != TASK_TYPE_SIGNAL && task_desc->type != TASK_TYPE_INTERVAL, EC_TASK_TYPE, "");
+    verify(MAX_TASK_SIGNAL < task_desc->signal, EC_TASK_SIGNAL, "");
+    verify(task_desc->interval < MIN_TASK_INTERVAL, EC_TASK_INTERVAL, "");
+    verify(MAX_TASK_POU_COUNT < task_desc->pou_count, EC_TASK_POU_COUNT, "");
+    verify(MAX_TASK_CONST_COUNT < task_desc->const_count, EC_TASK_CONST_COUNT, "");
+    verify(MAX_TASK_GLOBAL_COUNT < task_desc->global_count, EC_TASK_GLOBAL_COUNT, "");
+    verify(MAX_TASK_SFRAME_COUNT < task_desc->sframe_count, EC_TASK_SFRAME_COUNT, "");
+    LOGGER_DBG("TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n"
+            ".pou_count = %d\n .const_count = %d\n .global_count = %d\n .sframe_count = %d\n .inst_count = %d",
+        task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval,
+        task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->sframe_count, task_desc->inst_count);
     return 0;
 }
-/*-----------------------------------------------------------------------------
- * PLC Task Data Loader
- *---------------------------------------------------------------------------*/
-static char *load_plc_task_data(FILE *fp, TASK_PROP *prop) {
-    char *data = new char[prop->data_size];
-    if (data == NULL) {
-        LOGGER_ERR(EC_OOM, "loading plc task data");
-        return NULL;
-    }
-    fread(data, prop->data_size, 1, fp);
-    return data;
+static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
+    /* order sensitive */
+    loadvs(fp, pou_desc->name, MAX_POU_NAME_SIZE);
+    loadv(fp, &pou_desc->input_count);
+    loadv(fp, &pou_desc->output_count);
+    loadv(fp, &pou_desc->local_count);
+    loadv(fp, &pou_desc->addr);
+    verify(MAX_POU_PARAM_COUNT < (pou_desc->input_count+pou_desc->output_count+pou_desc->local_count), EC_POU_PARAM_COUNT, "");
+    return 0;
 }
-/*-----------------------------------------------------------------------------
- * PLC Task Code Loader
- *---------------------------------------------------------------------------*/
-static char *load_inst_arg_addr(FILE *fp, char *data) {
-    uint32_t arg_va;
-    fread(&arg_va, sizeof(arg_va), 1, fp);
-    int flag = arg_va & ARG_ADDR_FLAG_MASK;
-    uint32_t arg_addr_offset = arg_va >> ARG_ADDR_FLAG_SIZE;
-    char *arg_addr = NULL;
-    switch (flag) {
-        // TODO Error checker
-        case ARG_ADDR_DATA: arg_addr = &data[arg_addr_offset];break;
-        case ARG_ADDR_IO:   arg_addr = &io_shm[arg_addr_offset];break;
-        default: LOGGER_ERR(EC_ARG_VA_INVALID, "");break;
-    }
-    //LOGGER_DBG("io_shm_addr = %d\ninst_arg_addr = %d", io_shm, arg_addr);
-    return arg_addr;
+static int load_value(FILE *fp, IValue *value) {
+    loadv(fp, &value->type);
+    verify(value->type < TINT || TREF < value->type, EC_VALUE_TYPE, "");
+    loadv(fp, &value->v); //TODO must switch
+    return 0;
 }
-
-static int load_plc_task_inst(FILE *fp, PLC_INST *inst, char *data, inst_desc_map_t *inst_desc) {
-    fread(&inst->id, sizeof(inst->id), 1, fp);
-    if (inst->id < 0 || MAX_TASK_INST_COUNT < inst->id) {
-        LOGGER_ERR(EC_INST_ID_RANGE, "");
-        return -1;
-    }
-    inst->arg_addr = new char*[(*inst_desc)[inst->id].args_count];
-    if (inst->arg_addr == NULL) {
-        LOGGER_ERR(EC_OOM, "loading instruction arguments");
-        return -1;
-    }
-    for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
-        if ((inst->arg_addr[i]=load_inst_arg_addr(fp, data)) == NULL) {
-            LOGGER_ERR(EC_LOAD_INST_ARG_ADDR, "");
-            delete inst->arg_addr;
+static int load_plc_task(FILE *fp, PLCTask *task) {
+    verify(load_task_desc(fp, &task->task_desc) < 0, EC_LOAD_TASK_DESC, "");
+    task->pou_desc = new POUDesc[task->task_desc.pou_count];
+    task->vconst = new IValue[task->task_desc.const_count];
+    task->vglobal = new IValue[task->task_desc.global_count];
+    task->code = new PLCInst[task->task_desc.inst_count];
+    task->stack = new SFrame[task->task_desc.sframe_count];
+    verify(task->pou_desc==NULL || task->vconst==NULL || task->vglobal==NULL || task->code==NULL || task->stack==NULL, EC_OOM, "loading plc task");
+    for (int i = 0; i < task->task_desc.pou_count; i++) {
+        if (load_pou_desc(fp, &task->pou_desc[i]) < 0) {
+            LOGGER_ERR(EC_LOAD_POU_DESC, "");
+            delete[] task->pou_desc;
+            delete[] task->vconst;
+            delete[] task->vglobal;
+            delete[] task->code;
+            delete[] task->stack;
             return -1;
         }
     }
-    return 0;
-}
-static PLC_INST *load_plc_task_code(FILE *fp, TASK_PROP *prop, char *data, inst_desc_map_t *inst_desc) {
-    PLC_INST *code = new PLC_INST[prop->inst_count];
-    if (code == NULL) {
-        LOGGER_ERR(EC_OOM, "loading plc task code");
-        return NULL;
-    }
-    for (uint32_t i = 0; i < prop->inst_count; ++i) {
-        if (load_plc_task_inst(fp, &code[i], data, inst_desc) < 0) {
-            LOGGER_ERR(EC_LOAD_TASK_INST, "");
-            delete code;
-            return NULL;
+    for (int i = 0; i < task->task_desc.const_count; i++) {
+        if (load_value(fp, &task->vconst[i]) < 0) {
+            LOGGER_ERR(EC_LOAD_TASK_CONST, "");
+            delete[] task->pou_desc;
+            delete[] task->vconst;
+            delete[] task->vglobal;
+            delete[] task->code;
+            delete[] task->stack;
+            return -1;
         }
     }
-    return code;
-}
-
-/*-----------------------------------------------------------------------------
- * PLC Task Loader
- *---------------------------------------------------------------------------*/
-static int load_plc_task(FILE *fp, PLC_TASK *task, inst_desc_map_t *inst_desc) {
-    if (load_task_prop(fp, &task->prop) < 0) {
-        LOGGER_ERR(EC_LOAD_TASK_PROP, "");
-        return -1;
+    for (int i = 0; i < task->task_desc.global_count; i++) {
+        if (load_value(fp, &task->vglobal[i]) < 0) {
+            LOGGER_ERR(EC_LOAD_TASK_GLOBAL, "");
+            delete[] task->pou_desc;
+            delete[] task->vconst;
+            delete[] task->vglobal;
+            delete[] task->code;
+            delete[] task->stack;
+            return -1;
+        }
     }
-    if ((task->data=load_plc_task_data(fp, &task->prop)) == NULL) {
-        LOGGER_ERR(EC_LOAD_TASK_DATA, "");
-        return -1;
-    }
-    if ((task->code=load_plc_task_code(fp, &task->prop, task->data, inst_desc)) == NULL) {
-        LOGGER_ERR(EC_LOAD_TASK_CODE, "");
-        return -1;
-    }
-    //LOGGER_DBG("PLC_TASK:\n .data[0] = %d .data[n] = %d\n .instruction[0].id = %d",
-        //task->data[0], task->data[task->prop.data_size-1], task->code[0].id);
+    loadvs(fp, task->code, task->task_desc.inst_count);
     return 0;
 }
-/*-----------------------------------------------------------------------------
- * PLC Model Loader
- *---------------------------------------------------------------------------*/
-bool verify_obj(FILE *fp) {
-    OBJHeader header;
-	fread(&header, sizeof(header), 1, fp);
-    if (strcmp(header.magic, MAGIC) != 0) {
-        LOGGER_ERR(EC_PLC_FILE, "");
-        return false;
-    }
-    if (header.type != SYS_TYPE) {
-        LOGGER_ERR(EC_SYS_TYPE, "");
-        return false;
-    }
-	if (header.order != SYS_BYTE_ORDER) {
-	    LOGGER_ERR(EC_BYTE_ORDER, "");
-		return false;
-	}
-	if (SYS_VERSION < header.version) {
-	    LOGGER_ERR(EC_SYS_VERSION, "");
-		return false;
-	}
-	if (header.machine != SYS_MACHINE) {
-	    LOGGER_ERR(EC_SYS_MACHINE, "");
-		return false;
-	}
-	LOGGER_DBG(
-		"/BJ_HEADER:\n .magic = %s\n .type = %d\n .order = %d\n .version = %d\n .machine = %d",
-		header.magic, header.type, header.order, header.version, header.machine);
-	return true;
-}
-int load_plc_task_list(FILE *fp, TASK_LIST *task, inst_desc_map_t *inst_desc) {
-    fread(&task->task_count, sizeof(task->task_count), 1, fp);
-    if (MAX_TASK_COUNT < task->task_count) {
-        LOGGER_ERR(EC_TASK_COUNT, "");
-        return -1;
-    }
-    task->rt_task = new RT_TASK[task->task_count];
-    task->plc_task = new PLC_TASK[task->task_count];
-    if (task->rt_task == NULL || task->plc_task == NULL) {
-        LOGGER_ERR(EC_OOM, "loading plc task");
-        return -1;
-    }
-    for (int i = 0; i < task->task_count; ++i) {
-        if (load_plc_task(fp, &task->plc_task[i], inst_desc) < 0) {
+
+int load_task_list(FILE *fp, TaskList *task_list) {
+    /* order sensitive */
+    loadv(fp, &task_list->task_count);
+    loadv(fp, &task_list->strpool_size);
+    verify(MAX_TASK_COUNT < task_list->task_count, EC_TASK_COUNT, "");
+    verify(MAX_STRPOOL_SIZE < task_list->strpool_size, EC_STRPOOL_SIZE, "");
+    //TODO init string pool
+    task_list->rt_task = new RT_TASK[task_list->task_count];
+    task_list->plc_task = new PLCTask[task_list->task_count];
+    verify(task_list->rt_task == NULL || task_list->plc_task == NULL, EC_OOM, "loading plc task");
+    for (int i = 0; i < task_list->task_count; i++) {
+        if (load_plc_task(fp, &task_list->plc_task[i]) < 0) {
             LOGGER_ERR(EC_LOAD_PLC_TASK, "");
-            delete task->rt_task;
-            delete task->plc_task;
+            delete[] task_list->rt_task;
+            delete[] task_list->plc_task;
             return -1;
         }
     }

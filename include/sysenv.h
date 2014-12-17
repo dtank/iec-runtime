@@ -10,7 +10,7 @@
 #define BYTE_ORDER_BIG 2
 #define MACH_CORTEX_A8 1
 /*-----------------------------------------------------------------------------
- * Servo Configuration Segment
+ * Servo Configuration
  *---------------------------------------------------------------------------*/
 #define AXIS_TYPE_FINITE 1
 #define AXIS_TYPE_MODULO 2
@@ -18,8 +18,10 @@
 #define OPER_MODE_VEL 2
 #define OPER_MODE_TOR 3
 /*-----------------------------------------------------------------------------
- *  PLC Task Code Segment
+ *  PLC Task
  *---------------------------------------------------------------------------*/
+#define TASK_TYPE_SIGNAL   1
+#define TASK_TYPE_INTERVAL 2
 #define ARG_ADDR_INVALID 0x00
 #define ARG_ADDR_DATA    0x01
 #define ARG_ADDR_IO      0x02

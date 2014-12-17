@@ -25,17 +25,21 @@
 
 /* PLC Task Limitations */
 #define MAX_TASK_COUNT 16
+#define MAX_STRPOOL_SIZE 65536 /* string pool size (uint: Byte) */
 #define MAX_TASK_NAME_SIZE 16
 #define MAX_TASK_PRIORITY 95
 #define MIN_TASK_PRIORITY 80
+#define MAX_TASK_SIGNAL 0xff
 #define MIN_TASK_INTERVAL 8000000
-#define MAX_TASK_CONST_COUNT 1024
-#define MAX_TASK_GLOB_COUNT 1024 /* global variable */
-#define MAX_TASK_INST_COUNT 65535 /* instruction */
+#define MAX_TASK_POU_COUNT 1024 /* Program Organization Unit: FUN | FB | PROG */
+#define MAX_TASK_CONST_COUNT 1024 /* constant */
+#define MAX_TASK_GLOBAL_COUNT 1024 /* global variables */
 #define MAX_TASK_SFRAME_COUNT 1024 /* stack frame */
-#define MAX_TASK_FUNC_COUNT 1024 /* user-level FUN|FB */
 
-//TODO
-/* User-level FUN|FB Limitations */
+/* POU Limitations */
+#define MAX_POU_NAME_SIZE 20
+#define MAX_POU_PARAM_COUNT 256 /* input + output + local */
+
+/* TODO IValue Limitations */
 
 #endif
