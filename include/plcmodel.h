@@ -80,8 +80,8 @@ typedef struct {
 } PLCTask;
 
 typedef struct {
-    uint8_t task_count;
-    uint32_t strpool_size;
+    uint8_t task_count; /* number of plc task */
+    uint32_t sp_size;   /* capacity of string pool */
     RT_TASK *rt_task;
     PLCTask *plc_task;
 } TaskList;

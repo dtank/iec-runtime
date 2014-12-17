@@ -7,7 +7,7 @@
 #define TINT    1
 #define TDOUBLE 2
 #define TSTRING 3
-#define TREF    4
+//#define TREF    4
 
 /* Internal String Type */
 typedef struct {
@@ -22,7 +22,7 @@ typedef struct Value {
         int32_t value_i;
         double value_d;
         IString value_s;
-        struct Value *value_p; /* reference or pointer value */
+        //uint16_t value_p; [> reference or pointer value <]
     } v;
 } IValue;
 

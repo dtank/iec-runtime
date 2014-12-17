@@ -1,11 +1,17 @@
 #include <string.h>
 #include "istring.h"
+#include "syslimit.h"
 #include "logger.h"
 
 extern ec_map_t ec_msg;
+StrPool g_strpool;
 
 int sp_init(StrPool *sp, uint32_t size) {
     //TODO assert
+    if (MAX_STRPOOL_SIZE < size) {
+        LOGGER_ERR(EC_SP_SIZE, "");
+        return -1;
+    }
     sp->size = size;
     sp->index = 0;
     sp->base = new char[size];
@@ -18,7 +24,7 @@ int sp_init(StrPool *sp, uint32_t size) {
 int sp_add(StrPool *sp, const char *str, uint32_t size) {
     //TODO assert
     if (sp->size < sp->index+size) {
-        LOGGER_ERR(EC_SP_SIZE, "");
+        LOGGER_ERR(EC_SP_NEW, "");
         return -1;
     }
     strcpy(&sp->base[sp->index], str);

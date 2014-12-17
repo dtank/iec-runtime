@@ -3,18 +3,27 @@
 #include "loader.h"
 #include "objfile.h"
 #include "sysenv.h"
+#include "istring.h"
 #include "logger.h"
 
 using namespace std;
 extern char *io_shm;
 extern ec_map_t ec_msg;
+extern StrPool g_strpool;
 
+/*-----------------------------------------------------------------------------
+ * Helper Funciton Macros
+ *---------------------------------------------------------------------------*/
 #define loadv(fp, varp) {fread(varp, sizeof(*varp), 1, fp);}
 #define loadvs(fp, varp, size) {fread(varp, size, 1, fp);}
-#define verify(exp, ecode, msg) {   \
-    if (exp) {                 \
-        LOGGER_ERR(ecode, msg); \
-        return -1;             \
+#define loadstr(fp, strp) { \
+    loadv(fp, &(strp)->length); \
+    loadvs(fp, (strp)->str, (strp)->length); \
+}
+#define verify(exp, ecode, msg) { \
+    if (exp) {                    \
+        LOGGER_ERR(ecode, msg);   \
+        return -1;                \
     }}
 /*-----------------------------------------------------------------------------
  * Object File Verifier
@@ -139,8 +148,13 @@ static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
 }
 static int load_value(FILE *fp, IValue *value) {
     loadv(fp, &value->type);
-    verify(value->type < TINT || TREF < value->type, EC_VALUE_TYPE, "");
-    loadv(fp, &value->v); //TODO must switch
+    verify(value->type < TINT || TSTRING < value->type, EC_VALUE_TYPE, "");
+    switch (value->type) {
+        case TINT: loadv(fp, &value->v.value_i); break;
+        case TDOUBLE: loadv(fp, &value->v.value_d); break;
+        case TSTRING: loadstr(fp, &value->v.value_s);break;
+        default: break;
+    }
     return 0;
 }
 static int load_plc_task(FILE *fp, PLCTask *task) {
@@ -191,10 +205,10 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
 int load_task_list(FILE *fp, TaskList *task_list) {
     /* order sensitive */
     loadv(fp, &task_list->task_count);
-    loadv(fp, &task_list->strpool_size);
+    loadv(fp, &task_list->sp_size);
     verify(MAX_TASK_COUNT < task_list->task_count, EC_TASK_COUNT, "");
-    verify(MAX_STRPOOL_SIZE < task_list->strpool_size, EC_LOAD_SP_SIZE, "");
-    //TODO init string pool
+    verify(MAX_STRPOOL_SIZE < task_list->sp_size, EC_LOAD_SP_SIZE, "");
+    sp_init(&g_strpool, task_list->sp_size);
     task_list->rt_task = new RT_TASK[task_list->task_count];
     task_list->plc_task = new PLCTask[task_list->task_count];
     verify(task_list->rt_task == NULL || task_list->plc_task == NULL, EC_OOM, "loading plc task");
