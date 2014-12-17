@@ -193,7 +193,7 @@ int load_task_list(FILE *fp, TaskList *task_list) {
     loadv(fp, &task_list->task_count);
     loadv(fp, &task_list->strpool_size);
     verify(MAX_TASK_COUNT < task_list->task_count, EC_TASK_COUNT, "");
-    verify(MAX_STRPOOL_SIZE < task_list->strpool_size, EC_STRPOOL_SIZE, "");
+    verify(MAX_STRPOOL_SIZE < task_list->strpool_size, EC_LOAD_SP_SIZE, "");
     //TODO init string pool
     task_list->rt_task = new RT_TASK[task_list->task_count];
     task_list->plc_task = new PLCTask[task_list->task_count];

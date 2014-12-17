@@ -25,7 +25,6 @@
 
 /* PLC Task Limitations */
 #define MAX_TASK_COUNT 16
-#define MAX_STRPOOL_SIZE 65536 /* string pool size (uint: Byte) */
 #define MAX_TASK_NAME_SIZE 16
 #define MAX_TASK_PRIORITY 95
 #define MIN_TASK_PRIORITY 80
@@ -39,6 +38,9 @@
 /* POU Limitations */
 #define MAX_POU_NAME_SIZE 20
 #define MAX_POU_PARAM_COUNT 256 /* input + output + local */
+
+/* String Pool Limitations */
+#define MAX_STRPOOL_SIZE 65536 /* (uint: Byte) */
 
 /* TODO IValue Limitations */
 

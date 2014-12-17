@@ -2,6 +2,7 @@
 #define __LOGGER_H__
 
 #include <map>
+#include <stdio.h>
 #include <stdarg.h>
 
 using namespace std;
@@ -78,7 +79,7 @@ enum ERROR_CODE {
     EC_RC_TASK_START,
     /* PLC Task Error Code */
     EC_TASK_COUNT,
-    EC_STRPOOL_SIZE,
+    EC_LOAD_SP_SIZE,
     EC_TASK_PRIORITY,
     EC_TASK_TYPE,
     EC_TASK_SIGNAL,
@@ -96,6 +97,8 @@ enum ERROR_CODE {
     EC_LOAD_PLC_TASK,
     EC_PLC_TASK_CREATE,
     EC_PLC_TASK_START,
+    /* String Pool Error Code */
+    EC_SP_SIZE,
 };
 
 typedef map<ERROR_CODE, const char *> ec_map_t;
@@ -138,7 +141,7 @@ static const ec_map_t::value_type ec_data[] = {
     ec_map_t::value_type(EC_RC_TASK_START, "Failed to start rc task"),
     /* System PLC Task Error Code */
     ec_map_t::value_type(EC_TASK_COUNT, "Over maximum count of plc task"),
-    ec_map_t::value_type(EC_STRPOOL_SIZE, "Over maximum size of string pool"),
+    ec_map_t::value_type(EC_LOAD_SP_SIZE, "Over maximum size of string pool"),
     ec_map_t::value_type(EC_TASK_PRIORITY, "Out of range of plc task priority"),
     ec_map_t::value_type(EC_TASK_TYPE, "Unknown type of plc task"),
     ec_map_t::value_type(EC_TASK_SIGNAL, "Out of range of plc task signal source"),
@@ -156,6 +159,8 @@ static const ec_map_t::value_type ec_data[] = {
     ec_map_t::value_type(EC_LOAD_PLC_TASK, "Failed to load plc task"),
     ec_map_t::value_type(EC_PLC_TASK_CREATE, "Failed to create plc task"),
     ec_map_t::value_type(EC_PLC_TASK_START, "Failed to start plc task"),
+    /* String Pool Error Code */
+    ec_map_t::value_type(EC_SP_SIZE, "Over maximum size of string pool"),
 };
 static const uint32_t ec_count = sizeof ec_data / sizeof ec_data[0];
 static const ec_map_t ec_map(ec_data, ec_data + ec_count);
