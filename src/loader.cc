@@ -16,10 +16,6 @@ extern StrPool g_strpool;
  *---------------------------------------------------------------------------*/
 #define loadv(fp, varp) {fread(varp, sizeof(*varp), 1, fp);}
 #define loadvs(fp, varp, size) {fread(varp, size, 1, fp);}
-#define loadstr(fp, strp) { \
-    loadv(fp, &(strp)->length); \
-    loadvs(fp, (strp)->str, (strp)->length); \
-}
 #define verify(exp, ecode, msg) { \
     if (exp) {                    \
         LOGGER_ERR(ecode, msg);   \
@@ -131,7 +127,7 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     verify(MAX_TASK_GLOBAL_COUNT < task_desc->global_count, EC_TASK_GLOBAL_COUNT, "");
     verify(MAX_TASK_SFRAME_COUNT < task_desc->sframe_count, EC_TASK_SFRAME_COUNT, "");
     LOGGER_DBG("TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n"
-            ".pou_count = %d\n .const_count = %d\n .global_count = %d\n .sframe_count = %d\n .inst_count = %d",
+        ".pou_count = %d\n .const_count = %d\n .global_count = %d\n .sframe_count = %d\n .inst_count = %d",
         task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval,
         task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->sframe_count, task_desc->inst_count);
     return 0;
@@ -144,7 +140,17 @@ static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
     loadv(fp, &pou_desc->local_count);
     loadv(fp, &pou_desc->addr);
     verify(MAX_POU_PARAM_COUNT < (pou_desc->input_count+pou_desc->output_count+pou_desc->local_count), EC_POU_PARAM_COUNT, "");
+    LOGGER_DBG("POUDesc:\n .name = %s\n .input_count = %d\n .output_count = %d\n .local_count = %d\n .addr = %d",
+        pou_desc->name, pou_desc->input_count, pou_desc->output_count, pou_desc->local_count, pou_desc->addr);
     return 0;
+}
+static void load_string(FILE *fp, IString *str) {
+    // TODO error check
+    loadv(fp, &str->length);
+    char strtemp[str->length];
+    loadvs(fp, strtemp, str->length);
+    str->str = sp_add(&g_strpool, strtemp, str->length);
+    LOGGER_DBG("String: .length = %d .str = %s", str->length, str->str);
 }
 static int load_value(FILE *fp, IValue *value) {
     loadv(fp, &value->type);
@@ -152,7 +158,7 @@ static int load_value(FILE *fp, IValue *value) {
     switch (value->type) {
         case TINT: loadv(fp, &value->v.value_i); break;
         case TDOUBLE: loadv(fp, &value->v.value_d); break;
-        case TSTRING: loadstr(fp, &value->v.value_s);break;
+        case TSTRING: load_string(fp, &value->v.value_s); break;
         default: break;
     }
     return 0;

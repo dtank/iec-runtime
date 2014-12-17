@@ -21,15 +21,15 @@ int sp_init(StrPool *sp, uint32_t size) {
     }
     return 0;
 }
-int sp_add(StrPool *sp, const char *str, uint32_t size) {
+char *sp_add(StrPool *sp, const char *str, uint32_t size) { /* size include '\0' */
     //TODO assert
     if (sp->size < sp->index+size) {
         LOGGER_ERR(EC_SP_NEW, "");
-        return -1;
+        return NULL;
     }
     strcpy(&sp->base[sp->index], str);
     sp->index += size;
-    return 0;
+    return &sp->base[sp->index-size];
 }
 void sp_clean(StrPool *sp) {
     //TODO assert

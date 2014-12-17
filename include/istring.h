@@ -10,7 +10,7 @@ typedef struct {
 } StrPool;
 
 int sp_init(StrPool *sp, uint32_t size);
-int sp_add(StrPool *sp, char *str, uint32_t size);
+char *sp_add(StrPool *sp, const char *str, uint32_t size);
 void sp_clean(StrPool *sp);
 
 #endif
