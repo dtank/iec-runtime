@@ -13,7 +13,7 @@ int LOGGER_LEVEL = LEVEL_ALL;
 ec_map_t ec_msg = ec_map;
 IOConfig io_config;
 ServoConfig servo_config;
-//TASK_LIST plc_task;
+TaskList plc_task;
 
 void sys_init() {
     FILE *fplc = fopen("plc.bin", "rb");
@@ -22,7 +22,7 @@ void sys_init() {
     io_task_init(&io_config);
     load_servo_config(fplc, &servo_config);
     servo_task_init(&servo_config);
-    //load_plc_task_list(fplc, &plc_task, &inst_desc);
+    load_task_list(fplc, &plc_task);
     //plc_task_init(&plc_task);
 	fclose(fplc);
 }
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     mlockall(MCL_CURRENT|MCL_FUTURE);
 
 	sys_init();
-    sys_start();
+    //sys_start();
     pause();
     sys_exit();
 

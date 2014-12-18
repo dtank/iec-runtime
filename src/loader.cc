@@ -204,7 +204,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
             return -1;
         }
     }
-    loadvs(fp, task->code, task->task_desc.inst_count);
+    loadvs(fp, task->code, task->task_desc.inst_count*sizeof(PLCInst));
     return 0;
 }
 

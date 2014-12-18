@@ -1,29 +1,41 @@
-#ifndef __BIN_FORMAT_H__
-#define __BIN_FORMAT_H__
+#ifndef __OBJ_STRUCT_H__
+#define __OBJ_STRUCT_H__
 
 #include <stdint.h>
-#include "objfile.h"
 
+/*-----------------------------------------------------------------------------
+ * Limitations
+ *---------------------------------------------------------------------------*/
+#define MAGIC "\x7FPLC"
 #define MAGIC_SIZE 5 /* including '\0' */
-#define MAX_NAME_SIZE 16
+#define MAX_AXIS_NAME_SIZE 16
 #define MAX_AXIS_COUNT 2
+/* PLC Task */
+#define MAX_TASK_NAME_SIZE 16
+#define MAX_POU_NAME_SIZE 20
 #define MAX_TASK_COUNT 2
-#define MAX_DATA_SIZE 64
+#define MAX_POU_COUNT 4
+#define MAX_STR_LENGTH 8
+#define MAX_CONST_COUNT 8
+#define MAX_GLOBAL_COUNT 8
 #define MAX_INST_COUNT 10
-#define MAX_ARG_COUNT 4
 
+/*-----------------------------------------------------------------------------
+ * Value Type Tag
+ *---------------------------------------------------------------------------*/
+#define TINT    1
+#define TDOUBLE 2
+#define TSTRING 3
 /*-----------------------------------------------------------------------------
  * Definition of PLC Object File Header
  *---------------------------------------------------------------------------*/
-/*
- *typedef struct {
- *    char magic[MAGIC_SIZE]; [> magic number <]
- *    uint8_t type;           [> type of object file: 32BIT | 64BIT <]
- *    uint8_t order;          [> byte order: LITTLE-ENDIAN | BIG-ENDIAN <]
- *    uint8_t version;        [> version of object file (default: 1)<]
- *    uint8_t machine;        [> CPU platform <]
- *} OBJ_HEADER;
- */
+typedef struct {
+    char magic[MAGIC_SIZE]; /* magic number */
+    uint8_t type;           /* type of object file: 32BIT | 64BIT */
+    uint8_t order;          /* byte order: LITTLE-ENDIAN | BIG-ENDIAN */
+    uint8_t version;        /* version of object file (default: 1) */
+    uint8_t machine;        /* CPU platform */
+} OBJ_HEADER;
 
 /*-----------------------------------------------------------------------------
  * Definition of I/O Configuration Segment
@@ -40,7 +52,7 @@ typedef struct {
  * Definition of Servo Configuration Segment
  *---------------------------------------------------------------------------*/
 typedef struct {
-	char name[MAX_NAME_SIZE]; /* axis name */
+	char name[MAX_AXIS_NAME_SIZE]; /* axis name */
 	bool is_combined;         /* independent axis | combined axis */
 	uint8_t node_id;          /* axis id */
 	uint8_t axis_type;        /* axis type: FINITE | MODULO */
@@ -60,41 +72,59 @@ typedef struct {
 } OBJ_SCS; /* Servo Configuration Segment */
 
 /*-----------------------------------------------------------------------------
- * Definition of PLC Task Property Segment
- *---------------------------------------------------------------------------*/
-typedef struct {
-	char name[MAX_NAME_SIZE]; /* plc task name */
-	uint8_t priority;         /* plc task priority */
-	uint32_t interval;        /* plc task period interval (unit: ns) */
-    uint32_t data_size;       /* size of plc task data segment */
-    uint32_t inst_count;      /* number of plc task instructions */
-} OBJ_PTPS; /* PLC Task Property Segment */
-
-/*-----------------------------------------------------------------------------
- * Definition of PLC Task Code Segment
- *---------------------------------------------------------------------------*/
-typedef struct {
-    uint16_t id;                    /* instruction id */
-    uint32_t arg_va[MAX_ARG_COUNT]; /* vitual address(AKA index) of instruction's arguments */
-} OBJ_INST; /* Instruction */
-
-/*-----------------------------------------------------------------------------
  * Definition of PLC Task List Segment
  *---------------------------------------------------------------------------*/
 typedef struct {
-    OBJ_PTPS prop;
-	char data[MAX_DATA_SIZE];      /* plc task data segment */
-    OBJ_INST inst[MAX_INST_COUNT]; /* task instructions */
+	char name[MAX_TASK_NAME_SIZE]; /* plc task name */
+	uint8_t priority;         /* plc task priority */
+    uint8_t type;                  /* task type: SIGNAL | INTERVAL */
+    uint8_t signal;                /* signal source: TIMER | I/O */
+	uint32_t interval;             /* time interval (uint: ns) */
+    uint16_t pou_count;            /* Program Organization Unit: FUN | FB | PROG */
+    uint16_t const_count;          /* number of constant */
+    uint16_t global_count;         /* number of global variables */
+	uint16_t sframe_count;         /* number of stack frame */
+	uint32_t inst_count;           /* number of instructions(code) */
+} OBJ_TDS; /* PLC Task Descriptor Segment */
+
+typedef struct {
+    char name[MAX_POU_NAME_SIZE]; /* POU name */
+    uint8_t input_count;          /* number of input parameters */
+    uint8_t output_count;         /* number of output parameters */
+    uint8_t local_count;          /* number of local parameters */
+    uint32_t addr;                /* POU address(AKA index of instruction) */
+} OBJ_PDS; /* POU Descriptor Segment */
+
+typedef struct {
+    uint8_t type;
+    union {
+        int32_t value_i;
+        double value_d;
+        struct {
+            uint32_t length; /* '\0' included */
+            char str[MAX_STR_LENGTH];
+        } value_s;
+    } v;
+} OBJ_VAL; /* Value */
+
+typedef uint32_t OBJ_INST;
+typedef struct {
+    OBJ_TDS task_desc;
+    OBJ_PDS pou_desc[MAX_POU_COUNT];
+	OBJ_VAL vconst[MAX_CONST_COUNT];      /* task constant segment */
+	OBJ_VAL vglobal[MAX_GLOBAL_COUNT];      /* task global segment */
+    OBJ_INST code[MAX_INST_COUNT]; /* task code segment */
 } OBJ_PTS; /* PLC Task Segment */
 
 /*-----------------------------------------------------------------------------
  * Definition of PLC Object File
  *---------------------------------------------------------------------------*/
 typedef struct {
-    OBJHeader header;
+    OBJ_HEADER header;
     OBJ_IOCS iocs;
     OBJ_SCS scs;
     uint8_t task_count;
+    uint32_t sp_size;
     OBJ_PTS task[MAX_TASK_COUNT];
 } OBJ_FILE;
 

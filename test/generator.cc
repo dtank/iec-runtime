@@ -4,7 +4,7 @@
 /*-----------------------------------------------------------------------------
  * PLC Object File Header Generator
  *---------------------------------------------------------------------------*/
-void generate_obj_header(FILE *fp, OBJHeader *header) {
+void generate_obj_header(FILE *fp, OBJ_HEADER *header) {
 	fwrite(header->magic, MAGIC_SIZE, 1, fp);
 	fwrite(&header->type, sizeof(header->type), 1, fp);
 	fwrite(&header->order, sizeof(header->order), 1, fp);
@@ -25,7 +25,7 @@ void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs) {
  * Servo Configuration Segment Generator
  *---------------------------------------------------------------------------*/
 void generate_obj_acs(FILE *fp, OBJ_ACS *acs) {
-	fwrite(acs->name, MAX_NAME_SIZE, 1, fp); /* including '\0' */
+	fwrite(acs->name, MAX_AXIS_NAME_SIZE, 1, fp); /* including '\0' */
 	fwrite(&acs->is_combined, sizeof(acs->is_combined), 1, fp);
 	fwrite(&acs->node_id, sizeof(acs->node_id), 1, fp);
 	fwrite(&acs->axis_type, sizeof(acs->axis_type), 1, fp);
@@ -47,35 +47,58 @@ void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
 /*-----------------------------------------------------------------------------
  * PLC Task Segment Generator
  *---------------------------------------------------------------------------*/
-void generate_obj_ptps(FILE *fp, OBJ_PTPS *ptps) {
-	fwrite(ptps->name, MAX_NAME_SIZE, 1, fp);
-	fwrite(&ptps->priority, sizeof(ptps->priority), 1, fp);
-	fwrite(&ptps->interval, sizeof(ptps->interval), 1, fp);
-    fwrite(&ptps->data_size, sizeof(ptps->data_size), 1, fp);
-    fwrite(&ptps->inst_count, sizeof(ptps->inst_count), 1, fp);
+void generate_obj_tds(FILE *fp, OBJ_TDS *tds) {
+	fwrite(tds->name, MAX_TASK_NAME_SIZE, 1, fp);
+	fwrite(&tds->priority, sizeof(tds->priority), 1, fp);
+	fwrite(&tds->type, sizeof(tds->type), 1, fp);
+	fwrite(&tds->signal, sizeof(tds->signal), 1, fp);
+	fwrite(&tds->interval, sizeof(tds->interval), 1, fp);
+    fwrite(&tds->pou_count, sizeof(tds->pou_count), 1, fp);
+    fwrite(&tds->const_count, sizeof(tds->const_count), 1, fp);
+    fwrite(&tds->global_count, sizeof(tds->global_count), 1, fp);
+    fwrite(&tds->sframe_count, sizeof(tds->sframe_count), 1, fp);
+    fwrite(&tds->inst_count, sizeof(tds->inst_count), 1, fp);
 }
-void generate_obj_inst(FILE *fp, OBJ_INST *inst, inst_desc_t *inst_desc) {
-    fwrite(&inst->id, sizeof(inst->id), 1, fp);
-    for (int i = 0; i < (*inst_desc)[inst->id].args_count; ++i) {
-        fwrite(&inst->arg_va[i], sizeof(inst->arg_va[0]), 1, fp);
+void generate_obj_pds(FILE *fp, OBJ_PDS *pds) {
+	fwrite(pds->name, MAX_POU_NAME_SIZE, 1, fp);
+	fwrite(&pds->input_count, sizeof(pds->input_count), 1, fp);
+	fwrite(&pds->output_count, sizeof(pds->output_count), 1, fp);
+	fwrite(&pds->local_count, sizeof(pds->local_count), 1, fp);
+	fwrite(&pds->addr, sizeof(pds->addr), 1, fp);
+}
+void generate_obj_value(FILE *fp, OBJ_VAL *value) {
+	fwrite(&value->type, sizeof(value->type), 1, fp);
+    switch (value->type) {
+        case TINT: fwrite(&value->v.value_i, sizeof(value->v.value_i), 1, fp); break;
+        case TDOUBLE: fwrite(&value->v.value_d, sizeof(value->v.value_d), 1, fp); break;
+        case TSTRING: fwrite(&value->v.value_s.length, sizeof(value->v.value_s.length), 1, fp);
+                      fwrite(value->v.value_s.str, value->v.value_s.length, 1, fp); break;
+        default: break;
     }
 }
-void generate_obj_pts(FILE *fp, OBJ_PTS *pts, inst_desc_t *inst_desc) {
-    generate_obj_ptps(fp, &pts->prop);
-	fwrite(pts->data, pts->prop.data_size, 1, fp);
-    for (uint32_t i = 0; i < pts->prop.inst_count; ++i) {
-        generate_obj_inst(fp, &pts->inst[i], inst_desc);
+void generate_obj_pts(FILE *fp, OBJ_PTS *pts) {
+    generate_obj_tds(fp, &pts->task_desc);
+    for (uint32_t i = 0; i < pts->task_desc.pou_count; ++i) {
+        generate_obj_pds(fp, &pts->pou_desc[i]);
     }
+    for (uint32_t i = 0; i < pts->task_desc.const_count; ++i) {
+        generate_obj_value(fp, &pts->vconst[i]);
+    }
+    for (uint32_t i = 0; i < pts->task_desc.global_count; ++i) {
+        generate_obj_value(fp, &pts->vglobal[i]);
+    }
+    fwrite(pts->code, pts->task_desc.inst_count*sizeof(OBJ_INST), 1, fp);
 }
 /*-----------------------------------------------------------------------------
  * PLC Object File Generator
  *---------------------------------------------------------------------------*/
-void generate_obj_file(FILE *fp, OBJ_FILE *file, inst_desc_t *inst_desc) {
+void generate_obj_file(FILE *fp, OBJ_FILE *file) {
     generate_obj_header(fp, &file->header);
     generate_obj_iocs(fp, &file->iocs);
     generate_obj_scs(fp, &file->scs);
     fwrite(&file->task_count, sizeof(file->task_count), 1, fp);
+    fwrite(&file->sp_size, sizeof(file->sp_size), 1, fp);
     for (int i = 0; i < file->task_count; ++i) {
-        generate_obj_pts(fp, &file->task[i], inst_desc);
+        generate_obj_pts(fp, &file->task[i]);
     }
 }
