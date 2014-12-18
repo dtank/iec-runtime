@@ -40,7 +40,8 @@
 #define MAX_POU_PARAM_COUNT 256 /* input + output + local */
 
 /* String Pool Limitations */
-#define MAX_STRPOOL_SIZE 65536 /* (uint: Byte) */
+#define MAX_SP_SIZE 65536 /* (uint: Byte) */
+#define MAX_STRLEN 128  /* '\0' included (uint: Byte) */
 
 /* TODO IValue Limitations */
 

@@ -9,6 +9,9 @@
 #define TSTRING 3
 //#define TREF    4
 
+#define MIN_VTYPE TINT
+#define MAX_VTYPE TSTRING
+
 /* Internal String Type */
 typedef struct {
     uint32_t length;

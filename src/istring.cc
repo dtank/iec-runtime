@@ -8,7 +8,7 @@ StrPool g_strpool;
 
 int sp_init(StrPool *sp, uint32_t size) {
     //TODO assert
-    if (MAX_STRPOOL_SIZE < size) {
+    if (MAX_SP_SIZE < size) {
         LOGGER_ERR(EC_SP_SIZE, "");
         return -1;
     }

@@ -127,7 +127,7 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     verify(MAX_TASK_GLOBAL_COUNT < task_desc->global_count, EC_TASK_GLOBAL_COUNT, "");
     verify(MAX_TASK_SFRAME_COUNT < task_desc->sframe_count, EC_TASK_SFRAME_COUNT, "");
     LOGGER_DBG("TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n"
-        ".pou_count = %d\n .const_count = %d\n .global_count = %d\n .sframe_count = %d\n .inst_count = %d",
+        " .pou_count = %d\n .const_count = %d\n .global_count = %d\n .sframe_count = %d\n .inst_count = %d",
         task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval,
         task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->sframe_count, task_desc->inst_count);
     return 0;
@@ -144,21 +144,26 @@ static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
         pou_desc->name, pou_desc->input_count, pou_desc->output_count, pou_desc->local_count, pou_desc->addr);
     return 0;
 }
-static void load_string(FILE *fp, IString *str) {
-    // TODO error check
+static int load_string(FILE *fp, IString *str) {
     loadv(fp, &str->length);
+    verify(MAX_STRLEN < str->length, EC_LOAD_STRLEN, "");
     char strtemp[str->length];
     loadvs(fp, strtemp, str->length);
-    str->str = sp_add(&g_strpool, strtemp, str->length);
-    LOGGER_DBG("String: .length = %d .str = %s", str->length, str->str);
+    if ((str->str=sp_add(&g_strpool, strtemp, str->length)) == NULL) {
+        return -1;
+    }
+    return 0;
 }
 static int load_value(FILE *fp, IValue *value) {
     loadv(fp, &value->type);
-    verify(value->type < TINT || TSTRING < value->type, EC_VALUE_TYPE, "");
+    verify(value->type < MIN_VTYPE || MAX_VTYPE < value->type, EC_LOAD_VTYPE, "");
     switch (value->type) {
-        case TINT: loadv(fp, &value->v.value_i); break;
-        case TDOUBLE: loadv(fp, &value->v.value_d); break;
-        case TSTRING: load_string(fp, &value->v.value_s); break;
+        case TINT: loadv(fp, &value->v.value_i);
+                   LOGGER_DBG("Int: %d", value->v.value_i); break;
+        case TDOUBLE: loadv(fp, &value->v.value_d);
+                      LOGGER_DBG("Double: %f", value->v.value_d); break;
+        case TSTRING: verify(load_string(fp, &value->v.value_s) < 0, EC_LOAD_STRING, "");
+                      LOGGER_DBG("String: .length = %d .str = %s", value->v.value_s.length, value->v.value_s.str); break;
         default: break;
     }
     return 0;
@@ -213,8 +218,9 @@ int load_task_list(FILE *fp, TaskList *task_list) {
     loadv(fp, &task_list->task_count);
     loadv(fp, &task_list->sp_size);
     verify(MAX_TASK_COUNT < task_list->task_count, EC_TASK_COUNT, "");
-    verify(MAX_STRPOOL_SIZE < task_list->sp_size, EC_LOAD_SP_SIZE, "");
-    sp_init(&g_strpool, task_list->sp_size);
+    verify(MAX_SP_SIZE < task_list->sp_size, EC_LOAD_SP_SIZE, "");
+    LOGGER_DBG("PLCList:\n .task_count = %d\n .sp_size = %d", task_list->task_count, task_list->sp_size);
+    sp_init(&g_strpool, task_list->sp_size); /* MUST initialize before loading task */
     task_list->rt_task = new RT_TASK[task_list->task_count];
     task_list->plc_task = new PLCTask[task_list->task_count];
     verify(task_list->rt_task == NULL || task_list->plc_task == NULL, EC_OOM, "loading plc task");
