@@ -33,7 +33,6 @@
 #define MAX_TASK_POU_COUNT 1024 /* Program Organization Unit: FUN | FB | PROG */
 #define MAX_TASK_CONST_COUNT 1024 /* constant */
 #define MAX_TASK_GLOBAL_COUNT 1024 /* global variables */
-#define MAX_TASK_SFRAME_COUNT 1024 /* stack frame */
 
 /* POU Limitations */
 #define MAX_POU_NAME_SIZE 20
@@ -44,5 +43,7 @@
 #define MAX_STRLEN 128  /* '\0' included (uint: Byte) */
 
 /* TODO IValue Limitations */
+/* Calling Stack Limitations */
+#define MAX_CS_CAP 1024 /* number of stack frame */
 
 #endif

@@ -4,11 +4,20 @@
 #include <stdint.h>
 #include "ivalue.h"
 
-/* Stack Frame */
 typedef struct {
-    IValue *reg_base;  /* register group base address */
-    uint16_t caller;   /* index of current function descriptors */
+    uint16_t called;   /* index of current pou descriptors */
     uint32_t ret_addr; /* return address(AKA index of instructions) */
-} SFrame;
+    IValue *reg_base;  /* register group base address */
+} SFrame; /* Stack Frame */
+
+typedef struct {
+    uint16_t capacity; /* stack capacity */
+    uint16_t top;      /* top of stack(AKA index of stack frame) */
+    SFrame *base;      /* stack base address */
+} CStack; /* Calling Stack */
+
+int cs_init(CStack *stk, uint16_t cap);
+int cs_push(CStack *stk, SFrame *frame);
+int cs_pop(CStack *stk);
 
 #endif

@@ -25,6 +25,8 @@ extern StrPool g_strpool;
  * Object File Verifier
  *---------------------------------------------------------------------------*/
 int verify_obj(FILE *fp) {
+    assert(fp != NULL);
+
     OBJHeader header;
     loadv(fp, &header); /* rely on byte alignment */
     verify(strcmp(header.magic, MAGIC) != 0, EC_PLC_FILE, "");
@@ -41,6 +43,9 @@ int verify_obj(FILE *fp) {
  * I/O Configuration Loader
  *---------------------------------------------------------------------------*/
 int load_io_config(FILE *fp, IOConfig *io_config) {
+    assert(fp != NULL);
+    assert(io_config != NULL);
+
     loadv(fp, io_config); /* rely on byte alignment */
     verify(io_config->update_interval < MIN_IO_INTERVAL, EC_IO_INTERVAL, "");
     verify(MAX_LDI_COUNT < io_config->ldi_count, EC_LDI_COUNT, "");
@@ -56,6 +61,9 @@ int load_io_config(FILE *fp, IOConfig *io_config) {
  * Servo Configuration Loader
  *---------------------------------------------------------------------------*/
 static int load_axis_config(FILE *fp, AxisConfig *axis_config) {
+    assert(fp != NULL);
+    assert(axis_config != NULL);
+
     /* order sensitive */
     loadvs(fp, axis_config->name, MAX_AXIS_NAME_SIZE);
     loadv(fp, &axis_config->is_combined);
@@ -85,6 +93,9 @@ static int load_axis_config(FILE *fp, AxisConfig *axis_config) {
 	return 0;
 }
 int load_servo_config(FILE *fp, ServoConfig *servo_config) {
+    assert(fp != NULL);
+    assert(servo_config != NULL);
+
     /* order sensitive */
     loadv(fp, &servo_config->axis_count);
     loadv(fp, &servo_config->update_interval);
@@ -107,6 +118,9 @@ int load_servo_config(FILE *fp, ServoConfig *servo_config) {
  * PLC Task List Loader
  *---------------------------------------------------------------------------*/
 static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
+    assert(fp != NULL);
+    assert(task_desc != NULL);
+
     /* order sensitive */
     loadvs(fp, task_desc->name, MAX_TASK_NAME_SIZE);
     loadv(fp, &task_desc->priority);
@@ -125,7 +139,7 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     verify(MAX_TASK_POU_COUNT < task_desc->pou_count, EC_TASK_POU_COUNT, "");
     verify(MAX_TASK_CONST_COUNT < task_desc->const_count, EC_TASK_CONST_COUNT, "");
     verify(MAX_TASK_GLOBAL_COUNT < task_desc->global_count, EC_TASK_GLOBAL_COUNT, "");
-    verify(MAX_TASK_SFRAME_COUNT < task_desc->sframe_count, EC_TASK_SFRAME_COUNT, "");
+    verify(MAX_CS_CAP < task_desc->sframe_count, EC_LOAD_CS_CAP, "");
     LOGGER_DBG("TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n"
         " .pou_count = %d\n .const_count = %d\n .global_count = %d\n .sframe_count = %d\n .inst_count = %d",
         task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval,
@@ -133,6 +147,9 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     return 0;
 }
 static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
+    assert(fp != NULL);
+    assert(pou_desc != NULL);
+
     /* order sensitive */
     loadvs(fp, pou_desc->name, MAX_POU_NAME_SIZE);
     loadv(fp, &pou_desc->input_count);
@@ -145,6 +162,9 @@ static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
     return 0;
 }
 static int load_string(FILE *fp, IString *str) {
+    assert(fp != NULL);
+    assert(str != NULL);
+
     loadv(fp, &str->length);
     verify(MAX_STRLEN < str->length, EC_LOAD_STRLEN, "");
     char strtemp[str->length];
@@ -155,20 +175,29 @@ static int load_string(FILE *fp, IString *str) {
     return 0;
 }
 static int load_value(FILE *fp, IValue *value) {
+    assert(fp != NULL);
+    assert(value != NULL);
+
     loadv(fp, &value->type);
     verify(value->type < MIN_VTYPE || MAX_VTYPE < value->type, EC_LOAD_VTYPE, "");
     switch (value->type) {
-        case TINT: loadv(fp, &value->v.value_i);
-                   LOGGER_DBG("Int: %d", value->v.value_i); break;
-        case TDOUBLE: loadv(fp, &value->v.value_d);
-                      LOGGER_DBG("Double: %f", value->v.value_d); break;
-        case TSTRING: verify(load_string(fp, &value->v.value_s) < 0, EC_LOAD_STRING, "");
-                      LOGGER_DBG("String: .length = %d .str = %s", value->v.value_s.length, value->v.value_s.str); break;
+        case TINT:
+            loadv(fp, &value->v.value_i);
+            LOGGER_DBG("Int: %d", value->v.value_i); break;
+        case TDOUBLE:
+            loadv(fp, &value->v.value_d);
+            LOGGER_DBG("Double: %f", value->v.value_d); break;
+        case TSTRING:
+            verify(load_string(fp, &value->v.value_s) < 0, EC_LOAD_STRING, "");
+            LOGGER_DBG("String: %s(length = %d)", value->v.value_s.str, value->v.value_s.length); break;
         default: break;
     }
     return 0;
 }
 static int load_plc_task(FILE *fp, PLCTask *task) {
+    assert(fp != NULL);
+    assert(task != NULL);
+
     verify(load_task_desc(fp, &task->task_desc) < 0, EC_LOAD_TASK_DESC, "");
     task->pou_desc = new POUDesc[task->task_desc.pou_count];
     task->vconst = new IValue[task->task_desc.const_count];
@@ -214,6 +243,9 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
 }
 
 int load_task_list(FILE *fp, TaskList *task_list) {
+    assert(fp != NULL);
+    assert(task_list != NULL);
+
     /* order sensitive */
     loadv(fp, &task_list->task_count);
     loadv(fp, &task_list->sp_size);

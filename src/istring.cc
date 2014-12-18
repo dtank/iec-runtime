@@ -7,11 +7,9 @@ extern ec_map_t ec_msg;
 StrPool g_strpool;
 
 int sp_init(StrPool *sp, uint32_t size) {
-    //TODO assert
-    if (MAX_SP_SIZE < size) {
-        LOGGER_ERR(EC_SP_SIZE, "");
-        return -1;
-    }
+    assert(sp != NULL);
+    assert(size <= MAX_SP_SIZE); /* guaranteed by verifier */
+
     sp->size = size;
     sp->index = 0;
     sp->base = new char[size];
@@ -22,9 +20,11 @@ int sp_init(StrPool *sp, uint32_t size) {
     return 0;
 }
 char *sp_add(StrPool *sp, const char *str, uint32_t size) { /* size include '\0' */
-    //TODO assert
+    assert(sp != NULL);
+    assert(str != NULL);
+
     if (sp->size < sp->index+size) {
-        LOGGER_ERR(EC_SP_NEW, "");
+        LOGGER_ERR(EC_SP_NEW, ""); //TODO expand capacity automatically
         return NULL;
     }
     strcpy(&sp->base[sp->index], str);
@@ -32,7 +32,8 @@ char *sp_add(StrPool *sp, const char *str, uint32_t size) { /* size include '\0'
     return &sp->base[sp->index-size];
 }
 void sp_clean(StrPool *sp) {
-    //TODO assert
+    assert(sp != NULL);
+
     sp->size = 0;
     sp->index = 0;
     if (sp->base != NULL) {

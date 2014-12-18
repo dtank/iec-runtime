@@ -14,12 +14,16 @@ using namespace std;
 #define LEVEL_DBG 4
 #define LEVEL_ALL 5
 
-extern int LOGGER_LEVEL;
+#define LOGGER_LEVEL LEVEL_ALL
+#if LOGGER_LEVEL < LEVEL_DBG
+    #define NDEBUG
+#endif
+#include <assert.h>
 
 #define LOGGER_DBG(msg, ...)                                                                             \
     do {                                                                                                 \
         if (LOGGER_LEVEL >= LEVEL_DBG) {                                                                 \
-            fprintf(stderr, "TRACE: File:%s Line:%d Function:%s()\n", __FILE__, __LINE__, __FUNCTION__); \
+            fprintf(stderr, "TRACE: " __FILE__ ":%d %s()\n", __LINE__, __FUNCTION__); \
             fprintf(stderr, msg, __VA_ARGS__);                                                           \
             fprintf(stderr, "\n"); }                                                                     \
     } while(0)
@@ -87,7 +91,7 @@ enum ERROR_CODE {
     EC_TASK_POU_COUNT,
     EC_TASK_CONST_COUNT,
     EC_TASK_GLOBAL_COUNT,
-    EC_TASK_SFRAME_COUNT,
+    EC_LOAD_CS_CAP,
     EC_POU_PARAM_COUNT,
     EC_LOAD_VTYPE,
     EC_LOAD_STRLEN,
@@ -100,8 +104,8 @@ enum ERROR_CODE {
     EC_PLC_TASK_CREATE,
     EC_PLC_TASK_START,
     /* String Pool Error Code */
-    EC_SP_SIZE,
     EC_SP_NEW,
+    /* Calling Stack Error Code */
 };
 
 typedef map<ERROR_CODE, const char *> ec_map_t;
@@ -152,7 +156,7 @@ static const ec_map_t::value_type ec_data[] = {
     ec_map_t::value_type(EC_TASK_POU_COUNT, "Over maximum count of POU"),
     ec_map_t::value_type(EC_TASK_CONST_COUNT, "Over maximum count of constant"),
     ec_map_t::value_type(EC_TASK_GLOBAL_COUNT, "Over maximum count of global variables"),
-    ec_map_t::value_type(EC_TASK_SFRAME_COUNT, "Over maximum count of stack frame"),
+    ec_map_t::value_type(EC_LOAD_CS_CAP, "Over maximum count of stack frame"),
     ec_map_t::value_type(EC_POU_PARAM_COUNT, "Over maximum count of pou's parameters"),
     ec_map_t::value_type(EC_LOAD_VTYPE, "Unknown type of value"),
     ec_map_t::value_type(EC_LOAD_STRLEN, "Over maximum length of string"),
@@ -165,8 +169,8 @@ static const ec_map_t::value_type ec_data[] = {
     ec_map_t::value_type(EC_PLC_TASK_CREATE, "Failed to create plc task"),
     ec_map_t::value_type(EC_PLC_TASK_START, "Failed to start plc task"),
     /* String Pool Error Code */
-    ec_map_t::value_type(EC_SP_SIZE, "Over maximum capacity of string pool"),
     ec_map_t::value_type(EC_SP_NEW, "No enough free space for new string"),
+    /* Calling Stack Error Code */
 };
 static const uint32_t ec_count = sizeof ec_data / sizeof ec_data[0];
 static const ec_map_t ec_map(ec_data, ec_data + ec_count);
