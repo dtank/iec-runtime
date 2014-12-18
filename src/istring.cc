@@ -24,7 +24,7 @@ char *sp_add(StrPool *sp, const char *str, uint32_t size) { /* size include '\0'
     assert(str != NULL);
 
     if (sp->size < sp->index+size) {
-        LOGGER_ERR(EC_SP_NEW, ""); //TODO expand capacity automatically
+        LOGGER_ERR(EC_SP_FULL, ""); //TODO expand capacity automatically
         return NULL;
     }
     strcpy(&sp->base[sp->index], str);

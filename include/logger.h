@@ -104,8 +104,10 @@ enum ERROR_CODE {
     EC_PLC_TASK_CREATE,
     EC_PLC_TASK_START,
     /* String Pool Error Code */
-    EC_SP_NEW,
+    EC_SP_FULL,
     /* Calling Stack Error Code */
+    EC_CS_FULL,
+    EC_CS_EMPTY,
 };
 
 typedef map<ERROR_CODE, const char *> ec_map_t;
@@ -169,8 +171,10 @@ static const ec_map_t::value_type ec_data[] = {
     ec_map_t::value_type(EC_PLC_TASK_CREATE, "Failed to create plc task"),
     ec_map_t::value_type(EC_PLC_TASK_START, "Failed to start plc task"),
     /* String Pool Error Code */
-    ec_map_t::value_type(EC_SP_NEW, "No enough free space for new string"),
+    ec_map_t::value_type(EC_SP_FULL, "String pool is full, can't add new string"),
     /* Calling Stack Error Code */
+    ec_map_t::value_type(EC_CS_FULL, "Calling stack is full, can't push new frame"),
+    ec_map_t::value_type(EC_CS_EMPTY, "Calling stack is empty, can't pop frame"),
 };
 static const uint32_t ec_count = sizeof ec_data / sizeof ec_data[0];
 static const ec_map_t ec_map(ec_data, ec_data + ec_count);

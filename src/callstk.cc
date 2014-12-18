@@ -17,3 +17,28 @@ int cs_init(CStack *stk, uint16_t cap) {
     }
     return 0;
 }
+int cs_push(CStack *stk, SFrame *frame) {
+    assert(stk != NULL);
+    assert(frame != NULL);
+
+    if (stk->top == stk->capacity) {
+        LOGGER_ERR(EC_CS_FULL, ""); //TODO expand capacity automatically
+        return -1;
+    }
+    stk->base[stk->top] = *frame;
+    stk->top++;
+    return 0;
+}
+int cs_pop(CStack *stk) {
+    assert(stk != NULL);
+
+    if (stk->top == 0) {
+        LOGGER_ERR(EC_CS_EMPTY, "");
+        return -1;
+    }
+    if (stk->base[stk->top].reg_base != NULL) {
+        delete[] stk->base[stk->top].reg_base;
+    }
+    stk->top--;
+    return 0;
+}
