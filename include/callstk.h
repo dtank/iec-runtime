@@ -5,7 +5,7 @@
 #include "ivalue.h"
 
 typedef struct {
-    uint16_t called;   /* index of current pou descriptors */
+    uint16_t curr_pou;   /* index of current pou descriptors */
     uint32_t ret_addr; /* return address(AKA index of instructions) */
     IValue *reg_base;  /* register group base address */
 } SFrame; /* Stack Frame */

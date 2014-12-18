@@ -104,8 +104,10 @@ enum ERROR_CODE {
     EC_PLC_TASK_CREATE,
     EC_PLC_TASK_START,
     /* String Pool Error Code */
+    EC_SP_INIT,
     EC_SP_FULL,
     /* Calling Stack Error Code */
+    EC_CS_INIT,
     EC_CS_FULL,
     EC_CS_EMPTY,
 };
@@ -171,8 +173,10 @@ static const ec_map_t::value_type ec_data[] = {
     ec_map_t::value_type(EC_PLC_TASK_CREATE, "Failed to create plc task"),
     ec_map_t::value_type(EC_PLC_TASK_START, "Failed to start plc task"),
     /* String Pool Error Code */
+    ec_map_t::value_type(EC_SP_INIT, "Failed to initialize stirng pool"),
     ec_map_t::value_type(EC_SP_FULL, "String pool is full, can't add new string"),
     /* Calling Stack Error Code */
+    ec_map_t::value_type(EC_CS_INIT, "Failed to initialize calling stack"),
     ec_map_t::value_type(EC_CS_FULL, "Calling stack is full, can't push new frame"),
     ec_map_t::value_type(EC_CS_EMPTY, "Calling stack is empty, can't pop frame"),
 };

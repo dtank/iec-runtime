@@ -76,7 +76,7 @@ typedef struct {
     IValue *vconst;     /* constant pool */
     IValue *vglobal;    /* global variables */
     PLCInst *code;      /* task code(instruction) */
-    SFrame *stack;      /* calling stack(constant capacity) */
+    CStack stack;       /* calling stack(constant capacity) */
 } PLCTask;
 
 typedef struct {
