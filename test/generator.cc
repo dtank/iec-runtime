@@ -53,11 +53,12 @@ void generate_obj_tds(FILE *fp, OBJ_TDS *tds) {
 	fwrite(&tds->type, sizeof(tds->type), 1, fp);
 	fwrite(&tds->signal, sizeof(tds->signal), 1, fp);
 	fwrite(&tds->interval, sizeof(tds->interval), 1, fp);
+	fwrite(&tds->sp_size, sizeof(tds->sp_size), 1, fp);
     fwrite(&tds->pou_count, sizeof(tds->pou_count), 1, fp);
     fwrite(&tds->const_count, sizeof(tds->const_count), 1, fp);
     fwrite(&tds->global_count, sizeof(tds->global_count), 1, fp);
-    fwrite(&tds->sframe_count, sizeof(tds->sframe_count), 1, fp);
     fwrite(&tds->inst_count, sizeof(tds->inst_count), 1, fp);
+    fwrite(&tds->sframe_count, sizeof(tds->sframe_count), 1, fp);
 }
 void generate_obj_pds(FILE *fp, OBJ_PDS *pds) {
 	fwrite(pds->name, MAX_POU_NAME_SIZE, 1, fp);
@@ -97,7 +98,6 @@ void generate_obj_file(FILE *fp, OBJ_FILE *file) {
     generate_obj_iocs(fp, &file->iocs);
     generate_obj_scs(fp, &file->scs);
     fwrite(&file->task_count, sizeof(file->task_count), 1, fp);
-    fwrite(&file->sp_size, sizeof(file->sp_size), 1, fp);
     for (int i = 0; i < file->task_count; ++i) {
         generate_obj_pts(fp, &file->task[i]);
     }

@@ -4,7 +4,6 @@
 #include "logger.h"
 
 extern ec_map_t ec_msg;
-StrPool g_strpool;
 
 int sp_init(StrPool *sp, uint32_t size) {
     assert(sp != NULL);

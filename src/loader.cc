@@ -9,7 +9,6 @@
 using namespace std;
 extern char *io_shm;
 extern ec_map_t ec_msg;
-extern StrPool g_strpool;
 
 /*-----------------------------------------------------------------------------
  * Helper Funciton Macros
@@ -127,23 +126,25 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     loadv(fp, &task_desc->type);
     loadv(fp, &task_desc->signal);
     loadv(fp, &task_desc->interval);
+    loadv(fp, &task_desc->sp_size);
     loadv(fp, &task_desc->pou_count);
     loadv(fp, &task_desc->const_count);
     loadv(fp, &task_desc->global_count);
-    loadv(fp, &task_desc->sframe_count);
     loadv(fp, &task_desc->inst_count);
+    loadv(fp, &task_desc->sframe_count);
     verify(task_desc->priority < MIN_TASK_PRIORITY || MAX_TASK_PRIORITY < task_desc->priority, EC_TASK_PRIORITY, "");
     verify(task_desc->type != TASK_TYPE_SIGNAL && task_desc->type != TASK_TYPE_INTERVAL, EC_TASK_TYPE, "");
     verify(MAX_TASK_SIGNAL < task_desc->signal, EC_TASK_SIGNAL, "");
     verify(task_desc->interval < MIN_TASK_INTERVAL, EC_TASK_INTERVAL, "");
+    verify(MAX_SP_SIZE < task_desc->sp_size, EC_LOAD_SP_SIZE, "");
     verify(MAX_TASK_POU_COUNT < task_desc->pou_count, EC_TASK_POU_COUNT, "");
     verify(MAX_TASK_CONST_COUNT < task_desc->const_count, EC_TASK_CONST_COUNT, "");
     verify(MAX_TASK_GLOBAL_COUNT < task_desc->global_count, EC_TASK_GLOBAL_COUNT, "");
     verify(MAX_CS_CAP < task_desc->sframe_count, EC_LOAD_CS_CAP, "");
-    LOGGER_DBG("TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n"
-        " .pou_count = %d\n .const_count = %d\n .global_count = %d\n .sframe_count = %d\n .inst_count = %d",
-        task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval,
-        task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->sframe_count, task_desc->inst_count);
+    LOGGER_DBG("TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n .sp_size = %d\n"
+        " .pou_count = %d\n .const_count = %d\n .global_count = %d\n .inst_count = %d\n .sframe_count = %d",
+        task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval, task_desc->sp_size,
+        task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->inst_count, task_desc->sframe_count);
     return 0;
 }
 static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
@@ -161,7 +162,7 @@ static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
         pou_desc->name, pou_desc->input_count, pou_desc->output_count, pou_desc->local_count, pou_desc->addr);
     return 0;
 }
-static int load_string(FILE *fp, IString *str) {
+static int load_string(FILE *fp, IString *str, StrPool *sp) {
     assert(fp != NULL);
     assert(str != NULL);
 
@@ -169,12 +170,12 @@ static int load_string(FILE *fp, IString *str) {
     verify(MAX_STRLEN < str->length, EC_LOAD_STRLEN, "");
     char strtemp[str->length];
     loadvs(fp, strtemp, str->length);
-    if ((str->str=sp_add(&g_strpool, strtemp, str->length)) == NULL) {
+    if ((str->str=sp_add(sp, strtemp, str->length)) == NULL) {
         return -1;
     }
     return 0;
 }
-static int load_value(FILE *fp, IValue *value) {
+static int load_value(FILE *fp, IValue *value, StrPool *sp) {
     assert(fp != NULL);
     assert(value != NULL);
 
@@ -188,7 +189,7 @@ static int load_value(FILE *fp, IValue *value) {
             loadv(fp, &value->v.value_d);
             LOGGER_DBG("Double: %f", value->v.value_d); break;
         case TSTRING:
-            verify(load_string(fp, &value->v.value_s) < 0, EC_LOAD_STRING, "");
+            verify(load_string(fp, &value->v.value_s, sp) < 0, EC_LOAD_STRING, "");
             LOGGER_DBG("String: %s(length = %d)", value->v.value_s.str, value->v.value_s.length); break;
         default: break;
     }
@@ -199,6 +200,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
     assert(task != NULL);
 
     verify(load_task_desc(fp, &task->task_desc) < 0, EC_LOAD_TASK_DESC, "");
+    verify(sp_init(&task->strpool, task->task_desc.sp_size) < 0, EC_SP_INIT, ""); /* MUST initialize before loading constant/global */
     task->pou_desc = new POUDesc[task->task_desc.pou_count];
     task->vconst = new IValue[task->task_desc.const_count];
     task->vglobal = new IValue[task->task_desc.global_count];
@@ -215,7 +217,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
         }
     }
     for (int i = 0; i < task->task_desc.const_count; i++) {
-        if (load_value(fp, &task->vconst[i]) < 0) {
+        if (load_value(fp, &task->vconst[i], &task->strpool) < 0) {
             LOGGER_ERR(EC_LOAD_TASK_CONST, "");
             delete[] task->pou_desc;
             delete[] task->vconst;
@@ -225,7 +227,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
         }
     }
     for (int i = 0; i < task->task_desc.global_count; i++) {
-        if (load_value(fp, &task->vglobal[i]) < 0) {
+        if (load_value(fp, &task->vglobal[i], &task->strpool) < 0) {
             LOGGER_ERR(EC_LOAD_TASK_GLOBAL, "");
             delete[] task->pou_desc;
             delete[] task->vconst;
@@ -235,7 +237,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
         }
     }
     loadvs(fp, task->code, task->task_desc.inst_count*sizeof(Instruction));
-    verify(cs_init(&task->stack, task->task_desc.sframe_count) < 0, EC_CS_INIT, "");
+    verify(cs_init(&task->stack, task->task_desc.sframe_count) < 0, EC_CS_INIT, ""); /* MUST initialize after loading POU descriptor */
     /* create main() stack frame manually */
     SFrame main = {0, 0, NULL};
     main.reg_base = new IValue[task->pou_desc[0].input_count+task->pou_desc[0].output_count+task->pou_desc[0].local_count];
@@ -252,14 +254,11 @@ int load_task_list(FILE *fp, TaskList *task_list) {
 
     /* order sensitive */
     loadv(fp, &task_list->task_count);
-    loadv(fp, &task_list->sp_size);
     verify(MAX_TASK_COUNT < task_list->task_count, EC_TASK_COUNT, "");
-    verify(MAX_SP_SIZE < task_list->sp_size, EC_LOAD_SP_SIZE, "");
-    verify(sp_init(&g_strpool, task_list->sp_size) < 0, EC_SP_INIT, ""); /* MUST initialize before loading task */
     task_list->rt_task = new RT_TASK[task_list->task_count];
     task_list->plc_task = new PLCTask[task_list->task_count];
     verify(task_list->rt_task == NULL || task_list->plc_task == NULL, EC_OOM, "loading plc task");
-    LOGGER_DBG("PLCList:\n .task_count = %d\n .sp_size = %d", task_list->task_count, task_list->sp_size);
+    LOGGER_DBG("PLCList:\n .task_count = %d", task_list->task_count);
     for (int i = 0; i < task_list->task_count; i++) {
         if (load_plc_task(fp, &task_list->plc_task[i]) < 0) {
             LOGGER_ERR(EC_LOAD_PLC_TASK, "");

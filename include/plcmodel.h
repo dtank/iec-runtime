@@ -3,6 +3,7 @@
 
 #include <native/task.h>
 #include "ivalue.h"
+#include "istring.h"
 #include "callstk.h"
 #include "opcode.h"
 #include "syslimit.h"
@@ -55,11 +56,12 @@ typedef struct {
     uint8_t type;                  /* task type: SIGNAL | INTERVAL */
     uint8_t signal;                /* signal source: TIMER | I/O */
 	uint32_t interval;             /* time interval (uint: ns) */
+    uint32_t sp_size;              /* capacity of string pool(unit: Byte) */
     uint16_t pou_count;            /* Program Organization Unit: FUN | FB | PROG */
     uint16_t const_count;          /* number of constant */
     uint16_t global_count;         /* number of global variables */
-	uint16_t sframe_count;         /* number of stack frame */
 	uint32_t inst_count;           /* number of instructions(code) */
+	uint16_t sframe_count;         /* number of stack frame */
 } TaskDesc; /* PLC Task Descriptor */
 
 typedef struct {
@@ -72,6 +74,7 @@ typedef struct {
 
 typedef struct {
     TaskDesc task_desc; /* PLC task descriptor */
+    StrPool strpool;    /* string pool */
     POUDesc *pou_desc;  /* POU descriptor */
     IValue *vconst;     /* constant pool */
     IValue *vglobal;    /* global variables */
@@ -81,7 +84,6 @@ typedef struct {
 
 typedef struct {
     uint8_t task_count; /* number of plc task */
-    uint32_t sp_size;   /* capacity of string pool */
     RT_TASK *rt_task;
     PLCTask *plc_task;
 } TaskList;

@@ -80,11 +80,12 @@ typedef struct {
     uint8_t type;                  /* task type: SIGNAL | INTERVAL */
     uint8_t signal;                /* signal source: TIMER | I/O */
 	uint32_t interval;             /* time interval (uint: ns) */
+    uint32_t sp_size;              /* capacity of string pool(unit: Byte) */
     uint16_t pou_count;            /* Program Organization Unit: FUN | FB | PROG */
     uint16_t const_count;          /* number of constant */
     uint16_t global_count;         /* number of global variables */
-	uint16_t sframe_count;         /* number of stack frame */
 	uint32_t inst_count;           /* number of instructions(code) */
+	uint16_t sframe_count;         /* number of stack frame */
 } OBJ_TDS; /* PLC Task Descriptor Segment */
 
 typedef struct {
@@ -124,7 +125,6 @@ typedef struct {
     OBJ_IOCS iocs;
     OBJ_SCS scs;
     uint8_t task_count;
-    uint32_t sp_size;
     OBJ_PTS task[MAX_TASK_COUNT];
 } OBJ_FILE;
 
