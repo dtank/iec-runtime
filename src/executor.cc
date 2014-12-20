@@ -2,7 +2,6 @@
 #include "opcode.h"
 #include "logger.h"
 
-extern inst_desc_map_t inst_desc;
 extern char *io_shm;
 extern ec_map_t ec_msg;
 

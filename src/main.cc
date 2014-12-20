@@ -8,7 +8,6 @@
 #include "logger.h"
 
 
-//inst_desc_map_t inst_desc = inst_desc_map;
 ec_map_t ec_msg = ec_map;
 IOConfig io_config;
 ServoConfig servo_config;

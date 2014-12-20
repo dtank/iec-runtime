@@ -14,8 +14,8 @@ extern StrPool g_strpool;
 /*-----------------------------------------------------------------------------
  * Helper Funciton Macros
  *---------------------------------------------------------------------------*/
-#define loadv(fp, varp) {fread(varp, sizeof(*varp), 1, fp);}
-#define loadvs(fp, varp, size) {fread(varp, size, 1, fp);}
+#define loadv(fp, varp) {fread((varp), sizeof(*(varp)), 1, fp);}
+#define loadvs(fp, varp, size) {fread((varp), (size), 1, fp);}
 #define verify(exp, ecode, msg) { \
     if (exp) {                    \
         LOGGER_ERR(ecode, msg);   \
@@ -202,7 +202,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
     task->pou_desc = new POUDesc[task->task_desc.pou_count];
     task->vconst = new IValue[task->task_desc.const_count];
     task->vglobal = new IValue[task->task_desc.global_count];
-    task->code = new PLCInst[task->task_desc.inst_count];
+    task->code = new Instruction[task->task_desc.inst_count];
     verify(task->pou_desc==NULL || task->vconst==NULL || task->vglobal==NULL || task->code==NULL, EC_OOM, "loading plc task");
     for (int i = 0; i < task->task_desc.pou_count; i++) {
         if (load_pou_desc(fp, &task->pou_desc[i]) < 0) {
@@ -234,7 +234,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
             return -1;
         }
     }
-    loadvs(fp, task->code, task->task_desc.inst_count*sizeof(PLCInst));
+    loadvs(fp, task->code, task->task_desc.inst_count*sizeof(Instruction));
     verify(cs_init(&task->stack, task->task_desc.sframe_count) < 0, EC_CS_INIT, "");
     /* create main() stack frame manually */
     SFrame main = {0, 0, NULL};
@@ -255,11 +255,11 @@ int load_task_list(FILE *fp, TaskList *task_list) {
     loadv(fp, &task_list->sp_size);
     verify(MAX_TASK_COUNT < task_list->task_count, EC_TASK_COUNT, "");
     verify(MAX_SP_SIZE < task_list->sp_size, EC_LOAD_SP_SIZE, "");
-    LOGGER_DBG("PLCList:\n .task_count = %d\n .sp_size = %d", task_list->task_count, task_list->sp_size);
     verify(sp_init(&g_strpool, task_list->sp_size) < 0, EC_SP_INIT, ""); /* MUST initialize before loading task */
     task_list->rt_task = new RT_TASK[task_list->task_count];
     task_list->plc_task = new PLCTask[task_list->task_count];
     verify(task_list->rt_task == NULL || task_list->plc_task == NULL, EC_OOM, "loading plc task");
+    LOGGER_DBG("PLCList:\n .task_count = %d\n .sp_size = %d", task_list->task_count, task_list->sp_size);
     for (int i = 0; i < task_list->task_count; i++) {
         if (load_plc_task(fp, &task_list->plc_task[i]) < 0) {
             LOGGER_ERR(EC_LOAD_PLC_TASK, "");

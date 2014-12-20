@@ -4,6 +4,7 @@
 #include <native/task.h>
 #include "ivalue.h"
 #include "callstk.h"
+#include "opcode.h"
 #include "syslimit.h"
 
 /*-----------------------------------------------------------------------------
@@ -69,13 +70,12 @@ typedef struct {
     uint32_t addr;                /* POU address(AKA index of instruction) */
 } POUDesc; /* POU Descriptor */
 
-typedef uint32_t PLCInst;
 typedef struct {
     TaskDesc task_desc; /* PLC task descriptor */
     POUDesc *pou_desc;  /* POU descriptor */
     IValue *vconst;     /* constant pool */
     IValue *vglobal;    /* global variables */
-    PLCInst *code;      /* task code(instruction) */
+    Instruction *code;  /* task code(instruction) */
     CStack stack;       /* calling stack(constant capacity) */
 } PLCTask;
 
