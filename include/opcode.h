@@ -6,7 +6,15 @@
 typedef uint32_t Instruction;
 
 /*-----------------------------------------------------------------------------
- * Instructoin Encoding
+ * Helper Funtion Macros
+ *---------------------------------------------------------------------------*/
+/* creates a mask with `n' 1 bits at position `p' */
+#define MASK1(n,p)	((~((~(Instruction)0)<<(n)))<<(p))
+/* creates a mask with `n' 0 bits at position `p' */
+#define MASK0(n,p)	(~MASK1(n,p))
+#define cast(type, exp) ((type)(exp))
+/*-----------------------------------------------------------------------------
+ * Instructoin Encoding Defination
  *---------------------------------------------------------------------------*/
 #define SIZE_OP  8
 #define SIZE_A   8
@@ -23,25 +31,7 @@ typedef uint32_t Instruction;
 #define POS_sAx POS_C
 
 #define BIAS_sAx (1<<(SIZE_sAx-1))
-/*-----------------------------------------------------------------------------
- * Instructoin Decoder Macro
- *---------------------------------------------------------------------------*/
-/* creates a mask with `n' 1 bits at position `p' */
-#define MASK1(n,p)	((~((~(Instruction)0)<<(n)))<<(p))
-/* creates a mask with `n' 0 bits at position `p' */
-#define MASK0(n,p)	(~MASK1(n,p))
-#define cast(type, exp) ((type)(exp))
 
-#define GET_OPCODE(i) (cast(OpCode, (i>>POS_OP) & MASK1(SIZE_OP, 0)))
-#define getarg(i, pos, size) (cast(int, (i>>pos) & MASK1(size, 0)))
-#define GETARG_A(i)   getarg(i, POS_A, SIZE_A)
-#define GETARG_B(i)   getarg(i, POS_B, SIZE_B)
-#define GETARG_C(i)   getarg(i, POS_C, SIZE_C)
-#define GETARG_Bx(i)  getarg(i, POS_Bx, SIZE_Bx)
-#define GETARG_sAx(i) (getarg(i, POS_sAx, SIZE_sAx) - BIAS_sAx)
-/*-----------------------------------------------------------------------------
- * Instructoin OpCode
- *---------------------------------------------------------------------------*/
 typedef enum {
     /* basic opcode */
     OP_GLOAD = 1,
@@ -67,4 +57,32 @@ typedef enum {
     OP_SCALL,
     OP_RET,
 } OpCode;
+
+#define MIN_OPCODE OP_GLOAD
+#define MAX_OPCODE OP_RET
+/*-----------------------------------------------------------------------------
+ * Instructoin Decoder Macro
+ *---------------------------------------------------------------------------*/
+#define GET_OPCODE(i) (cast(OpCode, ((i)>>POS_OP) & MASK1(SIZE_OP, 0)))
+#define getarg(i,pos,size) (cast(int, ((i)>>pos) & MASK1(size, 0)))
+#define GETARG_A(i)   getarg(i, POS_A, SIZE_A)
+#define GETARG_B(i)   getarg(i, POS_B, SIZE_B)
+#define GETARG_C(i)   getarg(i, POS_C, SIZE_C)
+#define GETARG_Bx(i)  getarg(i, POS_Bx, SIZE_Bx)
+#define GETARG_sAx(i) (getarg(i, POS_sAx, SIZE_sAx) - BIAS_sAx)
+/*-----------------------------------------------------------------------------
+ * Instructoin Encoder Macro
+ *---------------------------------------------------------------------------*/
+#define CREATE_ABC(o,a,b,c)	((cast(Instruction, o)<<POS_OP) \
+			| (cast(Instruction, a)<<POS_A) \
+			| (cast(Instruction, b)<<POS_B) \
+			| (cast(Instruction, c)<<POS_C))
+
+#define CREATE_ABx(o,a,bx)	((cast(Instruction, o)<<POS_OP) \
+			| (cast(Instruction, a)<<POS_A) \
+			| (cast(Instruction, bx)<<POS_Bx))
+
+#define CREATE_sAx(o,sax)		((cast(Instruction, o)<<POS_OP) \
+			| (cast(Instruction, sax+BIAS_sAx)<<POS_sAx))
+
 #endif

@@ -2,6 +2,7 @@
 #define __OBJ_CASE_H__
 
 #include "objstruct.h"
+#include "opcode.h"
 #include "sysenv.h"
 
 #define OBJ_ARITHMETIC {                                                        \
@@ -22,8 +23,8 @@
             {TINT,{0}}, /* global variable */                                   \
             {TINT,{0}}, /* global variable */                                   \
         },{ /* instructions */                                                  \
-            0xffffffff,                                                         \
-            0xffffffff,                                                         \
+            CREATE_ABC(OP_ADD, 1, 2, 3),                                        \
+            CREATE_ABC(OP_ADD, 4, 5, 6),                                        \
         }},                                                                     \
     }                                                                           \
 }

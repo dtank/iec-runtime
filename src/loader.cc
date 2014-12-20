@@ -237,6 +237,10 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
         }
     }
     loadvs(fp, task->code, task->task_desc.inst_count*sizeof(Instruction));
+    for (uint32_t i = 0; i < task->task_desc.inst_count; i++) { // TODO verify instruction
+        verify(GET_OPCODE(task->code[i]) < MIN_OPCODE || MAX_OPCODE < GET_OPCODE(task->code[i]), EC_LOAD_OPCODE, "");
+        LOGGER_DBG("OpCode: %d", GET_OPCODE(task->code[i]));
+    }
     verify(cs_init(&task->stack, task->task_desc.sframe_count) < 0, EC_CS_INIT, ""); /* MUST initialize after loading POU descriptor */
     /* create main() stack frame manually */
     SFrame main = {0, 0, NULL};
