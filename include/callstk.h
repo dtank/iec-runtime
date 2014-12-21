@@ -12,7 +12,7 @@ typedef struct {
 
 typedef struct {
     uint16_t capacity; /* stack capacity */
-    uint16_t top;      /* top of stack(AKA index of stack frame) */
+    uint16_t top;      /* top of stack(always point next stack frame) */
     SFrame *base;      /* stack base address */
 } CStack; /* Calling Stack */
 

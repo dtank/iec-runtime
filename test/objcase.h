@@ -23,8 +23,8 @@
             {TINT,{0}}, /* global variable */                                   \
             {TINT,{0}}, /* global variable */                                   \
         },{ /* instructions */                                                  \
-            CREATE_ABC(OP_ADD, 1, 2, 3),                                        \
-            CREATE_ABC(OP_ADD, 4, 5, 6),                                        \
+            CREATE_ABx(OP_KLOAD, 0, 1), /* K(1) -> R(0) */                                       \
+            CREATE_ABx(OP_GLOAD, 1, 0), /* G(0) -> R(1) */                                      \
         }},                                                                     \
     }                                                                           \
 }

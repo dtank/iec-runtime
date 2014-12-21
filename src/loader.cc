@@ -249,6 +249,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
     if (cs_push(&task->stack, &main) < 0) {
         return -1;
     }
+    task->pc = 0;
     return 0;
 }
 

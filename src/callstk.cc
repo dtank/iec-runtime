@@ -9,7 +9,7 @@ int cs_init(CStack *stk, uint16_t cap) {
     assert(cap <= MAX_CS_CAP); /* guaranteed by verifier */
 
     stk->capacity = cap;
-    stk->top = 1;
+    stk->top = 0;
     stk->base = new SFrame[stk->capacity];
     if (stk->base == NULL) {
         LOGGER_ERR(EC_OOM, "initializing calling stack");

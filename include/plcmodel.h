@@ -80,6 +80,7 @@ typedef struct {
     IValue *vglobal;    /* global variables */
     Instruction *code;  /* task code(instruction) */
     CStack stack;       /* calling stack(constant capacity) */
+    uint32_t pc;        /* program counter(AKA instruction pointer) */
 } PLCTask;
 
 typedef struct {
