@@ -6,14 +6,6 @@
 typedef uint32_t Instruction;
 
 /*-----------------------------------------------------------------------------
- * Helper Funtion Macros
- *---------------------------------------------------------------------------*/
-/* creates a mask with `n' 1 bits at position `p' */
-#define MASK1(n,p)	((~((~(Instruction)0)<<(n)))<<(p))
-/* creates a mask with `n' 0 bits at position `p' */
-#define MASK0(n,p)	(~MASK1(n,p))
-#define cast(type, exp) ((type)(exp))
-/*-----------------------------------------------------------------------------
  * Instructoin Encoding Defination
  *---------------------------------------------------------------------------*/
 #define SIZE_OP  8
@@ -61,7 +53,16 @@ typedef enum {
 #define MIN_OPCODE OP_GLOAD
 #define MAX_OPCODE OP_RET
 /*-----------------------------------------------------------------------------
+ * Helper Funtion Macros
+ *---------------------------------------------------------------------------*/
+/* creates a mask with `n' 1 bits at position `p' */
+#define MASK1(n,p)	((~((~(Instruction)0)<<(n)))<<(p))
+/* creates a mask with `n' 0 bits at position `p' */
+#define MASK0(n,p)	(~MASK1(n,p))
+#define cast(type, exp) ((type)(exp))
+/*-----------------------------------------------------------------------------
  * Instructoin Decoder Macro
+ * Note: decoder won't change original instruction definitely!
  *---------------------------------------------------------------------------*/
 #define GET_OPCODE(i) (cast(OpCode, ((i)>>POS_OP) & MASK1(SIZE_OP, 0)))
 #define getarg(i,pos,size) (cast(int, ((i)>>pos) & MASK1(size, 0)))

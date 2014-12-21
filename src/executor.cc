@@ -6,18 +6,19 @@
 extern char *io_shm;
 extern ec_map_t ec_msg;
 
-#define instruction task->code[task->pc]
+#define PC  (task->pc)
+#define EOC (task->task_desc.inst_count) /* end of code */
+#define instruction (task->code[PC])
 #define opcode GET_OPCODE(instruction)
 
-#define A  GETARG_A(instruction)
-#define B  GETARG_B(instruction)
-#define C  GETARG_C(instruction)
-#define Bx GETARG_Bx(instruction)
-#define R(i) task->stack.base[task->stack.top-1].reg_base[i]
-#define G(i) task->vglobal[i]
-#define K(i) task->vconst[i]
-#define PC task->pc
-#define EOC task->task_desc.inst_count /* end of code */
+#define A   GETARG_A(instruction)
+#define B   GETARG_B(instruction)
+#define C   GETARG_C(instruction)
+#define Bx  GETARG_Bx(instruction)
+#define sAx GETARG_sAx(instruction)
+#define R(i) (task->stack.base[task->stack.top-1].reg_base[i])
+#define G(i) (task->vglobal[i])
+#define K(i) (task->vconst[i])
 
 static void executor(void *plc_task) {
     PLCTask *task = (PLCTask *)plc_task;
@@ -26,12 +27,20 @@ static void executor(void *plc_task) {
         rt_task_wait_period(NULL);
         //TODO pre input
         for (PC = 0; PC < EOC; ) {
-            //LOGGER_DBG("PC = %d, OpCode = %d", PC, opcode);
+            LOGGER_DBG("instruction[%d] = %0#10x, OpCode = %d", PC, instruction, opcode);
             switch (opcode) {
-                case OP_GLOAD: R(A) = G(Bx); dump_value(R(A)); PC++; break; /* PC++ MUST be last */
-                case OP_KLOAD: R(A) = K(Bx); dump_value(R(A)); PC++; break;
-                case OP_HALT: PC = EOC; break;
-                default: LOGGER_DBG("Unknown opcode", 0); break;
+                case OP_GLOAD:  R(A) = G(Bx); dump_value("R(A)", R(A)); PC++; break; /* PC++ MUST be last */
+                case OP_GSTORE: G(Bx) = R(A); dump_value("G(Bx)", G(Bx)); PC++; break;
+                case OP_KLOAD:  R(A) = K(Bx); dump_value("R(A)", R(A)); PC++; break;
+                case OP_MOV:    R(A) = R(B); PC++; break;
+                case OP_ADD:    vadd(R(A), R(B), R(C)); dump_value("R(A)", R(A)); PC++; break;
+                case OP_SUB:    vsub(R(A), R(B), R(C)); PC++; break;
+                case OP_MUL:    vmul(R(A), R(B), R(C)); PC++; break;
+                case OP_DIV:    vdiv(R(A), R(B), R(C)); PC++; break;
+                case OP_MOD:    vmod(R(A), R(B), R(C)); PC++; break;
+                case OP_JMP:    PC += sAx; break;
+                case OP_HALT:   PC = EOC; break;
+                default: LOGGER_DBG("Unknown OpCode(%d)", opcode); break;
             }
         }
         //TODO post output
