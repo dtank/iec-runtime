@@ -36,12 +36,10 @@ typedef enum {
     OP_MUL,
     OP_DIV,
     OP_MOD,
-    /* compare opcode */
+    /* control opcode */
+    OP_EQ,
     OP_LT,
     OP_LE,
-    OP_GT,
-    OP_GE,
-    /* control opcode */
     OP_JMP,
     OP_HALT,
     /* call opcode */
@@ -75,15 +73,36 @@ typedef enum {
  * Instructoin Encoder Macro
  *---------------------------------------------------------------------------*/
 #define CREATE_ABC(o,a,b,c)	((cast(Instruction, o)<<POS_OP) \
-			| (cast(Instruction, a)<<POS_A) \
-			| (cast(Instruction, b)<<POS_B) \
+			| (cast(Instruction, a)<<POS_A)                 \
+			| (cast(Instruction, b)<<POS_B)                 \
 			| (cast(Instruction, c)<<POS_C))
 
 #define CREATE_ABx(o,a,bx)	((cast(Instruction, o)<<POS_OP) \
-			| (cast(Instruction, a)<<POS_A) \
+			| (cast(Instruction, a)<<POS_A)                 \
 			| (cast(Instruction, bx)<<POS_Bx))
 
-#define CREATE_sAx(o,sax)		((cast(Instruction, o)<<POS_OP) \
-			| (cast(Instruction, sax+BIAS_sAx)<<POS_sAx))
+/* sax == signed int */
+#define CREATE_sAx(o,sAx)		((cast(Instruction, o)<<POS_OP) \
+			| (cast(Instruction, sAx+BIAS_sAx)<<POS_sAx))
+
+#define CREATE_GLOAD(a, bx)  CREATE_ABx(OP_GLOAD, a, bx)
+#define CREATE_GSTORE(a, bx) CREATE_ABx(OP_GSTORE, a, bx)
+#define CREATE_KLOAD(a, bx)  CREATE_ABx(OP_KLOAD, a, bx)
+#define CREATE_MOV(a, b)     CREATE_ABC(OP_MOV, a, b, 0)
+
+#define CREATE_ADD(a, b, c)  CREATE_ABC(OP_ADD, a, b, c)
+#define CREATE_SUB(a, b, c)  CREATE_ABC(OP_SUB, a, b, c)
+#define CREATE_MUL(a, b, c)  CREATE_ABC(OP_MUL, a, b, c)
+#define CREATE_DIV(a, b, c)  CREATE_ABC(OP_DIV, a, b, c)
+#define CREATE_MOD(a, b, c)  CREATE_ABC(OP_MOD, a, b, c)
+
+#define CREATE_EQ(b, c)  CREATE_ABC(OP_EQ, 1, b, c)
+#define CREATE_LT(b, c)  CREATE_ABC(OP_LT, 1, b, c)
+#define CREATE_LE(b, c)  CREATE_ABC(OP_LE, 1, b, c)
+#define CREATE_NE(b, c)  CREATE_ABC(OP_EQ, 0, b, c)
+#define CREATE_GE(b, c)  CREATE_ABC(OP_LT, 0, b, c)
+#define CREATE_GT(b, c)  CREATE_ABC(OP_LE, 0, b, c)
+#define CREATE_JMP(sAx)  CREATE_sAx(OP_JMP, sAx)
+#define CREATE_HALT()  CREATE_ABC(OP_HALT, 0, 0, 0)
 
 #endif

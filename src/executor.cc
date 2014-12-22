@@ -38,7 +38,10 @@ static void executor(void *plc_task) {
                 case OP_MUL:    vmul(R(A), R(B), R(C)); PC++; break;
                 case OP_DIV:    vdiv(R(A), R(B), R(C)); PC++; break;
                 case OP_MOD:    vmod(R(A), R(B), R(C)); PC++; break;
-                case OP_JMP:    PC += sAx; break;
+                case OP_EQ:     if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
+                case OP_LT:     if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
+                case OP_LE:     if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
+                case OP_JMP:    PC += sAx; PC++; break; /* MUST follow EQ/LT/LE */
                 case OP_HALT:   PC = EOC; break;
                 default: LOGGER_DBG("Unknown OpCode(%d)", opcode); break;
             }

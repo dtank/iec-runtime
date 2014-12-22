@@ -10,8 +10,10 @@ map<string, OBJ_FILE> case_map;
 void init_case() {
     OBJ_FILE obj_case[] = {
         OBJ_ARITHMETIC,
+        OBJ_CONTROL,
     };
     case_map["arithmetic"] = obj_case[0];
+    case_map["control"] = obj_case[1];
 }
 
 int main(int argc, char* argv[]) {
