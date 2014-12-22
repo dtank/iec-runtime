@@ -7,7 +7,7 @@
 
 #define OBJ_ARITHMETIC {                                                               \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
-    {4000000, 0, 1, 0, 0}, /* io config */                                             \
+    {4000000, 0, 1, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
     {1, 4000000, { /* servo config */                                                  \
         {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
 		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
@@ -34,7 +34,7 @@
 
 #define OBJ_CONTROL {                                                                  \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
-    {4000000, 0, 1, 0, 0}, /* io config */                                             \
+    {4000000, 0, 1, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
     {1, 4000000, { /* servo config */                                                  \
         {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
 		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
@@ -60,4 +60,28 @@
         }},                                                                            \
     }                                                                                  \
 }
+#define OBJ_IO {                                                                  \
+    {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
+    {4000000, 2, 4, 1, 1, 2, 2, 0, 0}, /* io config */                                 \
+    {1, 4000000, { /* servo config */                                                  \
+        {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
+		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
+    }},                                                                                \
+    1, /* plc task count */                                                            \
+    {                                                                                  \
+        {{"task1", 80, TASK_TYPE_INTERVAL, 0, 100000000u,                              \
+          256, 1, 2, 2, 1, 4},{ /* sp_size, pouc, constc, globalc, *INSTC*, sframec */ \
+            {"main", 0, 0, 3, 0}, /* name, in, out, local, addr */                     \
+        },{                                                                            \
+            {TINT,{1}}, /* K(0) */                                                     \
+            {TINT,{2}}, /* K(1) */                                                     \
+        },{                                                                            \
+            {TINT,{0}}, /* G(0) */                                                     \
+            {TINT,{0}}, /* G(1) */                                                     \
+        },{ /* instructions */                                                         \
+            CREATE_HALT(),                                                             \
+        }},                                                                            \
+    }                                                                                  \
+}
+
 #endif

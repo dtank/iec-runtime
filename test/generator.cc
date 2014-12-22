@@ -20,6 +20,10 @@ void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs) {
 	fwrite(&iocs->ldo_count, sizeof(iocs->ldo_count), 1, fp);
 	fwrite(&iocs->lai_count, sizeof(iocs->lai_count), 1, fp);
 	fwrite(&iocs->lao_count, sizeof(iocs->lao_count), 1, fp);
+	fwrite(&iocs->rdi_count, sizeof(iocs->rdi_count), 1, fp);
+	fwrite(&iocs->rdo_count, sizeof(iocs->rdo_count), 1, fp);
+	fwrite(&iocs->rai_count, sizeof(iocs->rai_count), 1, fp);
+	fwrite(&iocs->rao_count, sizeof(iocs->rao_count), 1, fp);
 }
 /*-----------------------------------------------------------------------------
  * Servo Configuration Segment Generator

@@ -2,19 +2,15 @@
 #define __SYSLIMIT_H__
 
 /* I/O Limitations */
-#define MAX_LDI_COUNT 1
-#define MAX_LDO_COUNT 1
+#define MAX_LDI_COUNT 4
+#define MAX_LDO_COUNT 4
 #define MAX_LAI_COUNT 1
 #define MAX_LAO_COUNT 1
+#define MAX_RDI_COUNT 2
+#define MAX_RDO_COUNT 2
+#define MAX_RAI_COUNT 1
+#define MAX_RAO_COUNT 1
 #define MIN_IO_INTERVAL 2000000 /* unit: ns */
-#define LDI_WORDSIZE 4 /* unit: Byte */
-#define LDO_WORDSIZE 4 /* unit: Byte */
-#define LAI_WORDSIZE 4 /* unit: Byte */
-#define LAO_WORDSIZE 4 /* unit: Byte */
-#define MAX_IO_MEM_SIZE (MAX_LDI_COUNT*LDI_WORDSIZE + \
-        MAX_LDO_COUNT*LDO_WORDSIZE + \
-        MAX_LAI_COUNT*LAI_WORDSIZE + \
-        MAX_LAO_COUNT*LAO_WORDSIZE)
 
 /* Servo Limitations */
 #define MAX_AXIS_COUNT 8

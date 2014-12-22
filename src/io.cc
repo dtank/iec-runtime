@@ -1,38 +1,96 @@
 #include <native/task.h>
 #include <native/heap.h>
+#include <string.h>
 #include "io.h"
 #include "logger.h"
 
 static RT_TASK io_task;
-RT_HEAP io_heap_desc;
-char *io_shm;
+/* RT_HEAP MUST be separated */
+RT_HEAP diu_heap;
+RT_HEAP dou_heap;
+RT_HEAP aiu_heap;
+RT_HEAP aou_heap;
+IOMem g_ioshm;
 extern ec_map_t ec_msg;
 
-static void local_di_update(IOConfig *config) {
-    LOGGER_INF("STUB: io_shm .local_di = %d", *(uint32_t *)&io_shm[LDI_ADDR_OFFSET]);
-}
+#define LDI_COUNT (config->ldi_count)
+#define LDO_COUNT (config->ldo_count)
+#define LAI_COUNT (config->lai_count)
+#define LAO_COUNT (config->lao_count)
+#define RDI_COUNT (config->rdi_count)
+#define RDO_COUNT (config->rdo_count)
+#define RAI_COUNT (config->rai_count)
+#define RAO_COUNT (config->rao_count)
 
-static void local_do_update(IOConfig *config) {
-    LOGGER_INF("STUB: io_shm .local_do = %d", *(uint32_t *)&io_shm[LDO_ADDR_OFFSET]);
-}
+#define LDI_SIZE (LDI_COUNT * DU_SIZE)
+#define LDO_SIZE (LDO_COUNT * DU_SIZE)
+#define LAI_SIZE (LAI_COUNT * AU_SIZE)
+#define LAO_SIZE (LAO_COUNT * AU_SIZE)
+#define RDI_SIZE (RDI_COUNT * DU_SIZE)
+#define RDO_SIZE (RDO_COUNT * DU_SIZE)
+#define RAI_SIZE (RAI_COUNT * AU_SIZE)
+#define RAO_SIZE (RAO_COUNT * AU_SIZE)
 
-static void local_ai_update(IOConfig *config) {
-    LOGGER_INF("STUB: io_shm .local_ai = %d", *(uint32_t *)&io_shm[LAI_ADDR_OFFSET]);
-}
+#define LDI_BASE 0
+#define RDI_BASE (LDI_BASE+LDI_COUNT*DU_SIZE)
+#define LDO_BASE 0
+#define RDO_BASE (LDO_BASE+LDO_COUNT*DU_SIZE)
+#define LAI_BASE 0
+#define RAI_BASE (LAI_BASE+LAI_COUNT*AU_CHANNELS)
+#define LAO_BASE 0
+#define RAO_BASE (LAO_BASE+LAO_COUNT*AU_CHANNELS)
 
-static void local_ao_update(IOConfig *config) {
-    LOGGER_INF("STUB: io_shm .local_ao = %d", *(uint32_t *)&io_shm[LAO_ADDR_OFFSET]);
-}
+#define DIU_COUNT (LDI_COUNT + RDI_COUNT)
+#define DOU_COUNT (LDO_COUNT + RDO_COUNT)
+#define AIU_COUNT (LAI_COUNT + RAI_COUNT)
+#define AOU_COUNT (LAO_COUNT + RAO_COUNT)
 
-static void io_update(void *config) {
-    IOConfig *io_config = (IOConfig *)config;
-	rt_task_set_periodic(NULL, TM_NOW, io_config->update_interval);
+#define DIU_SIZE (DIU_COUNT * DU_SIZE)
+#define DOU_SIZE (DOU_COUNT * DU_SIZE)
+#define AIU_SIZE (AIU_COUNT * AU_SIZE)
+#define AOU_SIZE (AOU_COUNT * AU_SIZE)
+
+#define IO_SHM_SIZE (DIU_SIZE + DOU_SIZE + AIU_SIZE + AOU_SIZE)
+
+
+
+static inline void ldi_update(IOConfig *config) {
+    dump_mem("LDI", &g_ioshm.diu[LDI_BASE], LDI_SIZE);
+}
+static inline void ldo_update(IOConfig *config) {
+    dump_mem("LDO", &g_ioshm.dou[LDO_BASE], LDO_SIZE);
+}
+static inline void lai_update(IOConfig *config) {
+    dump_mem("LAI", &g_ioshm.aiu[LAI_BASE], LAI_SIZE);
+}
+static inline void lao_update(IOConfig *config) {
+    dump_mem("LAO", &g_ioshm.aou[LAO_BASE], LAO_SIZE);
+}
+static inline void rdi_update(IOConfig *config) {
+    dump_mem("RDI", &g_ioshm.diu[RDI_BASE], RDI_SIZE);
+}
+static inline void rdo_update(IOConfig *config) {
+    dump_mem("RDO", &g_ioshm.dou[RDO_BASE], RDO_SIZE);
+}
+static inline void rai_update(IOConfig *config) {
+    dump_mem("RAI", &g_ioshm.aiu[RAI_BASE], RAI_SIZE);
+}
+static inline void rao_update(IOConfig *config) {
+    dump_mem("RAO", &g_ioshm.aou[RAO_BASE], RAO_SIZE);
+}
+static void io_update(void *io_config) {
+    IOConfig *config = (IOConfig *)io_config;
+	rt_task_set_periodic(NULL, TM_NOW, config->update_interval);
 	while (1) {
 		rt_task_wait_period(NULL);
-		if (io_config->ldi_count != 0 ) local_di_update(io_config);
-		if (io_config->ldo_count != 0 ) local_do_update(io_config);
-		if (io_config->lai_count != 0 ) local_ai_update(io_config);
-		if (io_config->lao_count != 0 ) local_ao_update(io_config);
+        if (config->ldi_count != 0 ) ldi_update(config);
+        if (config->ldo_count != 0 ) ldo_update(config);
+        if (config->lai_count != 0 ) lai_update(config);
+        if (config->lao_count != 0 ) lao_update(config);
+        if (config->rdi_count != 0 ) rdi_update(config);
+        if (config->rdo_count != 0 ) rdo_update(config);
+        if (config->rai_count != 0 ) rai_update(config);
+        if (config->rao_count != 0 ) rao_update(config);
 	}
 }
 
@@ -43,10 +101,21 @@ static void io_task_create() {
 }
 
 void io_task_init(IOConfig *config) {
-    int size = config->ldi_count * LDI_WORDSIZE + config->ldo_count * LDO_WORDSIZE +
-        config->lai_count * LAI_WORDSIZE + config->lao_count * LAO_WORDSIZE;
-    rt_heap_create(&io_heap_desc, "io_shm", size, H_SHARED);
-    rt_heap_alloc(&io_heap_desc, size, TM_INFINITE, (void **)&io_shm);
+    rt_heap_create(&diu_heap, "diu_shm", DIU_SIZE, H_SHARED);
+    rt_heap_create(&dou_heap, "dou_shm", DOU_SIZE, H_SHARED);
+    rt_heap_create(&aiu_heap, "aiu_shm", AIU_SIZE, H_SHARED);
+    rt_heap_create(&aou_heap, "aou_shm", AOU_SIZE, H_SHARED);
+    rt_heap_alloc(&diu_heap, DIU_SIZE, TM_INFINITE, (void **)&g_ioshm.diu);
+    rt_heap_alloc(&dou_heap, DOU_SIZE, TM_INFINITE, (void **)&g_ioshm.dou);
+    rt_heap_alloc(&aiu_heap, AIU_SIZE, TM_INFINITE, (void **)&g_ioshm.aiu);
+    rt_heap_alloc(&aou_heap, AOU_SIZE, TM_INFINITE, (void **)&g_ioshm.aou);
+    /* clear up i/o shm*/
+    memset(g_ioshm.diu, 0, DIU_SIZE);
+    memset(g_ioshm.dou, 0, DOU_SIZE);
+    memset(g_ioshm.aiu, 0, AIU_SIZE);
+    memset(g_ioshm.aou, 0, AOU_SIZE);
+    LOGGER_DBG("I/O SHM:\n .total_size = %d\n .diu_size = %d\n .dou_size = %d\n .aiu_size = %d\n .aou_size = %d",
+        IO_SHM_SIZE, DIU_SIZE, DOU_SIZE, AIU_SIZE, AOU_SIZE);
     io_task_create();
 }
 void io_task_start(IOConfig *config) {

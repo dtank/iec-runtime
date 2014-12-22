@@ -46,6 +46,10 @@ typedef struct {
 	uint8_t ldo_count;        /* number of local digital output module */
 	uint8_t lai_count;        /* number of local analog input module */
 	uint8_t lao_count;        /* number of local analog output module */
+	uint8_t rdi_count;        /* number of local digital input module */
+	uint8_t rdo_count;        /* number of local digital output module */
+	uint8_t rai_count;        /* number of local analog input module */
+	uint8_t rao_count;        /* number of local analog output module */
 } OBJ_IOCS; /* I/O Configuration Segment */
 
 /*-----------------------------------------------------------------------------

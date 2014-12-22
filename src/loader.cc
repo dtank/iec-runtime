@@ -51,9 +51,15 @@ int load_io_config(FILE *fp, IOConfig *io_config) {
     verify(MAX_LDO_COUNT < io_config->ldo_count, EC_LDO_COUNT, "");
     verify(MAX_LAI_COUNT < io_config->lai_count, EC_LAI_COUNT, "");
     verify(MAX_LAO_COUNT < io_config->lao_count, EC_LAO_COUNT, "");
+    verify(MAX_RDI_COUNT < io_config->rdi_count, EC_RDI_COUNT, "");
+    verify(MAX_RDO_COUNT < io_config->rdo_count, EC_RDO_COUNT, "");
+    verify(MAX_RAI_COUNT < io_config->rai_count, EC_RAI_COUNT, "");
+    verify(MAX_RAO_COUNT < io_config->rao_count, EC_RAO_COUNT, "");
 	LOGGER_DBG(
-		"IOConfig:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n .lao_count = %d",
-		io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count, io_config->lao_count);
+		"IOConfig:\n .update_interval = %d\n .ldi_count = %d\n .ldo_count = %d\n .lai_count = %d\n"
+        " .lao_count = %d\n .rdi_count = %d\n .rdo_count = %d\n .rai_count = %d\n .rao_count = %d",
+		io_config->update_interval, io_config->ldi_count, io_config->ldo_count, io_config->lai_count,
+        io_config->lao_count, io_config->rdi_count, io_config->rdo_count, io_config->rai_count, io_config->rao_count);
 	return 0;
 }
 /*-----------------------------------------------------------------------------

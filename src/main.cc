@@ -17,7 +17,7 @@ void sys_init() {
     FILE *fplc = fopen("plc.bin", "rb");
     verify_obj(fplc);
     load_io_config(fplc, &io_config);
-    //io_task_init(&io_config);
+    io_task_init(&io_config);
     load_servo_config(fplc, &servo_config);
     //servo_task_init(&servo_config);
     load_task_list(fplc, &plc_task);
@@ -25,7 +25,7 @@ void sys_init() {
 	fclose(fplc);
 }
 void sys_start() {
-    //io_task_start(&io_config);
+    io_task_start(&io_config);
     //servo_task_start(&servo_config);
     plc_task_start(&plc_task);
 }
