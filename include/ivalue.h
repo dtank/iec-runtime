@@ -109,17 +109,17 @@ typedef struct Value {
 #define is_le(a, b) (is_eqt(a, b) && is_lev(a, b))
 
 #if LEVEL_DBG <= LOGGER_LEVEL
-    #define dump_value(s, v)                                                       \
-    do {                                                                           \
-        switch (type(v)) {                                                         \
-            case TINT:                                                             \
-                LOGGER_DBG(s " = %d(int)", vint(v)); break;                        \
-            case TDOUBLE:                                                          \
-                LOGGER_DBG(s " = %f(double)", vdouble(v)); break;                  \
-            case TSTRING:                                                          \
-                LOGGER_DBG(s " = %s(length = %d)", vstrstr(v), vstrlen(v)); break; \
-            default: LOGGER_DBG("Unknown Value Type(%d)", type(v)); break;         \
-        }                                                                          \
+    #define dump_value(s, v)                                                            \
+    do {                                                                                \
+        switch (type(v)) {                                                              \
+            case TINT:                                                                  \
+                fprintf(stderr, s " = %d(int)\n", vint(v)); break;                        \
+            case TDOUBLE:                                                               \
+                fprintf(stderr, s " = %f(double)\n", vdouble(v)); break;                  \
+            case TSTRING:                                                               \
+                fprintf(stderr, s " = %s(length = %d)\n", vstrstr(v), vstrlen(v)); break; \
+            default: fprintf(stderr, "Unknown Value Type(%d)\n", type(v)); break;         \
+        }                                                                               \
     } while(0)
 #else
     #define dump_value(value)

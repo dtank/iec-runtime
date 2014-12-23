@@ -133,7 +133,7 @@ void io_task_init(IOConfig *config) {
     memset(g_ioshm.aou, 0, AOU_SIZE);
 
 
-    LOGGER_DBG("I/O SHM:\n .total_size = %d\n .diu_size = %d\n .dou_size = %d\n .aiu_size = %d\n .aou_size = %d",
+    LOGGER_DBG(DFLAG_LONG, "I/O SHM:\n .total_size = %d\n .diu_size = %d\n .dou_size = %d\n .aiu_size = %d\n .aou_size = %d",
         IO_SHM_SIZE, DIU_SIZE, DOU_SIZE, AIU_SIZE, AOU_SIZE);
     io_task_create();
 }

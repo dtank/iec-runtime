@@ -32,7 +32,7 @@ static void executor(void *plc_task) {
         //TODO ADD LOCK!!
         io_memcpy(iomem, g_ioshm);
         for (PC = 0; PC < EOC; ) {
-            LOGGER_DBG("instruction[%d] = %0#10x, OpCode = %d", PC, instruction, opcode);
+            LOGGER_DBG(DFLAG_SHORT, "instruction[%d] = %0#10x, OpCode = %d", PC, instruction, opcode);
             switch (opcode) {
                 case OP_GLOAD:  R(A) = G(Bx); dump_value("R(A)", R(A)); PC++; break; /* PC++ MUST be last */
                 case OP_GSTORE: G(Bx) = R(A); dump_value("G(Bx)", G(Bx)); PC++; break;
@@ -52,7 +52,7 @@ static void executor(void *plc_task) {
                 case OP_LEJ:    if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
                 case OP_JMP:    PC += sAx; PC++; break; /* MUST follow EQ/LT/LE */
                 case OP_HALT:   PC = EOC; break;
-                default: LOGGER_DBG("Unknown OpCode(%d)", opcode); break;
+                default: LOGGER_DBG(DFLAG_SHORT, "Unknown OpCode(%d)", opcode); break;
             }
         }
         //TODO ADD LOCK!!

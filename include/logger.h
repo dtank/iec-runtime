@@ -15,34 +15,55 @@ using namespace std;
 #define LEVEL_ALL 5
 
 #define LOGGER_LEVEL LEVEL_ALL
+/*-----------------------------------------------------------------------------
+ * Assert Macro (for debug version)
+ *---------------------------------------------------------------------------*/
 #if LOGGER_LEVEL < LEVEL_DBG
     #define NDEBUG
 #endif
 #include <assert.h>
-
-#define LOGGER_DBG(msg, ...)                                                                             \
-    do {                                                                                                 \
-        if (LOGGER_LEVEL >= LEVEL_DBG) {                                                                 \
+/*-----------------------------------------------------------------------------
+ * Debug Macro (for debug version)
+ *---------------------------------------------------------------------------*/
+#define DFLAG_SHORT 1
+#define DFLAG_LONG  2
+#if LEVEL_DBG <= LOGGER_LEVEL
+    #define LOGGER_DBG(flag, msg, ...)                                                \
+    do {                                                                              \
+        if (flag == DFLAG_LONG)                                                       \
             fprintf(stderr, "TRACE: " __FILE__ ":%d %s()\n", __LINE__, __FUNCTION__); \
-            fprintf(stderr, msg, __VA_ARGS__);                                                           \
-            fprintf(stderr, "\n"); }                                                                     \
+        fprintf(stderr, msg, __VA_ARGS__);                                            \
+        fprintf(stderr, "\n");                                                        \
     } while(0)
-
-#define LOGGER_ERR(code, ...)                                                                            \
-    do {                                                                                                 \
-        if (LOGGER_LEVEL >= LEVEL_ERR) {                                                                 \
-            fprintf(stderr, "ERROR CODE %d: ", code);                                                    \
-            fprintf(stderr, ec_msg[code]);                                                               \
-            fprintf(stderr, __VA_ARGS__);                                                                \
-            fprintf(stderr, "...\n"); }                                                                  \
+#else
+    #define LOGGER_DBG(flag, msg, ...)
+#endif
+/*-----------------------------------------------------------------------------
+ * Error Check Macro (for released version)
+ *---------------------------------------------------------------------------*/
+#if LEVEL_ERR <= LOGGER_LEVEL
+    #define LOGGER_ERR(code, ...)                 \
+    do {                                          \
+        fprintf(stderr, "Error Code %d: ", code); \
+        fprintf(stderr, ec_msg[code]);            \
+        fprintf(stderr, __VA_ARGS__);             \
+        fprintf(stderr, "...\n");                 \
     } while(0)
-
-#define LOGGER_INF(msg, ...)                                                                             \
-    do {                                                                                                 \
-        if (LOGGER_LEVEL >= LEVEL_INF) {                                                                 \
-            fprintf(stderr, msg, __VA_ARGS__);                                                           \
-            fprintf(stderr, "\n"); }                                                                     \
+#else
+    #define LOGGER_ERR(code, ...)
+#endif
+/*-----------------------------------------------------------------------------
+ * Tips Information Macro (for released version)
+ *---------------------------------------------------------------------------*/
+#if LEVEL_INF <= LOGGER_LEVEL
+    #define LOGGER_INF(msg, ...)           \
+    do {                                   \
+        fprintf(stderr, msg, __VA_ARGS__); \
+        fprintf(stderr, "\n");             \
     } while(0)
+#else
+    #define LOGGER_INF(msg, ...)
+#endif
 
 enum ERROR_CODE {
     /* Basic Error Code*/

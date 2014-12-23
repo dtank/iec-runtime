@@ -45,11 +45,10 @@ typedef struct {
 }
 #if LEVEL_DBG <= LOGGER_LEVEL
     #define dump_mem(name, base, size) {                     \
-        fprintf(stderr, name ":");                           \
+        fprintf(stderr, name "(low -> high):");              \
         for (int i = 0; i < (size); i++) {                   \
-            if (i % 16 == 0) {                               \
+            if (i % 16 == 0)                                 \
                 fprintf(stderr, "\n");                       \
-            }                                                \
             fprintf(stderr, "%02x ", ((uint8_t*)(base))[i]); \
         }                                                    \
         fprintf(stderr, "\n");                               \

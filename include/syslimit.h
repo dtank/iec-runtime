@@ -2,8 +2,8 @@
 #define __SYSLIMIT_H__
 
 /* I/O Limitations */
-#define MAX_LDI_COUNT 4
-#define MAX_LDO_COUNT 4
+#define MAX_LDI_COUNT 6
+#define MAX_LDO_COUNT 6
 #define MAX_LAI_COUNT 1
 #define MAX_LAO_COUNT 1
 #define MAX_RDI_COUNT 2
