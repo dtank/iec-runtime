@@ -12,6 +12,8 @@
 #define LEVEL_ALL 5
 
 #define LOGGER_LEVEL LEVEL_ALL
+
+#define EOL {fprintf(stderr, "\n");}
 /*-----------------------------------------------------------------------------
  * Assert Macro (for debug version)
  *---------------------------------------------------------------------------*/
@@ -62,7 +64,7 @@
     #define LOGGER_INF(msg, ...)
 #endif
 
-/* order sensitive */
+/* ORDER SENSITIVE */
 enum ErrorCode {
     /* Basic Error Code*/
     EC_PLC_FILE,

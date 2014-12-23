@@ -67,7 +67,7 @@ static int load_axis_config(FILE *fp, AxisConfig *axis_config) {
     assert(fp != NULL);
     assert(axis_config != NULL);
 
-    /* order sensitive */
+    /* ORDER SENSITIVE */
     loadvs(fp, axis_config->name, MAX_AXIS_NAME_SIZE);
     loadv(fp, &axis_config->is_combined);
     loadv(fp, &axis_config->node_id);
@@ -99,7 +99,7 @@ int load_servo_config(FILE *fp, ServoConfig *servo_config) {
     assert(fp != NULL);
     assert(servo_config != NULL);
 
-    /* order sensitive */
+    /* ORDER SENSITIVE */
     loadv(fp, &servo_config->axis_count);
     loadv(fp, &servo_config->update_interval);
     verify(MAX_AXIS_COUNT < servo_config->axis_count, EC_AXIS_COUNT, "");
@@ -124,7 +124,7 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     assert(fp != NULL);
     assert(task_desc != NULL);
 
-    /* order sensitive */
+    /* ORDER SENSITIVE */
     loadvs(fp, task_desc->name, MAX_TASK_NAME_SIZE);
     loadv(fp, &task_desc->priority);
     loadv(fp, &task_desc->type);
@@ -155,7 +155,7 @@ static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
     assert(fp != NULL);
     assert(pou_desc != NULL);
 
-    /* order sensitive */
+    /* ORDER SENSITIVE */
     loadvs(fp, pou_desc->name, MAX_POU_NAME_SIZE);
     loadv(fp, &pou_desc->input_count);
     loadv(fp, &pou_desc->output_count);
@@ -259,7 +259,7 @@ int load_task_list(FILE *fp, TaskList *task_list) {
     assert(fp != NULL);
     assert(task_list != NULL);
 
-    /* order sensitive */
+    /* ORDER SENSITIVE */
     loadv(fp, &task_list->task_count);
     verify(MAX_TASK_COUNT < task_list->task_count, EC_TASK_COUNT, "");
     task_list->rt_task = new RT_TASK[task_list->task_count];

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "helper.h"
 #include "logger.h"
 
 /* Internal Value Type Tag */
@@ -60,7 +61,7 @@ typedef struct Value {
 #define setvdouble(value, data_d) {(value).v.value_d = (data_d);}
 #define setvstring(value, data_s) {(value).v.value_s = (data_s);}
 /*-----------------------------------------------------------------------------
- * Arithmetic Macro
+ * arithmetic Macro
  * Premise:
  *     1) verifier has checked type error already
  *     2) int & double type only
@@ -68,7 +69,7 @@ typedef struct Value {
  *     1) set type
  *     2) set result value
  *---------------------------------------------------------------------------*/
-#define arith(op, a, b, c) { /* a = b op c */  \
+#define arith3v(op, a, b, c) { /* a = b op c */\
     if (isint(b)) {                            \
         settint(a);                            \
         vint(a) = vint(b) op vint(c);          \
@@ -77,11 +78,27 @@ typedef struct Value {
         vdouble(a) = vdouble(b) op vdouble(c); \
     }                                          \
 }
-#define vadd(a, b, c) arith(+, a, b, c)
-#define vsub(a, b, c) arith(-, a, b, c)
-#define vmul(a, b, c) arith(*, a, b, c)
-#define vdiv(a, b, c) arith(/, a, b, c)
+#define vadd(a, b, c) arith3v(+, a, b, c)
+#define vsub(a, b, c) arith3v(-, a, b, c)
+#define vmul(a, b, c) arith3v(*, a, b, c)
+#define vdiv(a, b, c) arith3v(/, a, b, c)
 #define vmod(a, b, c) {vint(a) = vint(b) % vint(c);} /* int type only */
+
+#define arith2vi(op, a, b) {          \
+    settint(a);                       \
+    vint(a) = cast(int, op(vint(b))); \
+}
+#define arith2vd(op, a, b) {                   \
+    settdouble(a);                             \
+    vdouble(a) = cast(double, op(vdouble(b))); \
+}
+#define arith2v(op, a, b) { /* a = op(b) */ \
+    if (isint(b)) {                         \
+        arith2vi(op, a, b);                 \
+    } else if (isdouble(b)) {               \
+        arith2vd(op, a, b);                 \
+    }                                       \
+}
 /*-----------------------------------------------------------------------------
  * Comparation Macro
  * Premise:
@@ -113,12 +130,12 @@ typedef struct Value {
     do {                                                                                \
         switch (type(v)) {                                                              \
             case TINT:                                                                  \
-                fprintf(stderr, s " = %d(int)\n", vint(v)); break;                        \
+                fprintf(stderr, s " [%d(int)]", vint(v)); break;                        \
             case TDOUBLE:                                                               \
-                fprintf(stderr, s " = %f(double)\n", vdouble(v)); break;                  \
+                fprintf(stderr, s " [%f(double)]", vdouble(v)); break;                  \
             case TSTRING:                                                               \
-                fprintf(stderr, s " = %s(length = %d)\n", vstrstr(v), vstrlen(v)); break; \
-            default: fprintf(stderr, "Unknown Value Type(%d)\n", type(v)); break;         \
+                fprintf(stderr, s " [%s(length = %d)]", vstrstr(v), vstrlen(v)); break; \
+            default: fprintf(stderr, "Unknown Value Type(%d)", type(v)); break;         \
         }                                                                               \
     } while(0)
 #else

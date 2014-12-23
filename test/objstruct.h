@@ -103,8 +103,8 @@ typedef struct {
 typedef struct {
     uint8_t type;
     union {
-        int32_t value_i;
         double value_d;
+        int32_t value_i;
         struct {
             uint32_t length; /* '\0' included */
             char str[MAX_STR_LENGTH];
@@ -132,4 +132,9 @@ typedef struct {
     OBJ_PTS task[MAX_TASK_COUNT];
 } OBJ_FILE;
 
+enum SPOU_ID {
+    /* Numerical Functions */
+    SFUN_ABS = 0,
+    SFUN_SQRT,
+};
 #endif

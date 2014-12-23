@@ -74,7 +74,7 @@ typedef struct {
     uint8_t output_count;         /* number of output parameters */
     uint8_t local_count;          /* number of local parameters */
     uint32_t addr;                /* POU address(AKA index of instruction) */
-} POUDesc; /* POU Descriptor */
+} POUDesc; /* User-level POU Descriptor */
 
 typedef struct {
     TaskDesc task_desc; /* PLC task descriptor */

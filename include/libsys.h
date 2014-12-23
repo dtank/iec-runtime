@@ -1,29 +1,32 @@
 #ifndef __LIBSYS_H__
 #define __LIBSYS_H__
 
-/* Arithmetic */
-void std_add(void *in1, void *in2, void *out);
-void std_sub(void *in1, void *in2, void *out);
-void std_mul(void *in1, void *in2, void *out);
-void std_div(void *in1, void *in2, void *out);
-void std_mov(void *in, void *out);
-/* Comparation */
-void std_gt(void *in1, void *in2, void *out);
-void std_lt(void *in1, void *in2, void *out);
-void std_eq(void *in1, void *in2, void *out);
-/* Mathematics */
-void std_abs(void *in, void *out);
-void std_sqrt(void *in, void *out);
-void std_sin(void *in, void *out);
-void std_cos(void *in, void *out);
-void std_tan(void *in, void *out);
-/* Bit Operation */
-void std_shl(void *in, void *n, void *out);
-void std_shr(void *in, void *n, void *out);
-void std_and(void *in1, void *in2, void *out);
-void std_or(void *in1, void *in2, void *out);
-void std_xor(void *in1, void *in2, void *out);
-void std_not(void *in, void *out);
+#include <stdint.h>
+#include "ivalue.h"
+
+#define MAX_SPOU_NAME_SIZE 20
+typedef struct {
+    char name[MAX_SPOU_NAME_SIZE];
+    uint8_t input_count;
+    uint8_t output_count;
+    void (*addr)(IValue*);
+} SPOUDesc; /* System-level POU(Library) descriptor */
+
+/* ORDER SENSITIVE */
+enum SPOU_ID {
+    /* Numerical Functions */
+    SFUN_ABS = 0,
+    SFUN_SQRT,
+};
+
+/* Numerical Functions */
+void sfun_abs(IValue *reg_base);
+void sfun_sqrt(IValue *reg_base);
+
+static const SPOUDesc spou_desc[] = {
+    /* Numerical Functions */
+    {"SFUN_ABS", 1, 1, sfun_abs},
+    {"SFUN_SQRT", 1, 1, sfun_sqrt},
+};
 
 #endif
-

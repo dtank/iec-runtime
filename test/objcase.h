@@ -88,4 +88,32 @@
     }                                                                                  \
 }
 
+#define OBJ_NUMFUN {                                                                       \
+    {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
+    {8000000, 0, 6, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
+    {1, 8000000, { /* servo config */                                                  \
+        {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
+		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
+    }},                                                                                \
+    1, /* plc task count */                                                            \
+    {                                                                                  \
+        {{"task1", 80, TASK_TYPE_INTERVAL, 0, 100000000u,                              \
+          256, 1, 2, 2, 5, 4},{ /* sp_size, pouc, constc, globalc, *INSTC*, sframec */ \
+            {"main", 0, 0, 3, 0}, /* name, in, out, local, addr */                     \
+        },{                                                                            \
+            {TDOUBLE,{4.0}}, /* K(0) */                                                     \
+            {TDOUBLE,{16.0}}, /* K(1) */                                                     \
+        },{                                                                            \
+            {TINT,{0}}, /* G(0) */                                                     \
+            {TINT,{0}}, /* G(1) */                                                     \
+        },{ /* instructions */                                                         \
+            CREATE_KLOAD(0, 0),  /* R(0) <- K(0) */                                    \
+            CREATE_KLOAD(1, 1),  /* R(1) <- K(1) */                                    \
+            CREATE_SCALL(1, SFUN_SQRT), /* R(1)=REGI; R(2)=REGO */                                   \
+            CREATE_GSTORE(2, 0), /* R(2) -> G(0) */                                    \
+            CREATE_HALT(),                                                             \
+        }},                                                                            \
+    }                                                                                  \
+}
+
 #endif

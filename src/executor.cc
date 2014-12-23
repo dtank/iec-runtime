@@ -2,6 +2,7 @@
 #include "ivalue.h"
 #include "opcode.h"
 #include "io.h"
+#include "libsys.h"
 #include "logger.h"
 
 extern IOConfig g_ioconfig;
@@ -21,6 +22,28 @@ extern IOMem g_ioshm;
 #define G(i) (task->vglobal[i])
 #define K(i) (task->vconst[i])
 
+#define SPOU(i) (spou_desc[i].addr)
+
+#if LEVEL_DBG <= LOGGER_LEVEL
+    #define dump_opcode(i) {fprintf(stderr, #i ": ");}
+    #define dump_data(s, i, v) { \
+        fprintf(stderr, #s "(%d)", i); \
+        dump_value("", v);\
+    }
+    #define dump_R(i) dump_data(R, i, R(i))
+    #define dump_G(i) dump_data(G, i, G(i))
+    #define dump_K(i) dump_data(K, i, K(i))
+    /* data mov instruction */
+    #define dump_dminst(i, s1, i1, s2, i2) {\
+        dump_opcode(i);\
+        dump_##s1(i1);\
+        fprintf(stderr, " <- ");\
+        dump_##s2(i2);\
+        fprintf(stderr, "\n");\
+    }
+#else
+    #define dump_reg2(i, r1, r2)
+#endif
 static void executor(void *plc_task) {
     PLCTask *task = (PLCTask *)plc_task;
     rt_task_set_periodic(NULL, TM_NOW, task->task_desc.interval);
@@ -33,14 +56,14 @@ static void executor(void *plc_task) {
         for (PC = 0; PC < EOC; ) {
             LOGGER_DBG(DFLAG_SHORT, "instruction[%d] = %0#10x, OpCode = %d", PC, instruction, opcode);
             switch (opcode) {
-                case OP_GLOAD:  R(A) = G(Bx); dump_value("R(A)", R(A)); PC++; break; /* PC++ MUST be last */
-                case OP_GSTORE: G(Bx) = R(A); dump_value("G(Bx)", G(Bx)); PC++; break;
-                case OP_KLOAD:  R(A) = K(Bx); dump_value("R(A)", R(A)); PC++; break;
+                case OP_GLOAD:  R(A) = G(Bx); dump_dminst(GLOAD, R, A, G, Bx); PC++; break; /* PC++ MUST be last */
+                case OP_GSTORE: G(Bx) = R(A); dump_dminst(GSTORE, G, Bx, R, A); PC++; break;
+                case OP_KLOAD:  R(A) = K(Bx); dump_dminst(KLOAD, R, A, K, Bx); PC++; break;
                 case OP_DLOAD:  setvint(R(A), getdch(iomem.diu, B, C)); PC++; break;
                 case OP_DSTORE: setdch(iomem.dou, B, C, R(A).v.value_i); PC++; break;
                 case OP_ALOAD:  setvint(R(A), getach(iomem.aiu, B, C)); PC++; break;
                 case OP_ASTORE: setach(iomem.aou, B, C, R(A).v.value_i); PC++; break;
-                case OP_MOV:    R(A) = R(B); PC++; break;
+                case OP_MOV:    R(A) = R(B); dump_dminst(MOV, R, A, R, B); PC++; break;
                 case OP_ADD:    vadd(R(A), R(B), R(C)); dump_value("R(A)", R(A)); PC++; break;
                 case OP_SUB:    vsub(R(A), R(B), R(C)); PC++; break;
                 case OP_MUL:    vmul(R(A), R(B), R(C)); PC++; break;
@@ -51,6 +74,7 @@ static void executor(void *plc_task) {
                 case OP_LEJ:    if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
                 case OP_JMP:    PC += sAx; PC++; break; /* MUST follow EQ/LT/LE */
                 case OP_HALT:   PC = EOC; break;
+                case OP_SCALL:  SPOU(Bx)(&R(A)); PC++; break;
                 default: LOGGER_DBG(DFLAG_SHORT, "Unknown OpCode(%d)", opcode); break;
             }
         }
