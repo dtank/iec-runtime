@@ -1,6 +1,5 @@
 #include <native/task.h>
 #include <native/heap.h>
-#include <string.h>
 #include "io.h"
 #include "logger.h"
 
@@ -53,6 +52,20 @@ extern ec_map_t ec_msg;
 #define IO_SHM_SIZE (DIU_SIZE + DOU_SIZE + AIU_SIZE + AOU_SIZE)
 
 
+void iomem_init(IOMem *iomem, IOConfig *config) {
+    assert(iomem != NULL);
+    assert(config != NULL);
+
+    iomem->diu_size = DIU_SIZE;
+    iomem->dou_size = DOU_SIZE;
+    iomem->aiu_size = AIU_SIZE;
+    iomem->aou_size = AOU_SIZE;
+    iomem->diu = new uint8_t[DIU_SIZE];
+    iomem->dou = new uint8_t[DOU_SIZE];
+    iomem->aiu = new uint32_t[AIU_SIZE];
+    iomem->aou = new uint32_t[AOU_SIZE];
+    //TODO error check
+}
 
 static inline void ldi_update(IOConfig *config) {
     dump_mem("LDI", &g_ioshm.diu[LDI_BASE], LDI_SIZE);
@@ -101,6 +114,10 @@ static void io_task_create() {
 }
 
 void io_task_init(IOConfig *config) {
+    g_ioshm.diu_size = DIU_SIZE;
+    g_ioshm.dou_size = DOU_SIZE;
+    g_ioshm.aiu_size = AIU_SIZE;
+    g_ioshm.aou_size = AOU_SIZE;
     rt_heap_create(&diu_heap, "diu_shm", DIU_SIZE, H_SHARED);
     rt_heap_create(&dou_heap, "dou_shm", DOU_SIZE, H_SHARED);
     rt_heap_create(&aiu_heap, "aiu_shm", AIU_SIZE, H_SHARED);
@@ -114,6 +131,8 @@ void io_task_init(IOConfig *config) {
     memset(g_ioshm.dou, 0, DOU_SIZE);
     memset(g_ioshm.aiu, 0, AIU_SIZE);
     memset(g_ioshm.aou, 0, AOU_SIZE);
+
+
     LOGGER_DBG("I/O SHM:\n .total_size = %d\n .diu_size = %d\n .dou_size = %d\n .aiu_size = %d\n .aou_size = %d",
         IO_SHM_SIZE, DIU_SIZE, DOU_SIZE, AIU_SIZE, AOU_SIZE);
     io_task_create();

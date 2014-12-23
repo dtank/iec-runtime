@@ -7,7 +7,6 @@
 #include "logger.h"
 
 using namespace std;
-extern char *io_shm;
 extern ec_map_t ec_msg;
 
 /*-----------------------------------------------------------------------------

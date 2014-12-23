@@ -1,9 +1,11 @@
 #include "executor.h"
 #include "ivalue.h"
 #include "opcode.h"
+#include "io.h"
 #include "logger.h"
 
-extern char *io_shm;
+extern IOConfig io_config;
+extern IOMem g_ioshm;
 extern ec_map_t ec_msg;
 
 #define PC  (task->pc)
@@ -23,30 +25,38 @@ extern ec_map_t ec_msg;
 static void executor(void *plc_task) {
     PLCTask *task = (PLCTask *)plc_task;
     rt_task_set_periodic(NULL, TM_NOW, task->task_desc.interval);
+    IOMem iomem;
+    iomem_init(&iomem, &io_config);
     while (1) {
         rt_task_wait_period(NULL);
-        //TODO pre input
+        //TODO ADD LOCK!!
+        io_memcpy(iomem, g_ioshm);
         for (PC = 0; PC < EOC; ) {
             LOGGER_DBG("instruction[%d] = %0#10x, OpCode = %d", PC, instruction, opcode);
             switch (opcode) {
                 case OP_GLOAD:  R(A) = G(Bx); dump_value("R(A)", R(A)); PC++; break; /* PC++ MUST be last */
                 case OP_GSTORE: G(Bx) = R(A); dump_value("G(Bx)", G(Bx)); PC++; break;
                 case OP_KLOAD:  R(A) = K(Bx); dump_value("R(A)", R(A)); PC++; break;
+                case OP_DLOAD:  setvint(R(A), getdch(iomem.diu, B, C)); PC++; break;
+                case OP_DSTORE: setdch(iomem.dou, B, C, R(A).v.value_i); PC++; break;
+                case OP_ALOAD:  setvint(R(A), getach(iomem.aiu, B, C)); PC++; break;
+                case OP_ASTORE: setach(iomem.aou, B, C, R(A).v.value_i); PC++; break;
                 case OP_MOV:    R(A) = R(B); PC++; break;
                 case OP_ADD:    vadd(R(A), R(B), R(C)); dump_value("R(A)", R(A)); PC++; break;
                 case OP_SUB:    vsub(R(A), R(B), R(C)); PC++; break;
                 case OP_MUL:    vmul(R(A), R(B), R(C)); PC++; break;
                 case OP_DIV:    vdiv(R(A), R(B), R(C)); PC++; break;
                 case OP_MOD:    vmod(R(A), R(B), R(C)); PC++; break;
-                case OP_EQ:     if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
-                case OP_LT:     if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
-                case OP_LE:     if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
+                case OP_EQJ:    if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
+                case OP_LTJ:    if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
+                case OP_LEJ:    if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
                 case OP_JMP:    PC += sAx; PC++; break; /* MUST follow EQ/LT/LE */
                 case OP_HALT:   PC = EOC; break;
                 default: LOGGER_DBG("Unknown OpCode(%d)", opcode); break;
             }
         }
-        //TODO post output
+        //TODO ADD LOCK!!
+        io_memcpy(g_ioshm, iomem);
     }
 }
 

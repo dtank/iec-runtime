@@ -54,6 +54,11 @@ typedef struct Value {
 #define vstrstr(value) ((value).v.value_s.str)
 #define vstrlen(value) ((value).v.value_s.length)
 #define vnumber(v, t)  (t)((t==TINT)*vint(v) + (t==TDOUBLE)*vdouble(v)) /* CAN'T be left value */
+
+/* value setter */
+#define setvint(value, data_i) {(value).v.value_i = (data_i);}
+#define setvdouble(value, data_d) {(value).v.value_d = (data_d);}
+#define setvstring(value, data_s) {(value).v.value_s = (data_s);}
 /*-----------------------------------------------------------------------------
  * Arithmetic Macro
  * Premise:

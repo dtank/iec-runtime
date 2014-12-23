@@ -2,6 +2,7 @@
 #define __OPCODE_H__
 
 #include <stdint.h>
+#include <helper.h>
 
 typedef uint32_t Instruction;
 
@@ -29,6 +30,10 @@ typedef enum {
     OP_GLOAD = 1,
     OP_GSTORE,
     OP_KLOAD,
+    OP_DLOAD,
+    OP_DSTORE,
+    OP_ALOAD,
+    OP_ASTORE,
     OP_MOV,
     /* arithmetic opcode */
     OP_ADD,
@@ -37,9 +42,9 @@ typedef enum {
     OP_DIV,
     OP_MOD,
     /* control opcode */
-    OP_EQ,
-    OP_LT,
-    OP_LE,
+    OP_EQJ,
+    OP_LTJ,
+    OP_LEJ,
     OP_JMP,
     OP_HALT,
     /* call opcode */
@@ -51,19 +56,11 @@ typedef enum {
 #define MIN_OPCODE OP_GLOAD
 #define MAX_OPCODE OP_RET
 /*-----------------------------------------------------------------------------
- * Helper Funtion Macros
- *---------------------------------------------------------------------------*/
-/* creates a mask with `n' 1 bits at position `p' */
-#define MASK1(n,p)	((~((~(Instruction)0)<<(n)))<<(p))
-/* creates a mask with `n' 0 bits at position `p' */
-#define MASK0(n,p)	(~MASK1(n,p))
-#define cast(type, exp) ((type)(exp))
-/*-----------------------------------------------------------------------------
  * Instructoin Decoder Macro
  * Note: decoder won't change original instruction definitely!
  *---------------------------------------------------------------------------*/
-#define GET_OPCODE(i) (cast(OpCode, ((i)>>POS_OP) & MASK1(SIZE_OP, 0)))
-#define getarg(i,pos,size) (cast(int, ((i)>>pos) & MASK1(size, 0)))
+#define GET_OPCODE(i) (cast(OpCode, ((i)>>POS_OP) & MASK1(0, SIZE_OP)))
+#define getarg(i,pos,size) (cast(int, ((i)>>pos) & MASK1(0, size)))
 #define GETARG_A(i)   getarg(i, POS_A, SIZE_A)
 #define GETARG_B(i)   getarg(i, POS_B, SIZE_B)
 #define GETARG_C(i)   getarg(i, POS_C, SIZE_C)
@@ -85,10 +82,22 @@ typedef enum {
 #define CREATE_sAx(o,sAx)		((cast(Instruction, o)<<POS_OP) \
 			| (cast(Instruction, sAx+BIAS_sAx)<<POS_sAx))
 
-#define CREATE_GLOAD(a, bx)  CREATE_ABx(OP_GLOAD, a, bx)
-#define CREATE_GSTORE(a, bx) CREATE_ABx(OP_GSTORE, a, bx)
-#define CREATE_KLOAD(a, bx)  CREATE_ABx(OP_KLOAD, a, bx)
-#define CREATE_MOV(a, b)     CREATE_ABC(OP_MOV, a, b, 0)
+#define CREATE_GLOAD(a, bx)    CREATE_ABx(OP_GLOAD, a, bx)
+#define CREATE_GSTORE(a, bx)   CREATE_ABx(OP_GSTORE, a, bx)
+#define CREATE_KLOAD(a, bx)    CREATE_ABx(OP_KLOAD, a, bx)
+#define CREATE_DLOAD(a, b, c)  CREATE_ABC(OP_DLOAD, a, b, c)
+#define CREATE_DSTORE(a, b, c) CREATE_ABC(OP_DSTORE, a, b, c)
+#define CREATE_DIXb_c(a, b, c) CREATE_DLOAD(a, b*8+c, 1)
+#define CREATE_DIBb(a, b)      CREATE_DLOAD(a, b*8, 8)
+#define CREATE_DIWb(a, b)      CREATE_DLOAD(a, b*16, 16)
+#define CREATE_DIDb(a, b)      CREATE_DLOAD(a, b*32, 32)
+#define CREATE_DOXb_c(a, b, c) CREATE_DSTORE(a, b*8+c, 1)
+#define CREATE_DOBb(a, b)      CREATE_DSTORE(a, b*8, 8)
+#define CREATE_DOWb(a, b)      CREATE_DSTORE(a, b*16, 16)
+#define CREATE_DODb(a, b)      CREATE_DSTORE(a, b*32, 32)
+#define CREATE_ALOAD(a, b, c)  CREATE_ABC(OP_ALOAD, a, b, c)
+#define CREATE_ASTORE(a, b, c) CREATE_ABC(OP_ASTORE, a, b, c)
+#define CREATE_MOV(a, b)       CREATE_ABC(OP_MOV, a, b, 0)
 
 #define CREATE_ADD(a, b, c)  CREATE_ABC(OP_ADD, a, b, c)
 #define CREATE_SUB(a, b, c)  CREATE_ABC(OP_SUB, a, b, c)
@@ -96,12 +105,12 @@ typedef enum {
 #define CREATE_DIV(a, b, c)  CREATE_ABC(OP_DIV, a, b, c)
 #define CREATE_MOD(a, b, c)  CREATE_ABC(OP_MOD, a, b, c)
 
-#define CREATE_EQ(b, c)  CREATE_ABC(OP_EQ, 1, b, c)
-#define CREATE_LT(b, c)  CREATE_ABC(OP_LT, 1, b, c)
-#define CREATE_LE(b, c)  CREATE_ABC(OP_LE, 1, b, c)
-#define CREATE_NE(b, c)  CREATE_ABC(OP_EQ, 0, b, c)
-#define CREATE_GE(b, c)  CREATE_ABC(OP_LT, 0, b, c)
-#define CREATE_GT(b, c)  CREATE_ABC(OP_LE, 0, b, c)
+#define CREATE_EQJ(b, c)  CREATE_ABC(OP_EQJ, 1, b, c)
+#define CREATE_LTJ(b, c)  CREATE_ABC(OP_LTJ, 1, b, c)
+#define CREATE_LEJ(b, c)  CREATE_ABC(OP_LEJ, 1, b, c)
+#define CREATE_NEJ(b, c)  CREATE_ABC(OP_EQJ, 0, b, c)
+#define CREATE_GEJ(b, c)  CREATE_ABC(OP_LTJ, 0, b, c)
+#define CREATE_GTJ(b, c)  CREATE_ABC(OP_LEJ, 0, b, c)
 #define CREATE_JMP(sAx)  CREATE_sAx(OP_JMP, sAx)
 #define CREATE_HALT()  CREATE_ABC(OP_HALT, 0, 0, 0)
 
