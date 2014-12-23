@@ -7,7 +7,6 @@
 #include "logger.h"
 
 using namespace std;
-extern ec_map_t ec_msg;
 
 /*-----------------------------------------------------------------------------
  * Helper Funciton Macros

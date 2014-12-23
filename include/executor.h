@@ -6,5 +6,5 @@
 static void executor(void *task);
 void plc_task_init(TaskList *task_list);
 void plc_task_start(TaskList *task_list);
-//void plc_task_delete(TASK_LIST *task);
+void plc_task_delete(TaskList *task_list);
 #endif

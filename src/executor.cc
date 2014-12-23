@@ -4,9 +4,8 @@
 #include "io.h"
 #include "logger.h"
 
-extern IOConfig io_config;
+extern IOConfig g_ioconfig;
 extern IOMem g_ioshm;
-extern ec_map_t ec_msg;
 
 #define PC  (task->pc)
 #define EOC (task->task_desc.inst_count) /* end of code */
@@ -26,7 +25,7 @@ static void executor(void *plc_task) {
     PLCTask *task = (PLCTask *)plc_task;
     rt_task_set_periodic(NULL, TM_NOW, task->task_desc.interval);
     IOMem iomem;
-    iomem_init(&iomem, &io_config);
+    iomem_init(&iomem, &g_ioconfig);
     while (1) {
         rt_task_wait_period(NULL);
         //TODO ADD LOCK!!
@@ -74,10 +73,10 @@ void plc_task_start(TaskList *task_list) {
         }
     }
 }
-//void plc_task_delete(TaskList *task_list) {
-    //for (int i = 0; i < task_list->task_count; ++i) {
-        //if (rt_task_delete(&task_list->rt_task[i])) {
-            //TODO Error
-        //}
-    //}
-//}
+void plc_task_delete(TaskList *task_list) {
+    for (int i = 0; i < task_list->task_count; ++i) {
+        if (rt_task_delete(&task_list->rt_task[i])) {
+            LOGGER_ERR(EC_PLC_TASK_DELETE, "(\"%s\")", task_list->plc_task[i].task_desc.name);
+        }
+    }
+}

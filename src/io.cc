@@ -9,8 +9,8 @@ RT_HEAP diu_heap;
 RT_HEAP dou_heap;
 RT_HEAP aiu_heap;
 RT_HEAP aou_heap;
+IOConfig g_ioconfig;
 IOMem g_ioshm;
-extern ec_map_t ec_msg;
 
 #define LDI_COUNT (config->ldi_count)
 #define LDO_COUNT (config->ldo_count)
@@ -145,5 +145,6 @@ void io_task_start(IOConfig *config) {
 
 void io_task_delete() {
 	if (rt_task_delete(&io_task)) {
+        LOGGER_ERR(EC_IO_TASK_DELETE, "");
 	}
 }

@@ -62,8 +62,8 @@
 }
 #define OBJ_IO {                                                                       \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
-    {4000000, 0, 6, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
-    {1, 4000000, { /* servo config */                                                  \
+    {8000000, 0, 6, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
+    {1, 8000000, { /* servo config */                                                  \
         {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
 		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
     }},                                                                                \

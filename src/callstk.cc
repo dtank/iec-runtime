@@ -2,8 +2,6 @@
 #include "syslimit.h"
 #include "logger.h"
 
-extern ec_map_t ec_msg;
-
 int cs_init(CStack *stk, uint16_t cap) {
     assert(stk != NULL);
     assert(cap <= MAX_CS_CAP); /* guaranteed by verifier */

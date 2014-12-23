@@ -4,7 +4,7 @@
 #include "plcmodel.h"
 
 #define SERVO_TASK_NAME "servo_task"
-#define SERVO_TASK_PRIORITY 98
+#define SERVO_TASK_PRIORITY 70
 typedef struct {
     double actual_pos;
     double actual_vel;

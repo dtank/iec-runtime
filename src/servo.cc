@@ -6,7 +6,7 @@
 static RT_TASK servo_task;
 RT_HEAP servo_heap_desc;
 char *servo_shm;
-extern ec_map_t ec_msg;
+ServoConfig *g_svconfig;
 
 
 static void servo_update(void *config) {
@@ -38,5 +38,6 @@ void servo_task_start(ServoConfig *config) {
 
 void servo_task_delete() {
 	if (rt_task_delete(&servo_task)) {
+        LOGGER_ERR(EC_SERVO_TASK_DELETE, "");
 	}
 }

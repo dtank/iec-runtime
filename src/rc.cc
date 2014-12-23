@@ -6,7 +6,6 @@
 static RT_TASK rc_task;
 RT_HEAP rc_heap_desc;
 char *rc_shm;
-extern ec_map_t ec_msg;
 
 static void interp_calculate(void *config) {
     LOGGER_INF("STUB: Calculate interpolation value...", 0);
@@ -29,5 +28,6 @@ void rc_task_start(RobotConfig *config) {
 }
 void rc_task_delete() {
 	if (rt_task_delete(&rc_task)) {
+        LOGGER_ERR(EC_RC_TASK_DELETE, "");
 	}
 }
