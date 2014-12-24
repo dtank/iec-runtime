@@ -146,7 +146,7 @@
             CREATE_HALT(),                                                             \
             /* add fun (2 instructions) */                                                               \
             CREATE_ADD(2, 0, 1), /* R(2) <- R(0) + R(1) */                             \
-            CREATE_HALT(),                                                             \
+            CREATE_RET(0, 1), /*  */                             \
         }},                                                                            \
     }                                                                                  \
 }

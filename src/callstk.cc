@@ -6,8 +6,8 @@ int cs_init(CStack *stk, uint16_t cap) {
     assert(stk != NULL);
     assert(cap <= MAX_CS_CAP); /* guaranteed by verifier */
 
-    stk->capacity = cap;
-    stk->top = 0;
+    stk->capacity = cap+1;
+    stk->top = 1; /* MUST be 1(reduce bound case for main()) */
     stk->base = new SFrame[stk->capacity];
     if (stk->base == NULL) {
         LOGGER_ERR(EC_OOM, "initializing calling stack");
@@ -35,7 +35,7 @@ int cs_init(CStack *stk, uint16_t cap) {
         //return -1;
     //}
     //if (stk->base[stk->top].reg_base != NULL) {
-        //delete[] stk->base[stk->top].reg_base;
+        //delete[] stk->base[stk->top-1].reg_base;
     //}
     //stk->top--;
     //return 0;

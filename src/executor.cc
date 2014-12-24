@@ -22,12 +22,13 @@ extern IOMem g_ioshm;
 #define sAx GETARG_sAx(instruction)
 
 /* calling stack */
-#define STK  (task->stack)
-#define TOP  (task->stack.top)
-#define SF   (STK.base[TOP-1])
-#define R(i) (SF.reg[i])
-#define G(i) (task->vglobal[i])
-#define K(i) (task->vconst[i])
+#define STK     (task->stack)
+#define TOP     (task->stack.top)
+#define CURR_SF (STK.base[TOP-1])
+#define PREV_SF (STK.base[TOP-2])
+#define R(i)    (CURR_SF.reg[i])
+#define G(i)    (task->vglobal[i])
+#define K(i)    (task->vconst[i])
 
 /* system-level POU */
 #define SPOU(i) (spou_desc[i].addr)
@@ -39,6 +40,7 @@ extern IOMem g_ioshm;
 #define UPOU_LOCALC(i)  (UPOU_DESC(i).local_count)
 #define UPOU_REGC(i)    (UPOU_INPUTC(i) + UPOU_OUTPUTC(i) + UPOU_LOCALC(i))
 #define UPOU_ENTR(i)    (UPOU_DESC(i).addr)
+#define UPOU_RET        (CURR_SF.ret)
 
 #if LEVEL_DBG <= LOGGER_LEVEL
     #define dump_opcode(i) {fprintf(stderr, #i ": ");}
@@ -80,7 +82,7 @@ static void executor(void *plc_task) {
                 case OP_ALOAD:  setvint(R(A), getach(iomem.aiu, B, C)); PC++; break;
                 case OP_ASTORE: setach(iomem.aou, B, C, R(A).v.value_i); PC++; break;
                 case OP_MOV:    R(A) = R(B); dump_imov(MOV, R, A, R, B); PC++; break;
-                case OP_ADD:    vadd(R(A), R(B), R(C)); dump_value("R(A)", R(A)); PC++; break;
+                case OP_ADD:    vadd(R(A), R(B), R(C)); PC++; break;
                 case OP_SUB:    vsub(R(A), R(B), R(C)); PC++; break;
                 case OP_MUL:    vmul(R(A), R(B), R(C)); PC++; break;
                 case OP_DIV:    vdiv(R(A), R(B), R(C)); PC++; break;
@@ -90,8 +92,9 @@ static void executor(void *plc_task) {
                 case OP_LEJ:    if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
                 case OP_JMP:    PC += sAx; PC++; break; /* MUST follow EQ/LT/LE */
                 case OP_HALT:   PC = EOC; break;
-                case OP_UCALL:  SFrame newsf; sf_init(newsf, Bx, PC+1, UPOU_REGC(Bx)); sf_regcpy(newsf, 0, SF, A, UPOU_REGC(Bx)); cs_push(STK, newsf); PC = UPOU_ENTR(Bx); break;
                 case OP_SCALL:  SPOU(Bx)(&R(A)); PC++; break;
+                case OP_UCALL:  SFrame called_sf; sf_init(called_sf, Bx, PC+1, UPOU_REGC(Bx)); sf_regcpy(called_sf, 0, CURR_SF, A, UPOU_INPUTC(Bx)); cs_push(STK, called_sf); PC = UPOU_ENTR(Bx); break;
+                case OP_RET:     sf_regcpy(PREV_SF, A+UPOU_INPUTC(Bx), CURR_SF, UPOU_INPUTC(Bx), UPOU_OUTPUTC(Bx)); PC = UPOU_RET; cs_pop(STK); break;
                 default: LOGGER_DBG(DFLAG_SHORT, "Unknown OpCode(%d)", opcode); break;
             }
         }

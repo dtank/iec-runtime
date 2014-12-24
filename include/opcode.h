@@ -116,5 +116,6 @@ typedef enum {
 
 #define CREATE_SCALL(rid, pid) CREATE_ABx(OP_SCALL, rid, pid) /* r: reg_base id; pid: pou id */
 #define CREATE_UCALL(rid, pid) CREATE_ABx(OP_UCALL, rid, pid)
+#define CREATE_RET(rid, pid)   CREATE_ABx(OP_RET, rid, pid)
 
 #endif
