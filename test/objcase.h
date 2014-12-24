@@ -7,7 +7,7 @@
 
 #define OBJ_ARITHMETIC {                                                               \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
-    {4000000, 0, 1, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
+    {4000000, 0, 0, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
     {1, 4000000, { /* servo config */                                                  \
         {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
 		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
@@ -34,7 +34,7 @@
 
 #define OBJ_CONTROL {                                                                  \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
-    {4000000, 0, 1, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
+    {4000000, 0, 0, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
     {1, 4000000, { /* servo config */                                                  \
         {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
 		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
@@ -91,7 +91,7 @@
 /* MUST put value_d the first in IValue */
 #define OBJ_NUMFUN {                                                                   \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
-    {8000000, 0, 6, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
+    {8000000, 0, 0, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
     {1, 8000000, { /* servo config */                                                  \
         {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
 		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
@@ -117,10 +117,9 @@
     }                                                                                  \
 }
 
-//TODO
 #define OBJ_UCALL {                                                                    \
     {MAGIC, SYS_TYPE_32, BYTE_ORDER_LIT, 1, MACH_CORTEX_A8},                           \
-    {8000000, 0, 6, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
+    {8000000, 0, 0, 0, 0, 0, 0, 0, 0}, /* io config */                                 \
     {1, 8000000, { /* servo config */                                                  \
         {"axis1", false, 1, AXIS_TYPE_FINITE, OPER_MODE_POS,                           \
 		0.0, 180.0, 100.0, 20.0, 20.0, 10.0},                                          \
