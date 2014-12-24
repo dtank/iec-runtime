@@ -13,11 +13,13 @@ void init_case() {
         OBJ_CONTROL,
         OBJ_IO,
         OBJ_NUMFUN,
+        OBJ_UCALL,
     };
     case_map["arithmetic"] = obj_case[0];
     case_map["control"] = obj_case[1];
     case_map["io"] = obj_case[2];
     case_map["numfun"] = obj_case[3];
+    case_map["ucall"] = obj_case[4];
 }
 
 int main(int argc, char* argv[]) {

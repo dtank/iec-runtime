@@ -48,8 +48,8 @@ typedef enum {
     OP_JMP,
     OP_HALT,
     /* call opcode */
-    OP_UCALL,
     OP_SCALL,
+    OP_UCALL,
     OP_RET,
 } OpCode;
 
@@ -114,6 +114,7 @@ typedef enum {
 #define CREATE_JMP(sAx)   CREATE_sAx(OP_JMP, sAx)
 #define CREATE_HALT()     CREATE_ABC(OP_HALT, 0, 0, 0)
 
-#define CREATE_SCALL(r, pid)   CREATE_ABx(OP_SCALL, r, pid) /* r = reg_base; pid = pou id */
+#define CREATE_SCALL(rid, pid) CREATE_ABx(OP_SCALL, rid, pid) /* r: reg_base id; pid: pou id */
+#define CREATE_UCALL(rid, pid) CREATE_ABx(OP_UCALL, rid, pid)
 
 #endif

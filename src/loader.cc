@@ -18,6 +18,8 @@ using namespace std;
         LOGGER_ERR(ecode, msg);   \
         return -1;                \
     }}
+/* pd: pou descriptor */
+#define POU_REGC(pd) ((pd).input_count + (pd).output_count + (pd).local_count)
 /*-----------------------------------------------------------------------------
  * Object File Verifier
  *---------------------------------------------------------------------------*/
@@ -245,12 +247,10 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
     }
     verify(cs_init(&task->stack, task->task_desc.sframe_count) < 0, EC_CS_INIT, ""); /* MUST initialize after loading POU descriptor */
     /* create main() stack frame manually */
-    SFrame main = {0, 0, NULL};
-    main.reg_base = new IValue[task->pou_desc[0].input_count+task->pou_desc[0].output_count+task->pou_desc[0].local_count];
-    verify(main.reg_base == NULL, EC_OOM, "initializing main() stack frame");
-    if (cs_push(&task->stack, &main) < 0) {
-        return -1;
-    }
+    SFrame main;
+    sf_init(main, 0, 0, POU_REGC(task->pou_desc[0]));
+    verify(main.reg == NULL, EC_OOM, "initializing main() stack frame");
+    cs_push(task->stack, main);
     task->pc = 0;
     return 0;
 }

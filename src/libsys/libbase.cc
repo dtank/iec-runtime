@@ -14,6 +14,5 @@ void sfun_abs(IValue *reg_base) {
     arith2v(fabs, REGO(SFUN_ABS, 0), REGI(0)); /* int & double type only */
 }
 void sfun_sqrt(IValue *reg_base) {
-    dump_value("REGI(0)", REGI(0)); EOL;
     arith2vd(sqrt, REGO(SFUN_SQRT, 0), REGI(0)); /* double type only */
 }

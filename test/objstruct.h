@@ -18,7 +18,7 @@
 #define MAX_STR_LENGTH 8
 #define MAX_CONST_COUNT 8
 #define MAX_GLOBAL_COUNT 8
-#define MAX_INST_COUNT 10
+#define MAX_INST_COUNT 20
 
 /*-----------------------------------------------------------------------------
  * Value Type Tag
@@ -103,8 +103,8 @@ typedef struct {
 typedef struct {
     uint8_t type;
     union {
-        double value_d;
         int32_t value_i;
+        double value_d;
         struct {
             uint32_t length; /* '\0' included */
             char str[MAX_STR_LENGTH];

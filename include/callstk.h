@@ -5,9 +5,9 @@
 #include "ivalue.h"
 
 typedef struct {
-    uint16_t curr_pou;   /* index of current pou descriptors */
-    uint32_t ret_addr; /* return address(AKA index of instructions) */
-    IValue *reg_base;  /* register group base address */
+    uint16_t pou;   /* index of current pou descriptors */
+    uint32_t ret; /* return address(AKA index of instructions) */
+    IValue *reg;  /* register group base address */
 } SFrame; /* Stack Frame */
 
 typedef struct {
@@ -16,8 +16,24 @@ typedef struct {
     SFrame *base;      /* stack base address */
 } CStack; /* Calling Stack */
 
+#define sf_init(sf, ipou, iret, rcount) { \
+    (sf).pou = ipou;                     \
+    (sf).ret= iret;                      \
+    (sf).reg= new IValue[rcount];       \
+}
+/* sf1.reg[base1 ... base1+count] <-- sf2.reg[base2 ... base1+count] */
+#define sf_regcpy(sf1, base1, sf2, base2, count) { \
+    for (int i = 0; i < count; i++) {                \
+        (sf1).reg[base1+i] = (sf2).reg[base2+i];   \
+    }                                                \
+}
+/* stack capacity is enough */
+#define cs_push(stk, sf) {      \
+    (stk).base[(stk).top] = sf; \
+    (stk).top++;                \
+}
 int cs_init(CStack *stk, uint16_t cap);
-int cs_push(CStack *stk, SFrame *frame);
-int cs_pop(CStack *stk);
+//int cs_push(CStack *stk, SFrame *frame);
+//int cs_pop(CStack *stk);
 
 #endif
