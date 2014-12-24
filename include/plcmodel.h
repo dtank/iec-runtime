@@ -2,44 +2,14 @@
 #define __PLC_MODEL_H__
 
 #include <native/task.h>
-#include "binformat.h"
+#include "ivalue.h"
+#include "istring.h"
+#include "callstk.h"
+#include "opcode.h"
+#include "syslimit.h"
 
 /*-----------------------------------------------------------------------------
- * Definition of Runtime System Environment
- *---------------------------------------------------------------------------*/
-/* Basic */
-#define SYS_TYPE SYS_TYPE_32
-#define SYS_BYTE_ORDER BYTE_ORDER_LIT
-#define SYS_VERSION 1
-#define SYS_MACHINE MACH_CORTEX_A8
-/* I/O */
-#define SYS_MAX_LDI_COUNT 1
-#define SYS_MAX_LDO_COUNT 1
-#define SYS_MAX_LAI_COUNT 1
-#define SYS_MAX_LAO_COUNT 1
-#define SYS_MIN_IO_INTERVAL 2000000 /* unit: ns */
-#define SYS_LDI_WORDSIZE 1 /* unit: Byte */
-#define SYS_LDO_WORDSIZE 1 /* unit: Byte */
-#define SYS_LAI_WORDSIZE 1 /* unit: Byte */
-#define SYS_LAO_WORDSIZE 1 /* unit: Byte */
-#define SYS_MAX_IO_MEM_SIZE (SYS_MAX_LDI_COUNT*SYS_LDI_WORDSIZE + \
-        SYS_MAX_LDO_COUNT*SYS_LDO_WORDSIZE + \
-        SYS_MAX_LAI_COUNT*SYS_LAI_WORDSIZE + \
-        SYS_MAX_LAO_COUNT*SYS_LAO_WORDSIZE)
-/* Servo */
-#define SYS_MAX_AXIS_COUNT 8
-#define SYS_MAX_AXIS_NAME_SIZE 16
-#define SYS_MIN_AXIS_NODE_ID 1
-#define SYS_MAX_AXIS_NODE_ID SYS_MAX_AXIS_COUNT
-#define SYS_MIN_SERVO_INTERVAL 2000000 /* unit: ns */
-/* PLC Task */
-#define SYS_MAX_TASK_NAME_SIZE 16
-#define SYS_MAX_TASK_PRIORITY 90
-#define SYS_MIN_TASK_PRIORITY 50
-#define SYS_MIN_TASK_INTERVAL 8000000
-#define SYS_MAX_TASK_DATA_SIZE 65535
-/*-----------------------------------------------------------------------------
- * Definition of I/O Configuration
+ * I/O Configuration
  *---------------------------------------------------------------------------*/
 typedef struct {
 	uint32_t update_interval; /* I/O data update interval */
@@ -47,67 +17,80 @@ typedef struct {
 	uint8_t ldo_count;        /* number of local digital output module */
 	uint8_t lai_count;        /* number of local analog input module */
 	uint8_t lao_count;        /* number of local analog output module */
-} IO_CONFIG;
+	uint8_t rdi_count;        /* number of remote digital input module */
+	uint8_t rdo_count;        /* number of remote digital output module */
+	uint8_t rai_count;        /* number of remote analog input module */
+	uint8_t rao_count;        /* number of remote analog output module */
+} IOConfig;
 /*-----------------------------------------------------------------------------
- * Definition of Servo Configuration
+ * Servo Configuration
  *---------------------------------------------------------------------------*/
 typedef struct {
-	bool is_combined;   /* independent axis | combined axis */
-	char name[SYS_MAX_AXIS_NAME_SIZE];         /* axis name, including '\0' */
-	uint8_t node_id;    /* axis id */
-	uint8_t axis_type;  /* axis type: FINITE | MODULO */
-	uint8_t oper_mode;  /* operating mode: POSITION | VELOCITY | TORQUE */
-	double sw_limit_neg; /* negtive position limit (unit:) */
-	double sw_limit_pos; /* positive position limit (unit:) */
-	double max_vel;      /* velocity limit (unit:) */
-	double max_acc;      /* accelaration limit (unit:) */
-	double max_dec;      /* decelaration limit (unit:) */
-	double max_jerk;     /* jerk limit (unit:) */
-} AXIS_CONFIG;
+	char name[MAX_AXIS_NAME_SIZE]; /* axis name, including '\0' */
+	bool is_combined;              /* independent axis | combined axis */
+	uint8_t node_id;               /* axis id */
+	uint8_t axis_type;             /* axis type: FINITE | MODULO */
+	uint8_t oper_mode;             /* operating mode: POSITION | VELOCITY | TORQUE */
+	double sw_limit_neg;           /* negtive position limit (unit:) */
+	double sw_limit_pos;           /* positive position limit (unit:) */
+	double max_vel;                /* velocity limit (unit:) */
+	double max_acc;                /* accelaration limit (unit:) */
+	double max_dec;                /* decelaration limit (unit:) */
+	double max_jerk;               /* jerk limit (unit:) */
+} AxisConfig;
 
 typedef struct {
 	uint8_t axis_count;       /* number of axis */
 	uint32_t update_interval; /* Servo data update interval */
-	AXIS_CONFIG *axis_group;  /* array of axis configuration */
-} SERVO_CONFIG;
+	AxisConfig *axis_group;   /* array of axis configuration */
+} ServoConfig;
 /*-----------------------------------------------------------------------------
- * Definition of PLC Task Property
+ * Robot Configuration
  *---------------------------------------------------------------------------*/
 typedef struct {
-	char name[SYS_MAX_TASK_NAME_SIZE];
-	uint8_t priority;
-	uint32_t interval;
-	//uint32_t data_size;
-	//uint32_t inst_count;
-} PLC_TASK_PROP;
+    int axis_count;
+    int stub_param2;
+} RobotConfig;
 /*-----------------------------------------------------------------------------
- * Definition of PLC Task Data
- *---------------------------------------------------------------------------*/
-typedef char PLC_TASK_DATA;
-/*-----------------------------------------------------------------------------
- * Definition of PLC Task Code
+ * PLC Task Model
  *---------------------------------------------------------------------------*/
 typedef struct {
-    uint16_t id;      /* instruction id */
-    char **arg_addr; /* actual address of instruction's arguments */
-} PLC_TASK_INST;
+	char name[MAX_TASK_NAME_SIZE]; /* plc task name */
+	uint8_t priority;              /* priority: 80-95 */
+    uint8_t type;                  /* task type: SIGNAL | INTERVAL */
+    uint8_t signal;                /* signal source: TIMER | I/O */
+	uint32_t interval;             /* time interval (uint: ns) */
+    uint32_t sp_size;              /* capacity of string pool(unit: Byte) */
+    uint16_t pou_count;            /* Program Organization Unit: FUN | FB | PROG */
+    uint16_t const_count;          /* number of constant */
+    uint16_t global_count;         /* number of global variables */
+	uint32_t inst_count;           /* number of instructions(code) */
+	uint16_t sframe_count;         /* number of stack frame */
+} TaskDesc; /* PLC Task Descriptor */
 
 typedef struct {
-    PLC_TASK_INST **inst;
-} PLC_TASK_CODE;
-
-/*-----------------------------------------------------------------------------
- * Definition of PLC Task List
- *---------------------------------------------------------------------------*/
-typedef struct {
-    PLC_TASK_PROP property; /* task property */
-    PLC_TASK_DATA *data; /* task data */
-    PLC_TASK_CODE code; /* task code */
-} PLC_TASK; /* PLC Task Segment */
+    char name[MAX_POU_NAME_SIZE]; /* POU name */
+    uint8_t input_count;          /* number of input parameters */
+    uint8_t output_count;         /* number of output parameters */
+    uint8_t local_count;          /* number of local parameters */
+    uint32_t addr;                /* POU address(AKA index of instruction) */
+} POUDesc; /* User-level POU Descriptor */
 
 typedef struct {
+    TaskDesc task_desc; /* PLC task descriptor */
+    StrPool strpool;    /* string pool */
+    POUDesc *pou_desc;  /* POU descriptor */
+    IValue *vconst;     /* constant pool */
+    IValue *vglobal;    /* global variables */
+    Instruction *code;  /* task code(instruction) */
+    CStack stack;       /* calling stack(constant capacity) */
+    uint32_t pc;        /* program counter(AKA instruction pointer) */
+} PLCTask;
+
+typedef struct {
+    uint8_t task_count; /* number of plc task */
     RT_TASK *rt_task;
-    PLC_TASK *plc_task;
-} PLC_TASK_LIST;
+    PLCTask *plc_task;
+} TaskList;
 
 #endif

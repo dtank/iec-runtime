@@ -1,44 +1,126 @@
 #include "executor.h"
-#include "instruction.h"
+#include "ivalue.h"
+#include "opcode.h"
+#include "io.h"
+#include "libsys.h"
 #include "logger.h"
 
-extern inst_desc_map_t inst_desc;
-extern char *io_shm;
+extern IOConfig g_ioconfig;
+extern IOMem g_ioshm;
 
-//static void plc_task_execute(void *plc_task) {
-	//PLC_TASK *task = (PLC_TASK *)plc_task;
-	//rt_task_set_periodic(NULL, TM_NOW, task->property->interval);
-	//while (1) {
-		//rt_task_wait_period(NULL);
-		//for (int i = 0; i < task->property->inst_count; ++i) {
-			//((inst_3op_t)inst_desc[task->code->inst[i]->id].inst_addr)(
-				//(void *)task->code->inst[i]->arg_addr[0],
-				//(void *)task->code->inst[i]->arg_addr[1],
-				//(void *)task->code->inst[i]->arg_addr[2]);
-			//LOGGER(LOGGER_DBG, "arg1_value = %d", *(uint32_t *)task->code->inst[i]->arg_addr[0]);
-		//}
-	//}
-//}
+/* program counter */
+#define PC  (task->pc)
+#define EOC (task->task_desc.inst_count) /* end of code */
 
-//void plc_task_create(PLC_TASK_LIST *task_list, PLC_CONFIG *config) {
-	//for (int i = 0; i < config->task_count; ++i) {
-		//if (rt_task_create(&task_list->rt_task[i], task_list->plc_task[i]->property->name, 0, task_list->plc_task[i]->property->priority, 0)) {
-			//LOGGER(LOGGER_ERR, "ERROR: creating PLC task \"%s\"\n", task_list->plc_task[i]->property->name);
-		//}
-	//}
-//}
+/* instruction decoder */
+#define instruction (task->code[PC])
+#define opcode GET_OPCODE(instruction)
+#define A   GETARG_A(instruction)
+#define B   GETARG_B(instruction)
+#define C   GETARG_C(instruction)
+#define Bx  GETARG_Bx(instruction)
+#define sAx GETARG_sAx(instruction)
 
-//void plc_task_start(PLC_TASK_LIST *task_list, PLC_CONFIG *config) {
-	//for (int i = 0; i < config->task_count; ++i) {
-		//if (rt_task_start(&task_list->rt_task[i], &plc_task_execute, (void *)task_list->plc_task[i])) {
-			//LOGGER(LOGGER_ERR, "ERROR: starting PLC task \"%s\"\n", task_list->plc_task[i]->property->name);
-		//}
-	//}
-//}
-//void plc_task_delete(PLC_TASK_LIST *task_list, PLC_CONFIG *config) {
-	//for (int i = 0; i < config->task_count; ++i) {
-		//if (rt_task_delete(&task_list->rt_task[i])) {
-			//LOGGER(LOGGER_ERR, "ERROR: deleting PLC task \"%s\"\n", task_list->plc_task[i]->property->name);
-		//}
-	//}
-//}
+/* calling stack */
+#define STK     (task->stack)
+#define TOP     (task->stack.top)
+#define CURR_SF (STK.base[TOP-1])
+#define PREV_SF (STK.base[TOP-2])
+#define R(i)    (CURR_SF.reg[i])
+#define G(i)    (task->vglobal[i])
+#define K(i)    (task->vconst[i])
+
+/* system-level POU */
+#define SPOU(i) (spou_desc[i].addr)
+
+/* user-level POU */
+#define UPOU_DESC(i)    (task->pou_desc[i])
+#define UPOU_INPUTC(i)  (UPOU_DESC(i).input_count)
+#define UPOU_OUTPUTC(i) (UPOU_DESC(i).output_count)
+#define UPOU_LOCALC(i)  (UPOU_DESC(i).local_count)
+#define UPOU_REGC(i)    (UPOU_INPUTC(i) + UPOU_OUTPUTC(i) + UPOU_LOCALC(i))
+#define UPOU_ENTR(i)    (UPOU_DESC(i).addr)
+#define UPOU_RET        (CURR_SF.ret)
+
+#if LEVEL_DBG <= LOGGER_LEVEL
+    #define dump_opcode(i) {fprintf(stderr, #i ": ");}
+    #define dump_data(s, i, v) { \
+        fprintf(stderr, #s "(%d)", i); \
+        dump_value("", v);\
+    }
+    #define dump_R(i) dump_data(R, i, R(i))
+    #define dump_G(i) dump_data(G, i, G(i))
+    #define dump_K(i) dump_data(K, i, K(i))
+    /* data mov instruction */
+    #define dump_imov(i, s1, i1, s2, i2) {\
+        dump_opcode(i);\
+        dump_##s1(i1);\
+        fprintf(stderr, " <- ");\
+        dump_##s2(i2);\
+        fprintf(stderr, "\n");\
+    }
+#else
+    #define dump_reg2(i, r1, r2)
+#endif
+static void executor(void *plc_task) {
+    PLCTask *task = (PLCTask *)plc_task;
+    rt_task_set_periodic(NULL, TM_NOW, task->task_desc.interval);
+    IOMem iomem;
+    iomem_init(&iomem, &g_ioconfig);
+    while (1) {
+        rt_task_wait_period(NULL);
+        //TODO ADD LOCK!!
+        io_memcpy(iomem, g_ioshm);
+        for (PC = 0; PC < EOC; ) {
+            LOGGER_DBG(DFLAG_SHORT, "instruction[%d] = %0#10x, OpCode = %d", PC, instruction, opcode);
+            switch (opcode) {
+                case OP_GLOAD:  R(A) = G(Bx); dump_imov(GLOAD, R, A, G, Bx); PC++; break; /* PC++ MUST be last */
+                case OP_GSTORE: G(Bx) = R(A); dump_imov(GSTORE, G, Bx, R, A); PC++; break;
+                case OP_KLOAD:  R(A) = K(Bx); dump_imov(KLOAD, R, A, K, Bx); PC++; break;
+                case OP_DLOAD:  setvint(R(A), getdch(iomem.diu, B, C)); PC++; break;
+                case OP_DSTORE: setdch(iomem.dou, B, C, R(A).v.value_i); PC++; break;
+                case OP_ALOAD:  setvint(R(A), getach(iomem.aiu, B, C)); PC++; break;
+                case OP_ASTORE: setach(iomem.aou, B, C, R(A).v.value_i); PC++; break;
+                case OP_MOV:    R(A) = R(B); dump_imov(MOV, R, A, R, B); PC++; break;
+                case OP_ADD:    vadd(R(A), R(B), R(C)); PC++; break;
+                case OP_SUB:    vsub(R(A), R(B), R(C)); PC++; break;
+                case OP_MUL:    vmul(R(A), R(B), R(C)); PC++; break;
+                case OP_DIV:    vdiv(R(A), R(B), R(C)); PC++; break;
+                case OP_MOD:    vmod(R(A), R(B), R(C)); PC++; break;
+                case OP_EQJ:    if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
+                case OP_LTJ:    if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
+                case OP_LEJ:    if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
+                case OP_JMP:    PC += sAx; PC++; break; /* MUST follow EQ/LT/LE */
+                case OP_HALT:   PC = EOC; break;
+                case OP_SCALL:  SPOU(Bx)(&R(A)); PC++; break;
+                case OP_UCALL:  SFrame called_sf; sf_init(called_sf, Bx, PC+1, UPOU_REGC(Bx)); sf_regcpy(called_sf, 0, CURR_SF, A, UPOU_INPUTC(Bx)); cs_push(STK, called_sf); PC = UPOU_ENTR(Bx); break;
+                case OP_RET:     sf_regcpy(PREV_SF, A+UPOU_INPUTC(Bx), CURR_SF, UPOU_INPUTC(Bx), UPOU_OUTPUTC(Bx)); PC = UPOU_RET; cs_pop(STK); break;
+                default: LOGGER_DBG(DFLAG_SHORT, "Unknown OpCode(%d)", opcode); break;
+            }
+        }
+        //TODO ADD LOCK!!
+        io_memcpy(g_ioshm, iomem);
+    }
+}
+
+void plc_task_init(TaskList *task_list) {
+    for (int i = 0; i < task_list->task_count; ++i) {
+        if (rt_task_create(&task_list->rt_task[i], task_list->plc_task[i].task_desc.name, 0, task_list->plc_task[i].task_desc.priority, 0)) {
+            LOGGER_ERR(EC_PLC_TASK_CREATE, "(\"%s\")", task_list->plc_task[i].task_desc.name);
+        }
+    }
+}
+void plc_task_start(TaskList *task_list) {
+    for (int i = 0; i < task_list->task_count; ++i) {
+        if (rt_task_start(&task_list->rt_task[i], &executor, (void *)&task_list->plc_task[i])) {
+            LOGGER_ERR(EC_PLC_TASK_START, "(\"%s\")", task_list->plc_task[i].task_desc.name);
+        }
+    }
+}
+void plc_task_delete(TaskList *task_list) {
+    for (int i = 0; i < task_list->task_count; ++i) {
+        if (rt_task_delete(&task_list->rt_task[i])) {
+            LOGGER_ERR(EC_PLC_TASK_DELETE, "(\"%s\")", task_list->plc_task[i].task_desc.name);
+        }
+    }
+}
