@@ -57,22 +57,22 @@ typedef struct {
  *---------------------------------------------------------------------------*/
 typedef struct {
 	char name[MAX_AXIS_NAME_SIZE]; /* axis name */
-	bool is_combined;         /* independent axis | combined axis */
-	uint8_t node_id;          /* axis id */
-	uint8_t axis_type;        /* axis type: FINITE | MODULO */
-	uint8_t oper_mode;        /* operating mode: POSITION | VELOCITY | TORQUE */
-	double sw_limit_neg;      /* negtive position limit (unit:) */
-	double sw_limit_pos;      /* positive position limit (unit:) */
-	double max_vel;           /* velocity limit (unit:) */
-	double max_acc;           /* accelaration limit (unit:) */
-	double max_dec;           /* decelaration limit (unit:) */
-	double max_jerk;          /* jerk limit (unit:) */
+	uint8_t id;                    /* axis id */
+	uint8_t type;                  /* axis type: FINITE | MODULO */
+	uint8_t combined;              /* independent axis | combined axis */
+	uint8_t opmode;                /* operating mode: POSITION | VELOCITY | TORQUE */
+	double min_pos;                /* negtive position limit (unit:) */
+	double max_pos;                /* positive position limit (unit:) */
+	double max_vel;                /* velocity limit (unit:) */
+	double max_acc;                /* accelaration limit (unit:) */
+	double max_dec;                /* decelaration limit (unit:) */
+	double max_jerk;               /* jerk limit (unit:) */
 } OBJ_ACS; /* Axis Configuration Segment */
 
 typedef struct {
 	uint8_t axis_count;                 /* number of axis */
 	uint32_t update_interval;           /* servo data update interval */
-	OBJ_ACS axis_group[MAX_AXIS_COUNT]; /* array of axis */
+	OBJ_ACS axis_config[MAX_AXIS_COUNT]; /* array of axis */
 } OBJ_SCS; /* Servo Configuration Segment */
 
 /*-----------------------------------------------------------------------------
@@ -95,9 +95,10 @@ typedef struct {
 typedef struct {
     char name[MAX_POU_NAME_SIZE]; /* POU name */
     uint8_t input_count;          /* number of input parameters */
+    uint8_t inout_count;          /* number of in-out parameters */
     uint8_t output_count;         /* number of output parameters */
     uint8_t local_count;          /* number of local parameters */
-    uint32_t addr;                /* POU address(AKA index of instruction) */
+    uint32_t entry;               /* POU entry address(AKA index of instruction) */
 } OBJ_PDS; /* POU Descriptor Segment */
 
 typedef struct {

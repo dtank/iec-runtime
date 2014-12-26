@@ -30,12 +30,12 @@ void generate_obj_iocs(FILE *fp, OBJ_IOCS *iocs) {
  *---------------------------------------------------------------------------*/
 void generate_obj_acs(FILE *fp, OBJ_ACS *acs) {
 	fwrite(acs->name, MAX_AXIS_NAME_SIZE, 1, fp); /* including '\0' */
-	fwrite(&acs->is_combined, sizeof(acs->is_combined), 1, fp);
-	fwrite(&acs->node_id, sizeof(acs->node_id), 1, fp);
-	fwrite(&acs->axis_type, sizeof(acs->axis_type), 1, fp);
-	fwrite(&acs->oper_mode, sizeof(acs->oper_mode), 1, fp);
-	fwrite(&acs->sw_limit_neg, sizeof(acs->sw_limit_neg), 1, fp);
-	fwrite(&acs->sw_limit_pos, sizeof(acs->sw_limit_pos), 1, fp);
+	fwrite(&acs->id, sizeof(acs->id), 1, fp);
+	fwrite(&acs->type, sizeof(acs->type), 1, fp);
+	fwrite(&acs->combined, sizeof(acs->combined), 1, fp);
+	fwrite(&acs->opmode, sizeof(acs->opmode), 1, fp);
+	fwrite(&acs->min_pos, sizeof(acs->min_pos), 1, fp);
+	fwrite(&acs->max_pos, sizeof(acs->max_pos), 1, fp);
 	fwrite(&acs->max_vel, sizeof(acs->max_vel), 1, fp);
 	fwrite(&acs->max_acc, sizeof(acs->max_acc), 1, fp);
 	fwrite(&acs->max_dec, sizeof(acs->max_dec), 1, fp);
@@ -45,7 +45,7 @@ void generate_obj_scs(FILE *fp, OBJ_SCS *scs) {
 	fwrite(&scs->axis_count, sizeof(scs->axis_count), 1, fp);
 	fwrite(&scs->update_interval, sizeof(scs->update_interval), 1, fp);
 	for (int i = 0; i < scs->axis_count; ++i) {
-		generate_obj_acs(fp, &(scs->axis_group[i]));
+		generate_obj_acs(fp, &(scs->axis_config[i]));
 	}
 }
 /*-----------------------------------------------------------------------------
@@ -67,9 +67,10 @@ void generate_obj_tds(FILE *fp, OBJ_TDS *tds) {
 void generate_obj_pds(FILE *fp, OBJ_PDS *pds) {
 	fwrite(pds->name, MAX_POU_NAME_SIZE, 1, fp);
 	fwrite(&pds->input_count, sizeof(pds->input_count), 1, fp);
+	fwrite(&pds->inout_count, sizeof(pds->inout_count), 1, fp);
 	fwrite(&pds->output_count, sizeof(pds->output_count), 1, fp);
 	fwrite(&pds->local_count, sizeof(pds->local_count), 1, fp);
-	fwrite(&pds->addr, sizeof(pds->addr), 1, fp);
+	fwrite(&pds->entry, sizeof(pds->entry), 1, fp);
 }
 void generate_obj_value(FILE *fp, OBJ_VAL *value) {
 	fwrite(&value->type, sizeof(value->type), 1, fp);

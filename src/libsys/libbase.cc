@@ -1,13 +1,16 @@
 #include <math.h>
 #include "libsys.h"
 
-#define REGI_BASE 0
-#define REGI_COUNT(id) (spou_desc[id].input_count) /* id = system-level pou id */
-#define REGO_BASE(id)  (REGI_BASE + REGI_COUNT(id))
-#define REGO_COUNT(id) (spou_desc[id].output_count)
-#define REG(n) (reg_base[n])
-#define REGI(n) REG(REGI_BASE+n)
-#define REGO(id, n) REG(REGO_BASE(id)+n)
+/* id: system-level pou id */
+#define SPOU_DESC(id)     (spou_desc[id])
+#define SPOU_INPUTC(id)   (SPOU_DESC(id).input_count)
+#define SPOU_OUTPOUTC(id) (SPOU_DESC(id).output_count)
+#define SPOU_IBASE 0
+#define SPOU_OBASE(id)  (SPOU_IBASE + SPOU_INPUTC(id))
+
+#define REG(n)      (reg_base[n])
+#define REGI(n)     REG(SPOU_IBASE+n)
+#define REGO(id, n) REG(SPOU_OBASE(id)+n)
 
 /* Numerical Functions */
 void sfun_abs(IValue *reg_base) {
@@ -16,3 +19,4 @@ void sfun_abs(IValue *reg_base) {
 void sfun_sqrt(IValue *reg_base) {
     arith2vd(sqrt, REGO(SFUN_SQRT, 0), REGI(0)); /* double type only */
 }
+//TODO add some lib

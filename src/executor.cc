@@ -21,6 +21,21 @@ extern IOMem g_ioshm;
 #define Bx  GETARG_Bx(instruction)
 #define sAx GETARG_sAx(instruction)
 
+/* I/O */
+#define DIU (iomem.diu)
+#define DOU (iomem.dou)
+#define AIU (iomem.aiu)
+#define AOU (iomem.aou)
+#define DIU_CH(pos, size) getdch(DIU, pos, size)
+#define DOU_CH(pos, size) getdch(DOU, pos, size)
+#define AIU_CH(pos, size) getach(AIU, pos, size)
+#define AOU_CH(pos, size) getach(AOU, pos, size)
+
+#define do_dload(reg, diu_ch) {setvint(reg, diu_ch);}
+#define do_dstore(dou, pos, size, reg) {setdch(dou, pos, size, (reg).v.value_i);}
+#define do_aload(reg, aiu_ch) {setvint(reg, aiu_ch);}
+#define do_astore(aou, pos, size, reg) {setach(aou, pos, size, (reg).v.value_i);}
+
 /* calling stack */
 #define STK     (task->stack)
 #define TOP     (task->stack.top)
@@ -37,46 +52,35 @@ extern IOMem g_ioshm;
 /* user-level POU */
 #define UPOU_DESC(i)    (task->pou_desc[i])
 #define UPOU_INPUTC(i)  (UPOU_DESC(i).input_count)
+#define UPOU_INOUTC(i)  (UPOU_DESC(i).inout_count)
 #define UPOU_OUTPUTC(i) (UPOU_DESC(i).output_count)
 #define UPOU_LOCALC(i)  (UPOU_DESC(i).local_count)
-#define UPOU_REGC(i)    (UPOU_INPUTC(i) + UPOU_OUTPUTC(i) + UPOU_LOCALC(i))
-#define UPOU_ENTR(i)    (UPOU_DESC(i).addr)
-
-/* I/O */
-#define DIU (iomem.diu)
-#define DOU (iomem.dou)
-#define AIU (iomem.aiu)
-#define AOU (iomem.aou)
-#define DIU_CH(pos, size) getdch(DIU, pos, size)
-#define DOU_CH(pos, size) getdch(DOU, pos, size)
-#define AIU_CH(pos, size) getach(AIU, pos, size)
-#define AOU_CH(pos, size) getach(AOU, pos, size)
-
-#define do_dload(reg, diu_ch) {setvint(reg, diu_ch);}
-#define do_dstore(dou, pos, size, reg) {setdch(dou, pos, size, (reg).v.value_i);}
-#define do_aload(reg, aiu_ch) {setvint(reg, aiu_ch);}
-#define do_astore(aou, pos, size, reg) {setach(aou, pos, size, (reg).v.value_i);}
+#define UPOU_REGIC(i)   (UPOU_INPUTC(i) + UPOU_INOUTC(i))
+#define UPOU_REGOC(i)   (UPOU_INOUTC(i) + UPOU_OUTPUTC(i))
+#define UPOU_REGC(i)    (UPOU_REGIC(i) + UPOU_REGOC(i))
+#define UPOU_ENTRY(i)   (UPOU_DESC(i).entry)
 
 /**
  * A  = caller base_addr(index) of reg containing input args
  * Bx = called pou id
  */
-#define do_ucall(caller_input_base, called_id) {                                           \
-    SFrame called_sf;                                          \
-    /* sframe, pou_id, ret_addr, regs_needed */                \
-    sf_init(called_sf, called_id, PC+1, UPOU_REGC(called_id));               \
-    /* called_sf, input_base, caller_sf, input_base, inputc */ \
-    sf_regcpy(called_sf, 0, CURR_SF, caller_input_base, UPOU_INPUTC(called_id));      \
-    cs_push(STK, called_sf);                                   \
-    PC = UPOU_ENTR(called_id);                                        \
+#define do_ucall(caller_input_base, called_id) {                                \
+    SFrame called_sf;                                                           \
+    /* sframe, pou_id, ret_addr, regs_needed */                                 \
+    sf_init(called_sf, called_id, PC+1, UPOU_REGC(called_id));                  \
+    /* called_sf, input_base, caller_sf, input_base, inputc */                  \
+    sf_regcpy(called_sf, 0, CURR_SF, caller_input_base, UPOU_REGIC(called_id)); \
+    cs_push(STK, called_sf);                                                    \
+    PC = UPOU_ENTRY(called_id);                                                 \
 }
-#define do_ret(caller_input_base, called_id) {                                                                       \
-    /* caller_sf, output_base, called_sf, output_base, outpouc */                        \
-    sf_regcpy(PREV_SF, caller_input_base+UPOU_INPUTC(called_id),\
-            CURR_SF, 0+UPOU_INPUTC(called_id), UPOU_OUTPUTC(called_id)); \
-    PC = CURR_SF.ret;                                                                    \
-    cs_pop(STK);                                                                         \
+#define do_ret(caller_input_base, called_id) {                         \
+    /* caller_sf, output_base, called_sf, output_base, outpouc */      \
+    sf_regcpy(PREV_SF, caller_input_base+UPOU_INPUTC(called_id),       \
+            CURR_SF, 0+UPOU_INPUTC(called_id), UPOU_REGOC(called_id)); \
+    PC = CURR_SF.ret;                                                  \
+    cs_pop(STK);                                                       \
 }
+
 #if LEVEL_DBG <= LOGGER_LEVEL
     #define dump_opcode(i) {fprintf(stderr, "%-6s: ", #i);}
     #define dump_data(s, i, v) {       \
@@ -112,33 +116,35 @@ extern IOMem g_ioshm;
         fprintf(stderr, #io);                        \
         fprintf(stderr, " [%0#x]\n", io##U_CH(B,C)); \
     }
-    #define dump_icmp(i, sym, cmp) {                 \
-        dump_opcode(i);                              \
-        fprintf(stderr, "{ ");                        \
-        dump_R(B);                                   \
-        fprintf(stderr, " " #sym " ");                        \
-        dump_R(C);                                   \
-        fprintf(stderr, " } [%d == %d]\n", is_##cmp(R(B), R(C)), A);                        \
+    #define dump_icmp(i, sym, cmp) {                                 \
+        dump_opcode(i);                                              \
+        fprintf(stderr, "{ ");                                       \
+        dump_R(B);                                                   \
+        fprintf(stderr, " " #sym " ");                               \
+        dump_R(C);                                                   \
+        fprintf(stderr, " } [%d == %d]\n", is_##cmp(R(B), R(C)), A); \
     }
-    #define dump_jmp() {                 \
-        dump_opcode(JMP);                              \
-        fprintf(stderr, "Jump over next %d instructions\n", sAx);\
+    #define dump_jmp() {                                          \
+        dump_opcode(JMP);                                         \
+        fprintf(stderr, "Jump over next %d instructions\n", sAx); \
     }
     #define dump_halt() {                 \
-        dump_opcode(HALT);                              \
-        fprintf(stderr, "End of code\n");\
+        dump_opcode(HALT);                \
+        fprintf(stderr, "End of code\n"); \
     }
-    #define dump_scall() {                 \
-        dump_opcode(SCALL);                              \
-        fprintf(stderr, "Calling system-level POU(%s)\n", spou_desc[Bx].name);\
+    #define dump_scall() {                                                     \
+        dump_opcode(SCALL);                                                    \
+        fprintf(stderr, "Calling system-level POU(%s)\n", spou_desc[Bx].name); \
     }
-    #define dump_ucall() {                 \
-        dump_opcode(SCALL);                              \
-        fprintf(stderr, "Calling user-level POU(%s) [entry: instruction(%d)]\n", UPOU_DESC(Bx).name, UPOU_DESC(Bx).addr);\
+    #define dump_ucall() {                                                       \
+        dump_opcode(SCALL);                                                      \
+        fprintf(stderr, "Calling user-level POU(%s) [entry: instruction(%d)]\n", \
+                UPOU_DESC(Bx).name, UPOU_ENTRY(Bx));                             \
     }
-    #define dump_ret() {                 \
-        dump_opcode(RET);                              \
-        fprintf(stderr, "Returning from user-level POU(%s) [return: instruction(%d)]\n", UPOU_DESC(Bx).name, CURR_SF.ret);\
+    #define dump_ret() {                                                                 \
+        dump_opcode(RET);                                                                \
+        fprintf(stderr, "Returning from user-level POU(%s) [return: instruction(%d)]\n", \
+                UPOU_DESC(Bx).name, CURR_SF.ret);                                        \
     }
 #else
     #define dump_opcode(i)
@@ -149,7 +155,14 @@ extern IOMem g_ioshm;
     #define dump_imov(i, arrow, src, index)
     #define dump_iarith(i, op)
     #define dump_iio(i, arrow, io)
+    #define dump_icmp(i, sym, cmp)
+    #define dump_jmp()
+    #define dump_halt()
+    #define dump_scall()
+    #define dump_ucall()
+    #define dump_ret()
 #endif
+
 static void executor(void *plc_task) {
     PLCTask *task = (PLCTask *)plc_task;
     rt_task_set_periodic(NULL, TM_NOW, task->task_desc.interval);
