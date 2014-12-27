@@ -23,4 +23,4 @@
 *.hex
 
 # Others
-*.d
+*.pyc

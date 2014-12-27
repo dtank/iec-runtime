@@ -20,7 +20,7 @@ int load_servo_config(FILE *fp, ServoConfig *servo_config);
  * PLC Task List Loader
  *---------------------------------------------------------------------------*/
 static int load_task_desc(FILE *fp, TaskDesc *task_desc);
-static int load_pou_desc(FILE *fp, POUDesc *pou_desc);
+static int load_pou_desc(FILE *fp, UPOUDesc *pou_desc);
 static int load_string(FILE *fp, IString *str);
 static int load_value(FILE *fp, IValue *value);
 static int load_plc_task(FILE *fp, PLCTask *task);

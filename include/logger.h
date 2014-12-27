@@ -44,7 +44,7 @@
     #define LOGGER_ERR(code, ...)                 \
     do {                                          \
         fprintf(stderr, "Error Code %d: ", code); \
-        fprintf(stderr, err_msg[code]);            \
+        fprintf(stderr, "%s", err_msg[code]);     \
         fprintf(stderr, __VA_ARGS__);             \
         fprintf(stderr, "...\n");                 \
     } while(0)
@@ -94,7 +94,7 @@ enum ErrorCode {
     EC_AXIS_COMBINE,
     EC_AXIS_ID_RANGE,
     EC_AXIS_TYPE,
-    EC_AXIS_OPER_MODE,
+    EC_AXIS_OPMODE,
     EC_AXIS_SW,
     EC_AXIS_MAX_VEL,
     EC_AXIS_MAX_ACC,

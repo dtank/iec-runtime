@@ -17,7 +17,7 @@
 
 /* Internal String */
 typedef struct {
-    uint32_t length;
+    uint32_t length; /* '\0' included */
     char *str;
 } IString;
 

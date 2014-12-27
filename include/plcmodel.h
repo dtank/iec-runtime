@@ -27,12 +27,12 @@ typedef struct {
  *---------------------------------------------------------------------------*/
 typedef struct {
 	char name[MAX_AXIS_NAME_SIZE]; /* axis name, including '\0' */
-	bool is_combined;              /* independent axis | combined axis */
-	uint8_t node_id;               /* axis id */
-	uint8_t axis_type;             /* axis type: FINITE | MODULO */
-	uint8_t oper_mode;             /* operating mode: POSITION | VELOCITY | TORQUE */
-	double sw_limit_neg;           /* negtive position limit (unit:) */
-	double sw_limit_pos;           /* positive position limit (unit:) */
+	uint8_t id;                    /* axis id */
+	uint8_t type;                  /* axis type: FINITE | MODULO */
+	uint8_t combined;              /* independent axis | combined axis */
+	uint8_t opmode;                /* operating mode: POSITION | VELOCITY | TORQUE */
+	double min_pos;                /* negtive position limit (unit:) */
+	double max_pos;                /* positive position limit (unit:) */
 	double max_vel;                /* velocity limit (unit:) */
 	double max_acc;                /* accelaration limit (unit:) */
 	double max_dec;                /* decelaration limit (unit:) */
@@ -42,7 +42,7 @@ typedef struct {
 typedef struct {
 	uint8_t axis_count;       /* number of axis */
 	uint32_t update_interval; /* Servo data update interval */
-	AxisConfig *axis_group;   /* array of axis configuration */
+	AxisConfig *axis_config;   /* array of axis configuration */
 } ServoConfig;
 /*-----------------------------------------------------------------------------
  * Robot Configuration
@@ -61,25 +61,26 @@ typedef struct {
     uint8_t signal;                /* signal source: TIMER | I/O */
 	uint32_t interval;             /* time interval (uint: ns) */
     uint32_t sp_size;              /* capacity of string pool(unit: Byte) */
+	uint16_t cs_size;              /* capacity of calling stack(number of stack frame) */
     uint16_t pou_count;            /* Program Organization Unit: FUN | FB | PROG */
     uint16_t const_count;          /* number of constant */
     uint16_t global_count;         /* number of global variables */
 	uint32_t inst_count;           /* number of instructions(code) */
-	uint16_t sframe_count;         /* number of stack frame */
 } TaskDesc; /* PLC Task Descriptor */
 
 typedef struct {
     char name[MAX_POU_NAME_SIZE]; /* POU name */
     uint8_t input_count;          /* number of input parameters */
+    uint8_t inout_count;          /* number of in-out parameters */
     uint8_t output_count;         /* number of output parameters */
     uint8_t local_count;          /* number of local parameters */
-    uint32_t addr;                /* POU address(AKA index of instruction) */
-} POUDesc; /* User-level POU Descriptor */
+    uint32_t entry;               /* POU entry address(AKA index of instruction) */
+} UPOUDesc; /* User-level POU Descriptor */
 
 typedef struct {
     TaskDesc task_desc; /* PLC task descriptor */
     StrPool strpool;    /* string pool */
-    POUDesc *pou_desc;  /* POU descriptor */
+    UPOUDesc *pou_desc; /* POU descriptor */
     IValue *vconst;     /* constant pool */
     IValue *vglobal;    /* global variables */
     Instruction *code;  /* task code(instruction) */

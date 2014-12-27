@@ -71,30 +71,30 @@ static int load_axis_config(FILE *fp, AxisConfig *axis_config) {
 
     /* ORDER SENSITIVE */
     loadvs(fp, axis_config->name, MAX_AXIS_NAME_SIZE);
-    loadv(fp, &axis_config->is_combined);
-    loadv(fp, &axis_config->node_id);
-    loadv(fp, &axis_config->axis_type);
-    loadv(fp, &axis_config->oper_mode);
-    loadv(fp, &axis_config->sw_limit_neg);
-    loadv(fp, &axis_config->sw_limit_pos);
+    loadv(fp, &axis_config->id);
+    loadv(fp, &axis_config->type);
+    loadv(fp, &axis_config->combined);
+    loadv(fp, &axis_config->opmode);
+    loadv(fp, &axis_config->min_pos);
+    loadv(fp, &axis_config->max_pos);
     loadv(fp, &axis_config->max_vel);
     loadv(fp, &axis_config->max_acc);
     loadv(fp, &axis_config->max_dec);
     loadv(fp, &axis_config->max_jerk);
-    verify(axis_config->is_combined != false && axis_config->is_combined != true, EC_AXIS_COMBINE, "");
-    verify(axis_config->node_id < MIN_AXIS_NODE_ID || MAX_AXIS_NODE_ID < axis_config->node_id, EC_AXIS_ID_RANGE, "");
-    verify(axis_config->axis_type != AXIS_TYPE_FINITE && axis_config->axis_type != AXIS_TYPE_MODULO, EC_AXIS_TYPE, "");
-    verify(axis_config->oper_mode < OPER_MODE_POS || OPER_MODE_TOR < axis_config->oper_mode, EC_AXIS_OPER_MODE, "");
-    verify(axis_config->sw_limit_pos < axis_config->sw_limit_neg, EC_AXIS_SW, "");
+    verify(axis_config->id < MIN_AXIS_ID || MAX_AXIS_ID < axis_config->id, EC_AXIS_ID_RANGE, "");
+    verify(axis_config->type != AXIS_TYPE_FINITE && axis_config->type != AXIS_TYPE_MODULO, EC_AXIS_TYPE, "");
+    verify(axis_config->combined != AXIS_INDEPENDENT && axis_config->combined != AXIS_COMBINED, EC_AXIS_COMBINE, "");
+    verify(axis_config->opmode < OPMODE_POS || OPMODE_TOR < axis_config->opmode, EC_AXIS_OPMODE, "");
+    verify(axis_config->max_pos < axis_config->min_pos, EC_AXIS_SW, "");
     verify(axis_config->max_vel < 0.0, EC_AXIS_MAX_VEL, "");
     verify(axis_config->max_acc < 0.0, EC_AXIS_MAX_ACC, "");
     verify(axis_config->max_dec < 0.0, EC_AXIS_MAX_DEC, "");
     verify(axis_config->max_jerk < 0.0, EC_AXIS_MAX_JERK, "");
 	LOGGER_DBG(DFLAG_SHORT,
-		"AxisConfig:\n .is_combined = %d\n .name = %s\n .node_id = %d\n .axis_type = %d\n .oper_mode = %d\n"
-        " .sw_limit_neg = %f\n .sw_limit_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
-		axis_config->is_combined, axis_config->name, axis_config->node_id, axis_config->axis_type, axis_config->oper_mode,
-        axis_config->sw_limit_neg, axis_config->sw_limit_pos, axis_config->max_vel, axis_config->max_acc, axis_config->max_dec, axis_config->max_jerk);
+		"AxisConfig:\n .name = %s\n .id = %d\n .type = %d\n .combined = %d\n .opmode = %d\n"
+        " .min_pos = %f\n .max_pos = %f\n .max_vel = %f\n .max_acc = %f\n .max_dec = %f\n .max_jerk = %f",
+		axis_config->name, axis_config->id, axis_config->type, axis_config->combined, axis_config->opmode,
+        axis_config->min_pos, axis_config->max_pos, axis_config->max_vel, axis_config->max_acc, axis_config->max_dec, axis_config->max_jerk);
 	return 0;
 }
 int load_servo_config(FILE *fp, ServoConfig *servo_config) {
@@ -106,14 +106,14 @@ int load_servo_config(FILE *fp, ServoConfig *servo_config) {
     loadv(fp, &servo_config->update_interval);
     verify(MAX_AXIS_COUNT < servo_config->axis_count, EC_AXIS_COUNT, "");
     verify(servo_config->update_interval < MIN_SERVO_INTERVAL, EC_SERVO_INTERVAL, "");
-    servo_config->axis_group = new AxisConfig[servo_config->axis_count];
-    verify(servo_config->axis_group == NULL, EC_OOM, "loading axis configuration");
+    servo_config->axis_config = new AxisConfig[servo_config->axis_count];
+    verify(servo_config->axis_config == NULL, EC_OOM, "loading axis configuration");
 	LOGGER_DBG(DFLAG_LONG, "ServoConfig:\n .axis_count = %d\n .update_interval = %d",
         servo_config->axis_count, servo_config->update_interval);
 	for (int i = 0; i < servo_config->axis_count; ++i) {
-        if (load_axis_config(fp, &servo_config->axis_group[i]) < 0) {
+        if (load_axis_config(fp, &servo_config->axis_config[i]) < 0) {
             LOGGER_ERR(EC_LOAD_SERVO_CONFIG, "");
-            delete[] servo_config->axis_group;
+            delete[] servo_config->axis_config;
             return -1;
         }
 	}
@@ -133,39 +133,40 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     loadv(fp, &task_desc->signal);
     loadv(fp, &task_desc->interval);
     loadv(fp, &task_desc->sp_size);
+    loadv(fp, &task_desc->cs_size);
     loadv(fp, &task_desc->pou_count);
     loadv(fp, &task_desc->const_count);
     loadv(fp, &task_desc->global_count);
     loadv(fp, &task_desc->inst_count);
-    loadv(fp, &task_desc->sframe_count);
     verify(task_desc->priority < MIN_TASK_PRIORITY || MAX_TASK_PRIORITY < task_desc->priority, EC_TASK_PRIORITY, "");
     verify(task_desc->type != TASK_TYPE_SIGNAL && task_desc->type != TASK_TYPE_INTERVAL, EC_TASK_TYPE, "");
     verify(MAX_TASK_SIGNAL < task_desc->signal, EC_TASK_SIGNAL, "");
     verify(task_desc->interval < MIN_TASK_INTERVAL, EC_TASK_INTERVAL, "");
     verify(MAX_SP_SIZE < task_desc->sp_size, EC_LOAD_SP_SIZE, "");
+    verify(MAX_CS_CAP < task_desc->cs_size, EC_LOAD_CS_CAP, "");
     verify(MAX_TASK_POU_COUNT < task_desc->pou_count, EC_TASK_POU_COUNT, "");
     verify(MAX_TASK_CONST_COUNT < task_desc->const_count, EC_TASK_CONST_COUNT, "");
     verify(MAX_TASK_GLOBAL_COUNT < task_desc->global_count, EC_TASK_GLOBAL_COUNT, "");
-    verify(MAX_CS_CAP < task_desc->sframe_count, EC_LOAD_CS_CAP, "");
     LOGGER_DBG(DFLAG_SHORT, "TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n .sp_size = %d\n"
-        " .pou_count = %d\n .const_count = %d\n .global_count = %d\n .inst_count = %d\n .sframe_count = %d",
+        " .cs_size = %d\n .pou_count = %d\n .const_count = %d\n .global_count = %d\n .inst_count = %d",
         task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval, task_desc->sp_size,
-        task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->inst_count, task_desc->sframe_count);
+        task_desc->cs_size, task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->inst_count);
     return 0;
 }
-static int load_pou_desc(FILE *fp, POUDesc *pou_desc) {
+static int load_pou_desc(FILE *fp, UPOUDesc *pou_desc) {
     assert(fp != NULL);
     assert(pou_desc != NULL);
 
     /* ORDER SENSITIVE */
     loadvs(fp, pou_desc->name, MAX_POU_NAME_SIZE);
     loadv(fp, &pou_desc->input_count);
+    loadv(fp, &pou_desc->inout_count);
     loadv(fp, &pou_desc->output_count);
     loadv(fp, &pou_desc->local_count);
-    loadv(fp, &pou_desc->addr);
-    verify(MAX_POU_PARAM_COUNT < (pou_desc->input_count+pou_desc->output_count+pou_desc->local_count), EC_POU_PARAM_COUNT, "");
-    LOGGER_DBG(DFLAG_SHORT, "POUDesc:\n .name = %s\n .input_count = %d\n .output_count = %d\n .local_count = %d\n .addr = %d",
-        pou_desc->name, pou_desc->input_count, pou_desc->output_count, pou_desc->local_count, pou_desc->addr);
+    loadv(fp, &pou_desc->entry);
+    verify(MAX_POU_PARAM_COUNT < (pou_desc->input_count+pou_desc->inout_count+pou_desc->output_count+pou_desc->local_count), EC_POU_PARAM_COUNT, "");
+    LOGGER_DBG(DFLAG_SHORT, "UPOUDesc:\n .name = %s\n .input_count = %d\n .inout_count = %d\n .output_count = %d\n .local_count = %d\n .entry = %d",
+        pou_desc->name, pou_desc->input_count, pou_desc->inout_count, pou_desc->output_count, pou_desc->local_count, pou_desc->entry);
     return 0;
 }
 static int load_string(FILE *fp, IString *str, StrPool *sp) {
@@ -205,7 +206,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
 
     verify(load_task_desc(fp, &task->task_desc) < 0, EC_LOAD_TASK_DESC, "");
     verify(sp_init(&task->strpool, task->task_desc.sp_size) < 0, EC_SP_INIT, ""); /* MUST initialize before loading constant/global */
-    task->pou_desc = new POUDesc[task->task_desc.pou_count];
+    task->pou_desc = new UPOUDesc[task->task_desc.pou_count];
     task->vconst = new IValue[task->task_desc.const_count];
     task->vglobal = new IValue[task->task_desc.global_count];
     task->code = new Instruction[task->task_desc.inst_count];
@@ -245,7 +246,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
         verify(GET_OPCODE(task->code[i]) < MIN_OPCODE || MAX_OPCODE < GET_OPCODE(task->code[i]), EC_LOAD_OPCODE, "");
         LOGGER_DBG(DFLAG_SHORT, "loaded instruction[%d] = %0#10x, OpCode = %d", i, task->code[i], GET_OPCODE(task->code[i]));
     }
-    verify(cs_init(&task->stack, task->task_desc.sframe_count) < 0, EC_CS_INIT, ""); /* MUST initialize after loading POU descriptor */
+    verify(cs_init(&task->stack, task->task_desc.cs_size) < 0, EC_CS_INIT, ""); /* MUST initialize after loading POU descriptor */
     /* create main() stack frame manually */
     SFrame main;
     sf_init(main, 0, 0, POU_REGC(task->pou_desc[0]));

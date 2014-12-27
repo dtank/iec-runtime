@@ -15,8 +15,8 @@
 /* Servo Limitations */
 #define MAX_AXIS_COUNT 8
 #define MAX_AXIS_NAME_SIZE 16
-#define MIN_AXIS_NODE_ID 1
-#define MAX_AXIS_NODE_ID MAX_AXIS_COUNT
+#define MIN_AXIS_ID 1
+#define MAX_AXIS_ID MAX_AXIS_COUNT
 #define MIN_SERVO_INTERVAL 2000000 /* unit: ns */
 
 /* PLC Task Limitations */

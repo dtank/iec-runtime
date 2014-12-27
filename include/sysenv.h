@@ -14,9 +14,11 @@
  *---------------------------------------------------------------------------*/
 #define AXIS_TYPE_FINITE 1
 #define AXIS_TYPE_MODULO 2
-#define OPER_MODE_POS 1
-#define OPER_MODE_VEL 2
-#define OPER_MODE_TOR 3
+#define AXIS_INDEPENDENT 1
+#define AXIS_COMBINED    2
+#define OPMODE_POS 1
+#define OPMODE_VEL 2
+#define OPMODE_TOR 3
 /*-----------------------------------------------------------------------------
  *  PLC Task
  *---------------------------------------------------------------------------*/
