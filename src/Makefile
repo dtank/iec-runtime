@@ -1,4 +1,4 @@
-EXECUTABLE := ../bin/iec-runtime    # 可执行文件名
+EXECUTABLE := ../iec-runtime    # 可执行文件名
 LIBDIR := ../lib/xenomai            # 静态库目录
 LIBS := native xenomai pthread_rt           # 静态库文件名
 INCLUDES := ../include ../include/xenomai # 头文件目录

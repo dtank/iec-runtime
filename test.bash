@@ -1,9 +1,9 @@
 #!/bin/bash
 
-EXE=./bin/iec-runtime
+EXE=./iec-runtime
 OBJ=plc.bin
 NFSDIR=~/nfs
-GENOBJ=./bin/generate_obj
+GENOBJ=./generate_obj
 
 # Step1: generate obj file
 ${GENOBJ} "$1"

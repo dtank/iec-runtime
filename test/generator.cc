@@ -58,11 +58,11 @@ void generate_obj_tds(FILE *fp, OBJ_TDS *tds) {
 	fwrite(&tds->signal, sizeof(tds->signal), 1, fp);
 	fwrite(&tds->interval, sizeof(tds->interval), 1, fp);
 	fwrite(&tds->sp_size, sizeof(tds->sp_size), 1, fp);
+    fwrite(&tds->cs_size, sizeof(tds->cs_size), 1, fp);
     fwrite(&tds->pou_count, sizeof(tds->pou_count), 1, fp);
     fwrite(&tds->const_count, sizeof(tds->const_count), 1, fp);
     fwrite(&tds->global_count, sizeof(tds->global_count), 1, fp);
     fwrite(&tds->inst_count, sizeof(tds->inst_count), 1, fp);
-    fwrite(&tds->sframe_count, sizeof(tds->sframe_count), 1, fp);
 }
 void generate_obj_pds(FILE *fp, OBJ_PDS *pds) {
 	fwrite(pds->name, MAX_POU_NAME_SIZE, 1, fp);

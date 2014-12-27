@@ -133,24 +133,24 @@ static int load_task_desc(FILE *fp, TaskDesc *task_desc) {
     loadv(fp, &task_desc->signal);
     loadv(fp, &task_desc->interval);
     loadv(fp, &task_desc->sp_size);
+    loadv(fp, &task_desc->cs_size);
     loadv(fp, &task_desc->pou_count);
     loadv(fp, &task_desc->const_count);
     loadv(fp, &task_desc->global_count);
     loadv(fp, &task_desc->inst_count);
-    loadv(fp, &task_desc->sframe_count);
     verify(task_desc->priority < MIN_TASK_PRIORITY || MAX_TASK_PRIORITY < task_desc->priority, EC_TASK_PRIORITY, "");
     verify(task_desc->type != TASK_TYPE_SIGNAL && task_desc->type != TASK_TYPE_INTERVAL, EC_TASK_TYPE, "");
     verify(MAX_TASK_SIGNAL < task_desc->signal, EC_TASK_SIGNAL, "");
     verify(task_desc->interval < MIN_TASK_INTERVAL, EC_TASK_INTERVAL, "");
     verify(MAX_SP_SIZE < task_desc->sp_size, EC_LOAD_SP_SIZE, "");
+    verify(MAX_CS_CAP < task_desc->cs_size, EC_LOAD_CS_CAP, "");
     verify(MAX_TASK_POU_COUNT < task_desc->pou_count, EC_TASK_POU_COUNT, "");
     verify(MAX_TASK_CONST_COUNT < task_desc->const_count, EC_TASK_CONST_COUNT, "");
     verify(MAX_TASK_GLOBAL_COUNT < task_desc->global_count, EC_TASK_GLOBAL_COUNT, "");
-    verify(MAX_CS_CAP < task_desc->sframe_count, EC_LOAD_CS_CAP, "");
     LOGGER_DBG(DFLAG_SHORT, "TaskDesc:\n .name = %s\n .priority = %d\n .type = %d\n .signal = %d\n .interval = %d\n .sp_size = %d\n"
-        " .pou_count = %d\n .const_count = %d\n .global_count = %d\n .inst_count = %d\n .sframe_count = %d",
+        " .cs_size = %d\n .pou_count = %d\n .const_count = %d\n .global_count = %d\n .inst_count = %d",
         task_desc->name, task_desc->priority, task_desc->type, task_desc->signal, task_desc->interval, task_desc->sp_size,
-        task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->inst_count, task_desc->sframe_count);
+        task_desc->cs_size, task_desc->pou_count, task_desc->const_count, task_desc->global_count, task_desc->inst_count);
     return 0;
 }
 static int load_pou_desc(FILE *fp, UPOUDesc *pou_desc) {
@@ -246,7 +246,7 @@ static int load_plc_task(FILE *fp, PLCTask *task) {
         verify(GET_OPCODE(task->code[i]) < MIN_OPCODE || MAX_OPCODE < GET_OPCODE(task->code[i]), EC_LOAD_OPCODE, "");
         LOGGER_DBG(DFLAG_SHORT, "loaded instruction[%d] = %0#10x, OpCode = %d", i, task->code[i], GET_OPCODE(task->code[i]));
     }
-    verify(cs_init(&task->stack, task->task_desc.sframe_count) < 0, EC_CS_INIT, ""); /* MUST initialize after loading POU descriptor */
+    verify(cs_init(&task->stack, task->task_desc.cs_size) < 0, EC_CS_INIT, ""); /* MUST initialize after loading POU descriptor */
     /* create main() stack frame manually */
     SFrame main;
     sf_init(main, 0, 0, POU_REGC(task->pou_desc[0]));

@@ -15,7 +15,7 @@
     1, /* plc task count */                                                            \
     {                                                                                  \
         {{"task1", 80, TASK_TYPE_INTERVAL, 0, 100000000u,                              \
-          256, 1, 2, 2, 4, 4},{ /* sp_size, pouc, constc, globalc, *INSTC*, sframec */ \
+          256, 4, 1, 2, 2, 4},{ /* sp_size, cs_size, pouc, constc, globalc, *INSTC* */ \
             {"main", 0, 0, 0, 3, 0}, /* name, in, in-out, out, local, entry */         \
         },{                                                                            \
             {TINT,{1}}, /* K(0) */                                                     \
@@ -42,7 +42,7 @@
     1, /* plc task count */                                                            \
     {                                                                                  \
         {{"task1", 80, TASK_TYPE_INTERVAL, 0, 100000000u,                              \
-          256, 1, 2, 2, 6, 4},{ /* sp_size, pouc, constc, globalc, *INSTC*, sframec */ \
+          256, 4, 1, 2, 2, 6},{ /* sp_size, cs_size, pouc, constc, globalc, *INSTC* */ \
             {"main", 0, 0, 0, 3, 0}, /* name, in, in-out, out, local, entry */         \
         },{                                                                            \
             {TINT,{1}}, /* K(0) */                                                     \
@@ -70,7 +70,7 @@
     1, /* plc task count */                                                            \
     {                                                                                  \
         {{"task1", 80, TASK_TYPE_INTERVAL, 0, 100000000u,                              \
-          256, 1, 2, 2, 5, 4},{ /* sp_size, pouc, constc, globalc, *INSTC*, sframec */ \
+          256, 4, 1, 2, 2, 5},{ /* sp_size, cs_size, pouc, constc, globalc, *INSTC* */ \
             {"main", 0, 0, 0, 3, 0}, /* name, in, in-out, out, local, entry */         \
         },{                                                                            \
             {TINT,{1}}, /* K(0) */                                                     \
@@ -99,7 +99,7 @@
     1, /* plc task count */                                                            \
     {                                                                                  \
         {{"task1", 80, TASK_TYPE_INTERVAL, 0, 100000000u,                              \
-          256, 1, 2, 2, 5, 4},{ /* sp_size, pouc, constc, globalc, *INSTC*, sframec */ \
+          256, 4, 1, 2, 2, 5},{ /* sp_size, cs_size, pouc, constc, globalc, *INSTC* */ \
             {"main", 0, 0, 0, 3, 0}, /* name, in, in-out, out, local, entry */         \
         },{                                                                            \
             {TINT,{4}}, /* K(0) */                                                \
@@ -127,7 +127,7 @@
     1, /* plc task count */                                                            \
     {                                                                                  \
         {{"task1", 80, TASK_TYPE_INTERVAL, 0, 100000000u,                              \
-          256, 2, 2, 2, 7, 4},{ /* sp_size, pouc, constc, globalc, *INSTC*, sframec */ \
+          256, 4, 1, 2, 2, 7},{ /* sp_size, cs_size, pouc, constc, globalc, *INSTC* */ \
             {"main", 0, 0, 0, 3, 0}, /* name, in, in-out, out, local, entry */         \
             {"add", 2, 0, 1, 0, 5}, /* name, in, in-out, out, local, entry */          \
         },{                                                                            \

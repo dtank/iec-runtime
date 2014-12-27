@@ -1,4 +1,4 @@
-EXECUTABLE := ../bin/generate_obj # 可执行文件名
+EXECUTABLE := ../generate_obj # 可执行文件名
 INCLUDES := ../include # 头文件目录
 LIBDIR := # 静态库目录
 LIBS := # 静态库文件名
