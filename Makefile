@@ -1,17 +1,28 @@
-.PHONY : all clean rebuild genobj runtime
+EXECUTABLE := ./iec-runtime    # 可执行文件名
+LIBDIR := ./lib/xenomai            # 静态库目录
+LIBS := native xenomai pthread_rt           # 静态库文件名
+INCLUDES := ./include ./include/xenomai # 头文件目录
+SRCDIR := ./src ./src/libsys# 除了当前目录外，其他的源代码文件目录
 
-all:
-	@make -C src
-	@make -C test
+CC = arm-none-linux-gnueabi-g++
+CXX = arm-none-linux-gnueabi-g++
+CFLAGS := -std=c++0x
+CPPFLAGS += $(CFLAGS) $(addprefix -I,$(INCLUDES))
 
-clean:
-	@make clean -C src
-	@make clean -C test
+RM-F := rm -f
+
+SRCS := $(wildcard *.cc) $(wildcard $(addsuffix /*.cc, $(SRCDIR)))
+OBJS := $(patsubst %.cc,%.o,$(SRCS))
+
+.PHONY : all clean rebuild
+
+all: $(EXECUTABLE)
+
+clean :
+	@$(RM-F) ${OBJS}
+	@$(RM-F) $(EXECUTABLE)
 
 rebuild: clean all
 
-genobj:
-	@make rebuild -C test
-
-runtime:
-	@make rebuild -C src
+$(EXECUTABLE) : $(OBJS)
+	$(CXX) -o $(EXECUTABLE) $(OBJS) $(addprefix -L,$(LIBDIR)) $(addprefix -l,$(LIBS))
