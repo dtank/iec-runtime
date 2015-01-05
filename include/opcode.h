@@ -41,12 +41,12 @@ typedef enum {
     OP_MUL,
     OP_DIV,
     /* bit operation opcode */
-    //OP_SHL,
-    //OP_SHR,
-    //OP_AND,
-    //OP_OR,
-    //OP_XOR,
-    //OP_NOT,
+    OP_SHL,
+    OP_SHR,
+    OP_AND,
+    OP_OR,
+    OP_XOR,
+    OP_NOT,
     /* flow control opcode */
     OP_EQJ,
     OP_LTJ,

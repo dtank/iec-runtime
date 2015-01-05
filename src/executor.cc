@@ -187,6 +187,12 @@ static void executor(void *plc_task) {
                 case OP_SUB:    vsub(R(A), R(B), R(C)); dump_iarith(SUB, -); PC++; break;
                 case OP_MUL:    vmul(R(A), R(B), R(C)); dump_iarith(MUL, *); PC++; break;
                 case OP_DIV:    vdiv(R(A), R(B), R(C)); dump_iarith(DIV, /); PC++; break;
+                case OP_SHL:    vshl(R(A), R(B), R(C)); dump_iarith(SHL, <<); PC++; break;
+                case OP_SHR:    vshr(R(A), R(B), R(C)); dump_iarith(SHR, >>); PC++; break;
+                case OP_AND:    vand(R(A), R(B), R(C)); dump_iarith(AND, &); PC++; break;
+                case OP_OR:     vor(R(A), R(B), R(C));  dump_iarith(OR, |); PC++; break;
+                case OP_XOR:    vxor(R(A), R(B), R(C)); dump_iarith(XOR, ^); PC++; break;
+                case OP_NOT:    vnot(R(A), R(B)); PC++; break;
                 case OP_EQJ:    dump_icmp(EQJ, ==, eq); if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
                 case OP_LTJ:    dump_icmp(LTJ, <, lt);  if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
                 case OP_LEJ:    dump_icmp(LEJ, <=, le); if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */

@@ -72,12 +72,33 @@ typedef struct Value {
 /*-----------------------------------------------------------------------------
  * arithmetic Macro
  * Premise:
- *     1) verifier has checked type error already
+ *     1) verifier already checked type error
  *     2) int, uint & double type only
  * Procedue:
  *     1) set type
  *     2) set result value
  *---------------------------------------------------------------------------*/
+#define arith2vi(op, a, b) {           \
+    settint(a);                        \
+    vint(a) = cast(IInt, op(vint(b))); \
+}
+#define arith2vu(op, a, b) {              \
+    settuint(a);                          \
+    vuint(a) = cast(IUInt, op(vuint(b))); \
+}
+#define arith2vd(op, a, b) {                    \
+    settdouble(a);                              \
+    vdouble(a) = cast(IDouble, op(vdouble(b))); \
+}
+#define arith2v(op, a, b) { /* a = op(b) */ \
+    if (isint(b)) {                         \
+        arith2vi(op, a, b);                 \
+    } else if (isuint(b)) {                 \
+        arith2vu(op, a, b);                 \
+    } else if (isdouble(b)) {               \
+        arith2vd(op, a, b);                 \
+    }                                       \
+}
 #define arith3vi(op, a, b, c) {   \
     settint(a);                   \
     vint(a) = vint(b) op vint(c); \
@@ -103,29 +124,14 @@ typedef struct Value {
 #define vsub(a, b, c) arith3v(-, a, b, c)
 #define vmul(a, b, c) arith3v(*, a, b, c)
 #define vdiv(a, b, c) arith3v(/, a, b, c)
-//#define vmod(a, b, c) {vint(a) = vint(b) % vint(c);} /* int type only */
 
-#define arith2vi(op, a, b) {           \
-    settint(a);                        \
-    vint(a) = cast(IInt, op(vint(b))); \
-}
-#define arith2vu(op, a, b) {              \
-    settuint(a);                          \
-    vuint(a) = cast(IUInt, op(vuint(b))); \
-}
-#define arith2vd(op, a, b) {                    \
-    settdouble(a);                              \
-    vdouble(a) = cast(IDouble, op(vdouble(b))); \
-}
-#define arith2v(op, a, b) { /* a = op(b) */ \
-    if (isint(b)) {                         \
-        arith2vi(op, a, b);                 \
-    } else if (isuint(b)) {                 \
-        arith2vu(op, a, b);                 \
-    } else if (isdouble(b)) {               \
-        arith2vd(op, a, b);                 \
-    }                                       \
-}
+#define vshl(a, b, c) arith3vu(<<, a, b, c)
+#define vshr(a, b, c) arith3vu(>>, a, b, c)
+#define vand(a, b, c) arith3vu(&, a, b, c)
+#define vor(a, b, c)  arith3vu(|, a, b, c)
+#define vxor(a, b, c) arith3vu(^, a, b, c)
+#define vnot(a, b)    arith2vu(~, a, b)
+//#define vmod(a, b, c) {vint(a) = vint(b) % vint(c);} /* int type only */
 /*-----------------------------------------------------------------------------
  * Comparation Macro
  * Premise:
