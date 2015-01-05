@@ -46,18 +46,18 @@ tds_cs_size      4
 tds_pou_count    1
 tds_const_count  2
 tds_global_count 2
-tds_inst_count   6
+tds_inst_count   13
 
 # OBJ POU Description Segment
 pds_name         main
 pds_input_count  0
 pds_inout_count  0
 pds_output_count 0
-pds_local_count  3
+pds_local_count  4
 pds_entry        0
 
 # OBJ PLC Task Constant Segment
-K TINT 1
+K TINT 4
 K TINT 2
 
 # OBJ PLC Task Global Variables Segment
@@ -67,7 +67,18 @@ G TINT 0
 # OBJ PLC Task Code Segment
 I OP_KLOAD 0 0  # R(0) <-- K(0)
 I OP_KLOAD 1 1  # R(1) <-- K(1)
-I OP_LTJ 1 0 1  # [R(0) < R(1)] == 1?
-I OP_JMP 1      # Jump over next 1 instruction
-I OP_GSTORE 1 0 # R(1) --> G(0)
+
+I OP_LT 2 0 1   # R(2) <-- R(0) < R(1)
+I OP_CONDJ 2 2  # if R(2) == 0, then jump over next (2-1) instruction
+I OP_GSTORE 0 0 # R(0) --> G(0)
+
+I OP_GT 3 0 1   # R(3) <-- R(0) > R(1)
+I OP_CONDJ 3 2  # if R(3) == 0, then jump over next (2-1) instruction
+I OP_GSTORE 1 1 # R(1) --> G(1)
+
+I OP_JMP 4      # Jump over next (4-1) instructions
+I OP_GSTORE 0 0 # R(1) --> G(0)
+I OP_GSTORE 0 0 # R(1) --> G(0)
+I OP_GSTORE 0 0 # R(1) --> G(0)
+
 I OP_HALT 0 0 0 # Halt

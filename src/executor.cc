@@ -126,7 +126,7 @@ extern IOMem g_ioshm;
     }
     #define dump_jmp() {                                          \
         dump_opcode(JMP);                                         \
-        fprintf(stderr, "Jump over next %d instructions\n", sAx); \
+        fprintf(stderr, "Jump over next %d instructions\n", sAx-1); \
     }
     #define dump_halt() {                 \
         dump_opcode(HALT);                \
@@ -203,11 +203,9 @@ static void executor(void *plc_task) {
                 case OP_GE:     vge(R(A), R(B), R(C)); dump_iarith(GE, >=); PC++; break;
                 case OP_EQ:     veq(R(A), R(B), R(C)); dump_iarith(EQ, ==); PC++; break;
                 case OP_NE:     vne(R(A), R(B), R(C)); dump_iarith(NE, !=); PC++; break;
-                case OP_EQJ:    dump_icmp(EQJ, ==, eq); if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
-                case OP_LTJ:    dump_icmp(LTJ, <, lt);  if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
-                case OP_LEJ:    dump_icmp(LEJ, <=, le); if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */
-                case OP_JMP:    PC += sAx; dump_jmp(); PC++; break; /* MUST follow EQ/LT/LE; PC++ is needed! */
-                case OP_HALT:   PC = EOC; dump_halt(); break;
+                case OP_CONDJ:  if (vuint(R(A)) == 0) PC += Bx; else PC++; break; /* MUST follow LT/LE/... */
+                case OP_JMP:    dump_jmp(); PC += sAx; break;
+                case OP_HALT:   dump_halt(); PC = EOC; break;
                 case OP_SCALL:  dump_scall(); do_scall(&R(A), Bx); PC++; break;
                 case OP_UCALL:  dump_ucall(); do_ucall(A, Bx); break;
                 case OP_RET:    dump_ret(); do_ret(A, Bx); break;

@@ -187,15 +187,13 @@ opcode = {
         'OP_EQ':  {'id': 27, 'creator': create_ABC},
         'OP_NE':  {'id': 28, 'creator': create_ABC},
         # flow control
-        'OP_EQJ':  {'id': 29, 'creator': create_ABC},
-        'OP_LTJ':  {'id': 30, 'creator': create_ABC},
-        'OP_LEJ':  {'id': 31, 'creator': create_ABC},
-        'OP_JMP':  {'id': 32, 'creator': create_sAx},
-        'OP_HALT': {'id': 33, 'creator': create_ABC},
+        'OP_CONDJ':{'id': 29, 'creator': create_ABx},
+        'OP_JMP':  {'id': 30, 'creator': create_sAx},
+        'OP_HALT': {'id': 31, 'creator': create_ABC},
         # call
-        'OP_SCALL': {'id': 34, 'creator': create_scall},
-        'OP_UCALL': {'id': 35, 'creator': create_ABx},
-        'OP_RET':   {'id': 36, 'creator': create_ABx},
+        'OP_SCALL': {'id': 32, 'creator': create_scall},
+        'OP_UCALL': {'id': 33, 'creator': create_ABx},
+        'OP_RET':   {'id': 34, 'creator': create_ABx},
         # helper
         'OP_DIX':   {'id': 4, 'creator': create_DX},
         'OP_DIB':   {'id': 4, 'creator': create_DB},

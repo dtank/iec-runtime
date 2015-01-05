@@ -60,9 +60,7 @@ typedef enum {
     OP_EQ,
     OP_NE,
     /* flow control */
-    OP_EQJ,
-    OP_LTJ,
-    OP_LEJ,
+    OP_CONDJ,
     OP_JMP,
     OP_HALT,
     /* call */
@@ -122,12 +120,6 @@ typedef enum {
 #define CREATE_MUL(a, b, c)  CREATE_ABC(OP_MUL, a, b, c)
 #define CREATE_DIV(a, b, c)  CREATE_ABC(OP_DIV, a, b, c)
 
-#define CREATE_EQJ(b, c)  CREATE_ABC(OP_EQJ, 1, b, c)
-#define CREATE_LTJ(b, c)  CREATE_ABC(OP_LTJ, 1, b, c)
-#define CREATE_LEJ(b, c)  CREATE_ABC(OP_LEJ, 1, b, c)
-#define CREATE_NEJ(b, c)  CREATE_ABC(OP_EQJ, 0, b, c)
-#define CREATE_GEJ(b, c)  CREATE_ABC(OP_LTJ, 0, b, c)
-#define CREATE_GTJ(b, c)  CREATE_ABC(OP_LEJ, 0, b, c)
 #define CREATE_JMP(sAx)   CREATE_sAx(OP_JMP, sAx)
 #define CREATE_HALT()     CREATE_ABC(OP_HALT, 0, 0, 0)
 
