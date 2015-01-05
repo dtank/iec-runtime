@@ -40,7 +40,6 @@ typedef enum {
     OP_SUB,
     OP_MUL,
     OP_DIV,
-    OP_MOD,
     /* flow control opcode */
     OP_EQJ,
     OP_LTJ,
@@ -103,7 +102,6 @@ typedef enum {
 #define CREATE_SUB(a, b, c)  CREATE_ABC(OP_SUB, a, b, c)
 #define CREATE_MUL(a, b, c)  CREATE_ABC(OP_MUL, a, b, c)
 #define CREATE_DIV(a, b, c)  CREATE_ABC(OP_DIV, a, b, c)
-#define CREATE_MOD(a, b, c)  CREATE_ABC(OP_MOD, a, b, c)
 
 #define CREATE_EQJ(b, c)  CREATE_ABC(OP_EQJ, 1, b, c)
 #define CREATE_LTJ(b, c)  CREATE_ABC(OP_LTJ, 1, b, c)

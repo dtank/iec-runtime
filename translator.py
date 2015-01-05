@@ -79,8 +79,12 @@ objmacro = { # MUST be equal to iec-runtime
         'TASK_TYPE_INTERVAL': 2,
         # OBJ PLC Task Constant/Global Value Type
         'TINT': 1,
-        'TDOUBLE': 2,
-        'TSTRING': 3,
+        'TUINT': 2,
+        'TDOUBLE': 3,
+        'TSTRING': 4,
+        # System-level POU
+        'SFUN_ABS':  0,
+        'SFUN_SQRT': 1,
 }
 
 # VM Instruction Encoding (MUST be equal to iec-runtime)
@@ -100,20 +104,51 @@ POS_sAx = POS_C
 
 BIAS_sAx = (1<<(SIZE_sAx-1))
 
-def create_ABC(words):
-    return opcode[words[1]]['id'] << POS_OP \
-            | int(words[2]) << POS_A \
-            | int(words[3]) << POS_B \
-            | int(words[4]) << POS_C;
+# Original Instruction Encoder
+def create_ABC(operand):
+    return opcode[operand[1]]['id'] << POS_OP \
+            | int(operand[2]) << POS_A \
+            | int(operand[3]) << POS_B \
+            | int(operand[4]) << POS_C;
 
-def create_ABx(words):
-    return opcode[words[1]]['id'] << POS_OP \
-            | int(words[2]) << POS_A \
-            | int(words[3]) << POS_Bx
+def create_ABx(operand):
+    return opcode[operand[1]]['id'] << POS_OP \
+            | int(operand[2]) << POS_A \
+            | int(operand[3]) << POS_Bx
 
-def create_sAx(words):
-    return opcode[words[1]]['id'] << POS_OP \
-            | int(words[2])+BIAS_sAx << POS_sAx
+def create_sAx(operand):
+    return opcode[operand[1]]['id'] << POS_OP \
+            | int(operand[2])+BIAS_sAx << POS_sAx
+
+# Helper Instruction Encoder
+def create_DX(operand):
+    new_operand = operand;
+    new_operand[3] = int(operand[3]) * 8 + int(operand[4]);
+    new_operand[4] = 1;
+    return create_ABC(new_operand);
+
+def create_DB(operand):
+    new_operand = operand;
+    new_operand[3] = int(operand[3]) * 8;
+    new_operand[4] = 8;
+    return create_ABC(new_operand);
+
+def create_DW(operand):
+    new_operand = operand;
+    new_operand[3] = int(operand[3]) * 16;
+    new_operand[4] = 16;
+    return create_ABC(new_operand);
+
+def create_DD(operand):
+    new_operand = operand;
+    new_operand[3] = int(operand[3]) * 32;
+    new_operand[4] = 32;
+    return create_ABC(new_operand);
+
+def create_scall(operand):
+    new_operand = operand;
+    new_operand[3] = objmacro[operand[3]];
+    return create_ABx(new_operand);
 
 opcode = {
         # data move opcode
@@ -130,19 +165,26 @@ opcode = {
         'OP_SUB': {'id': 10, 'creator': create_ABC},
         'OP_MUL': {'id': 11, 'creator': create_ABC},
         'OP_DIV': {'id': 12, 'creator': create_ABC},
-        'OP_MOD': {'id': 13, 'creator': create_ABC},
         # flow control opcode
-        'OP_EQJ':  {'id': 14, 'creator': create_ABC},
-        'OP_LTJ':  {'id': 15, 'creator': create_ABC},
-        'OP_LEJ':  {'id': 16, 'creator': create_ABC},
-        'OP_JMP':  {'id': 17, 'creator': create_sAx},
-        'OP_HALT': {'id': 18, 'creator': create_ABC},
+        'OP_EQJ':  {'id': 13, 'creator': create_ABC},
+        'OP_LTJ':  {'id': 14, 'creator': create_ABC},
+        'OP_LEJ':  {'id': 15, 'creator': create_ABC},
+        'OP_JMP':  {'id': 16, 'creator': create_sAx},
+        'OP_HALT': {'id': 17, 'creator': create_ABC},
         # call opcde
-        'OP_SCALL': {'id': 19, 'creator': create_ABx},
-        'OP_UCALL': {'id': 20, 'creator': create_ABx},
-        'OP_RET':   {'id': 21, 'creator': create_ABx},
+        'OP_SCALL': {'id': 18, 'creator': create_scall},
+        'OP_UCALL': {'id': 19, 'creator': create_ABx},
+        'OP_RET':   {'id': 20, 'creator': create_ABx},
+        # helper
+        'OP_DIX':   {'id': 4, 'creator': create_DX},
+        'OP_DIB':   {'id': 4, 'creator': create_DB},
+        'OP_DIW':   {'id': 4, 'creator': create_DW},
+        'OP_DID':   {'id': 4, 'creator': create_DD},
+        'OP_DOX':   {'id': 5, 'creator': create_DX},
+        'OP_DOB':   {'id': 5, 'creator': create_DB},
+        'OP_DOW':   {'id': 5, 'creator': create_DW},
+        'OP_DOD':   {'id': 5, 'creator': create_DD},
 }
-
 
 def dump_inst(obj, words):
     obj.write(struct.pack('I', opcode[words[1]]['creator'](words)));
@@ -150,7 +192,9 @@ def dump_inst(obj, words):
 def dump_value(obj, words):
     obj.write(struct.pack('B', objmacro[words[1]]));
     if words[1] == 'TINT':
-        obj.write(struct.pack('I', int(words[2])));
+        obj.write(struct.pack('q', int(words[2]))); # int64_t
+    if words[1] == 'TUINT':
+        obj.write(struct.pack('Q', int(words[2]))); # uint64_t
     if words[1] == 'TDOUBLE':
         obj.write(struct.pack('d', float(words[2])));
     if words[1] == 'TSTRING':
