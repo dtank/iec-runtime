@@ -47,6 +47,11 @@ typedef enum {
     OP_OR,
     OP_XOR,
     OP_NOT,
+    /* logic operation opcode */
+    OP_LAND,
+    OP_LOR,
+    OP_LXOR,
+    OP_LNOT,
     /* flow control opcode */
     OP_EQJ,
     OP_LTJ,

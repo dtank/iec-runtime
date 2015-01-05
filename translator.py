@@ -153,7 +153,7 @@ def create_scall(operand):
     return create_ABx(new_operand);
 
 opcode = {
-        # data move opcode
+        # data move
         'OP_GLOAD':  {'id': 1, 'creator': create_ABx},
         'OP_GSTORE': {'id': 2, 'creator': create_ABx},
         'OP_KLOAD':  {'id': 3, 'creator': create_ABx},
@@ -162,7 +162,7 @@ opcode = {
         'OP_ALOAD':  {'id': 6, 'creator': create_ABC},
         'OP_ASTORE': {'id': 7, 'creator': create_ABC},
         'OP_MOV':    {'id': 8, 'creator': create_ABC},
-        # arithmetic opcode
+        # arithmetic
         'OP_ADD': {'id': 9, 'creator': create_ABC},
         'OP_SUB': {'id': 10, 'creator': create_ABC},
         'OP_MUL': {'id': 11, 'creator': create_ABC},
@@ -171,19 +171,24 @@ opcode = {
         'OP_SHL': {'id': 13, 'creator': create_ABC},
         'OP_SHR': {'id': 14, 'creator': create_ABC},
         'OP_AND': {'id': 15, 'creator': create_ABC},
-        'OP_OR': {'id': 16, 'creator': create_ABC},
+        'OP_OR':  {'id': 16, 'creator': create_ABC},
         'OP_XOR': {'id': 17, 'creator': create_ABC},
         'OP_NOT': {'id': 18, 'creator': create_ABC},
-        # flow control opcode
-        'OP_EQJ':  {'id': 19, 'creator': create_ABC},
-        'OP_LTJ':  {'id': 20, 'creator': create_ABC},
-        'OP_LEJ':  {'id': 21, 'creator': create_ABC},
-        'OP_JMP':  {'id': 22, 'creator': create_sAx},
-        'OP_HALT': {'id': 23, 'creator': create_ABC},
-        # call opcde
-        'OP_SCALL': {'id': 24, 'creator': create_scall},
-        'OP_UCALL': {'id': 25, 'creator': create_ABx},
-        'OP_RET':   {'id': 26, 'creator': create_ABx},
+        # logic operation
+        'OP_LAND': {'id': 19, 'creator': create_ABC},
+        'OP_LOR':  {'id': 20, 'creator': create_ABC},
+        'OP_LXOR': {'id': 21, 'creator': create_ABC},
+        'OP_LNOT': {'id': 22, 'creator': create_ABC},
+        # flow control
+        'OP_EQJ':  {'id': 23, 'creator': create_ABC},
+        'OP_LTJ':  {'id': 24, 'creator': create_ABC},
+        'OP_LEJ':  {'id': 25, 'creator': create_ABC},
+        'OP_JMP':  {'id': 26, 'creator': create_sAx},
+        'OP_HALT': {'id': 27, 'creator': create_ABC},
+        # call
+        'OP_SCALL': {'id': 28, 'creator': create_scall},
+        'OP_UCALL': {'id': 29, 'creator': create_ABx},
+        'OP_RET':   {'id': 30, 'creator': create_ABx},
         # helper
         'OP_DIX':   {'id': 4, 'creator': create_DX},
         'OP_DIB':   {'id': 4, 'creator': create_DB},
