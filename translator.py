@@ -85,6 +85,8 @@ objmacro = { # MUST be equal to iec-runtime
         # System-level POU
         'SFUN_ABS':  0,
         'SFUN_SQRT': 1,
+        'SFUN_MOD': 2,
+        'SFUN_EXPT': 3,
 }
 
 # VM Instruction Encoding (MUST be equal to iec-runtime)

@@ -26,7 +26,7 @@ typedef uint32_t Instruction;
 #define BIAS_sAx (1<<(SIZE_sAx-1))
 
 typedef enum {
-    /* data mov opcode */
+    /* data move opcode */
     OP_GLOAD = 1,
     OP_GSTORE,
     OP_KLOAD,
@@ -40,6 +40,13 @@ typedef enum {
     OP_SUB,
     OP_MUL,
     OP_DIV,
+    /* bit operation opcode */
+    //OP_SHL,
+    //OP_SHR,
+    //OP_AND,
+    //OP_OR,
+    //OP_XOR,
+    //OP_NOT,
     /* flow control opcode */
     OP_EQJ,
     OP_LTJ,

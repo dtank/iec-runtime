@@ -105,16 +105,16 @@ typedef struct Value {
 #define vdiv(a, b, c) arith3v(/, a, b, c)
 //#define vmod(a, b, c) {vint(a) = vint(b) % vint(c);} /* int type only */
 
-#define arith2vi(op, a, b) {              \
-    settint(a);                           \
+#define arith2vi(op, a, b) {           \
+    settint(a);                        \
     vint(a) = cast(IInt, op(vint(b))); \
 }
-#define arith2vu(op, a, b) {                 \
-    settuint(a);                             \
+#define arith2vu(op, a, b) {              \
+    settuint(a);                          \
     vuint(a) = cast(IUInt, op(vuint(b))); \
 }
-#define arith2vd(op, a, b) {                   \
-    settdouble(a);                             \
+#define arith2vd(op, a, b) {                    \
+    settdouble(a);                              \
     vdouble(a) = cast(IDouble, op(vdouble(b))); \
 }
 #define arith2v(op, a, b) { /* a = op(b) */ \

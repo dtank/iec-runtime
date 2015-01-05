@@ -44,29 +44,40 @@ tds_interval     100000000
 tds_sp_size      256
 tds_cs_size      4
 tds_pou_count    1
-tds_const_count  2
-tds_global_count 2
-tds_inst_count   5
+tds_const_count  3
+tds_global_count 3
+tds_inst_count   12
 
 # OBJ POU Description Segment
 pds_name         main
 pds_input_count  0
 pds_inout_count  0
 pds_output_count 0
-pds_local_count  3
+pds_local_count  8
 pds_entry        0
 
 # OBJ PLC Task Constant Segment
-K TDOUBLE 4
-K TDOUBLE 16
+K TDOUBLE 16.0
+K TINT 7
+K TINT 3
 
 # OBJ PLC Task Global Variables Segment
+G TDOUBLE 0
 G TINT 0
 G TINT 0
 
 # OBJ PLC Task Code Segment
 I OP_KLOAD 0 0         # R(0) <-- K(0)
-I OP_KLOAD 1 1         # R(1) <-- K(1)
-I OP_SCALL 1 SFUN_SQRT # R(1)=REGI; R(2)=REGO
-I OP_GSTORE 2 0        # R(2) --> G(0)
+I OP_SCALL 0 SFUN_SQRT # R(0)=REGI; R(1)=REGO
+I OP_GSTORE 1 0        # R(1) --> G(0)
+
+I OP_KLOAD 2 1         # R(2) <-- K(1)
+I OP_KLOAD 3 2         # R(3) <-- K(2)
+I OP_SCALL 2 SFUN_MOD  # R(2,3)=REGI; R(4)=REGO
+I OP_GSTORE 4 1        # R(4) --> G(1)
+
+I OP_KLOAD 5 2         # R(5) <-- K(2)
+I OP_KLOAD 6 2         # R(6) <-- K(2)
+I OP_SCALL 5 SFUN_EXPT # R(5,6)=REGI; R(7)=REGO
+I OP_GSTORE 7 2        # R(7) --> G(2)
 I OP_HALT 0 0 0        # Halt
