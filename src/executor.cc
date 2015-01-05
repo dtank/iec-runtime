@@ -31,10 +31,10 @@ extern IOMem g_ioshm;
 #define AIU_CH(pos, size) getach(AIU, pos, size)
 #define AOU_CH(pos, size) getach(AOU, pos, size)
 
-#define do_dload(reg, diu_ch) {setvint(reg, diu_ch);}
-#define do_dstore(dou, pos, size, reg) {setdch(dou, pos, size, (reg).v.value_i);}
-#define do_aload(reg, aiu_ch) {setvint(reg, aiu_ch);}
-#define do_astore(aou, pos, size, reg) {setach(aou, pos, size, (reg).v.value_i);}
+#define do_dload(reg, diu_ch) {setvuint(reg, diu_ch);}
+#define do_dstore(dou, pos, size, reg) {setdch(dou, pos, size, (reg).v.value_u);}
+#define do_aload(reg, aiu_ch) {setvuint(reg, aiu_ch);}
+#define do_astore(aou, pos, size, reg) {setach(aou, pos, size, (reg).v.value_u);}
 
 /* calling stack */
 #define STK     (task->stack)
@@ -114,7 +114,7 @@ extern IOMem g_ioshm;
         dump_R(A);                                   \
         fprintf(stderr, " " #arrow " ");             \
         fprintf(stderr, #io);                        \
-        fprintf(stderr, " [%0#x]\n", io##U_CH(B,C)); \
+        fprintf(stderr, " [%0#x]\n", (uint32_t)io##U_CH(B,C)); \
     }
     #define dump_icmp(i, sym, cmp) {                                 \
         dump_opcode(i);                                              \
@@ -187,7 +187,6 @@ static void executor(void *plc_task) {
                 case OP_SUB:    vsub(R(A), R(B), R(C)); dump_iarith(SUB, -); PC++; break;
                 case OP_MUL:    vmul(R(A), R(B), R(C)); dump_iarith(MUL, *); PC++; break;
                 case OP_DIV:    vdiv(R(A), R(B), R(C)); dump_iarith(DIV, /); PC++; break;
-                case OP_MOD:    vmod(R(A), R(B), R(C)); dump_iarith(MOD, %%); PC++; break;
                 case OP_EQJ:    dump_icmp(EQJ, ==, eq); if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
                 case OP_LTJ:    dump_icmp(LTJ, <, lt);  if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
                 case OP_LEJ:    dump_icmp(LEJ, <=, le); if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */

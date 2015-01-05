@@ -24,9 +24,16 @@ typedef struct {
 
 /*-----------------------------------------------------------------------------
  * Digital I/O Unit Manapulation Macros
+ * I/O data is stored in Ivalue.v.value_t (type IUInt)
  *---------------------------------------------------------------------------*/
-#define SHIFT 3 /* 8 = 2^3 */
-#define BASE(unit, pos) (*(uint32_t*)&(unit)[(pos)>>SHIFT]) /* MUST dereference first, then cast type!! */
+#undef MASK1
+#define MASK1(p,n)	((~((~(IUInt)0)<<(n)))<<(p))
+#undef MASK0
+#define MASK0(p,n)	(~MASK1(p,n))
+#define RES(num, shift) ((num) & MASK1(0,shift)) /* get residue */
+
+#define SHIFT 3 /* 8 = 2^3; 8 is the bit width of IOMem.diu */
+#define BASE(unit, pos) (*(IUInt*)&(unit)[(pos)>>SHIFT]) /* MUST dereference first, then cast type!! */
 #define getdch(diu, pos, size) ((BASE(diu,pos) >> RES(pos,SHIFT)) & MASK1(0,size))
 #define setdch(dou, pos, size, value) {                                                       \
     BASE(dou,pos) = BASE(dou,pos) & MASK0(RES(pos,SHIFT), size) | ((value)<<RES(pos, SHIFT)); \

@@ -191,6 +191,8 @@ static int load_value(FILE *fp, IValue *value, StrPool *sp) {
     switch (value->type) {
         case TINT:
             loadv(fp, &value->v.value_i); break;
+        case TUINT:
+            loadv(fp, &value->v.value_u); break;
         case TDOUBLE:
             loadv(fp, &value->v.value_d); break;
         case TSTRING:
