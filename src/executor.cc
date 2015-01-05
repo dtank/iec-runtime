@@ -197,6 +197,12 @@ static void executor(void *plc_task) {
                 case OP_LOR:    vlor(R(A), R(B), R(C));  dump_iarith(LOR, ||); PC++; break;
                 case OP_LXOR:   vlxor(R(A), R(B), R(C)); dump_iarith(LXOR, ^^); PC++; break;
                 case OP_LNOT:   vlnot(R(A), R(B)); PC++; break;
+                case OP_LT:     vlt(R(A), R(B), R(C)); dump_iarith(LT, <); PC++; break;
+                case OP_LE:     vle(R(A), R(B), R(C)); dump_iarith(LE, <=); PC++; break;
+                case OP_GT:     vgt(R(A), R(B), R(C)); dump_iarith(GT, >); PC++; break;
+                case OP_GE:     vge(R(A), R(B), R(C)); dump_iarith(GE, >=); PC++; break;
+                case OP_EQ:     veq(R(A), R(B), R(C)); dump_iarith(EQ, ==); PC++; break;
+                case OP_NE:     vne(R(A), R(B), R(C)); dump_iarith(NE, !=); PC++; break;
                 case OP_EQJ:    dump_icmp(EQJ, ==, eq); if (is_eq(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means EQ; A==0, means NE */
                 case OP_LTJ:    dump_icmp(LTJ, <, lt);  if (is_lt(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LT; A==0, means GE */
                 case OP_LEJ:    dump_icmp(LEJ, <=, le); if (is_le(R(B), R(C)) == A) PC++; PC++; break; /* A==1, means LE; A==0, means GT */

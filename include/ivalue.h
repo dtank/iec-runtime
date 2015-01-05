@@ -136,6 +136,13 @@ typedef struct Value {
 #define vlor(a, b, c)  arith3vu(||, a, b, c)
 #define vlxor(a, b, c) arith3vu(^, a, b, c)
 #define vlnot(a, b)    arith2vu(!, a, b)
+
+#define vlt(a, b, c)   arith3vu(<, a, b, c)
+#define vle(a, b, c)   arith3vu(<=, a, b, c)
+#define vgt(a, b, c)   arith3vu(>, a, b, c)
+#define vge(a, b, c)   arith3vu(>=, a, b, c)
+#define veq(a, b, c)   arith3vu(==, a, b, c)
+#define vne(a, b, c)   arith3vu(!=, a, b, c)
 //#define vmod(a, b, c) {vint(a) = vint(b) % vint(c);} /* int type only */
 /*-----------------------------------------------------------------------------
  * Comparation Macro

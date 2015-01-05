@@ -1,0 +1,93 @@
+# OBJ Header
+header_magic   MAGIC
+header_type    SYS_TYPE_32
+header_order   BYTE_ORDER_LIT
+header_version 1
+header_machine MACH_CORTEX_A8
+
+# OBJ I/O Configuration Segment
+iocs_update_interval 4000000
+iocs_ldi_count 0
+iocs_ldo_count 0
+iocs_lai_count 0
+iocs_lao_count 0
+iocs_rdi_count 0
+iocs_rdo_count 0
+iocs_rai_count 0
+iocs_rao_count 0
+
+# OBJ Servo Configuration Segment
+scs_axis_count 1
+scs_update_interval 4000000
+
+acs_name     axis1
+acs_id       1
+acs_type     AXIS_TYPE_FINITE
+acs_combined AXIS_INDEPENDENT
+acs_opmode   OPMODE_POS
+acs_min_pos  0.0
+acs_max_pos  180.0
+acs_max_vel  100.0
+acs_max_acc  20.0
+acs_max_dec  20.0
+acs_max_jerk 10.0
+
+# OBJ PLC Task List Segment
+plc_task_count 1
+
+# OBJ PLC Task Description Segment
+tds_name         task1
+tds_priority     80
+tds_type         TASK_TYPE_INTERVAL
+tds_signal       0
+tds_interval     100000000
+tds_sp_size      256
+tds_cs_size      4
+tds_pou_count    1
+tds_const_count  2
+tds_global_count 6
+tds_inst_count   15
+
+# OBJ POU Description Segment
+pds_name         main
+pds_input_count  0
+pds_inout_count  0
+pds_output_count 0
+pds_local_count  8
+pds_entry        0
+
+# OBJ PLC Task Constant Segment
+K TUINT 1
+K TUINT 2
+
+# OBJ PLC Task Global Variables Segment
+G TUINT 0
+G TUINT 0
+G TUINT 0
+G TUINT 0
+G TUINT 0
+G TUINT 0
+
+# OBJ PLC Task Code Segment
+I OP_KLOAD 0 0  # R(0) <-- K(0)
+I OP_KLOAD 1 1  # R(1) <-- K(1)
+
+I OP_LT 2 0 1   # R(2) <-- R(0) < R(1)
+I OP_GSTORE 2 0 # R(2) --> G(0)
+
+I OP_LE 3 0 1   # R(3) <-- R(0) <= R(1)
+I OP_GSTORE 3 1 # R(3) --> G(1)
+
+I OP_GT 4 0 1   # R(4) <-- R(0) > R(1)
+I OP_GSTORE 4 2 # R(4) --> G(2)
+
+I OP_GE 5 0 1   # R(5) <-- R(0) >= R(1)
+I OP_GSTORE 5 3 # R(5) --> G(3)
+
+I OP_EQ 6 0 1   # R(6) <-- R(0) == R(1)
+I OP_GSTORE 6 4 # R(6) --> G(4)
+
+I OP_NE 7 0 1   # R(7) <-- R(0) == R(1)
+I OP_GSTORE 7 5 # R(7) --> G(5)
+
+I OP_HALT 0 0 0
