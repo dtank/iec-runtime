@@ -67,17 +67,17 @@ G TINT 0
 G TINT 0
 
 # OBJ PLC Task Code Segment
-I OP_KLOAD 0 0         # R(0) <-- K(0)
-I OP_SCALL 0 SFUN_SQRT # R(0)=REGI; R(1)=REGO
-I OP_GSTORE 1 0        # R(1) --> G(0)
+I OP_KLOAD 1 0         # R(1) <-- K(0)
+I OP_SCALL 0 SFUN_SQRT # R(0)=OUT; R(1)=IN
+I OP_GSTORE 0 0        # R(0) --> G(0)
 
-I OP_KLOAD 2 1         # R(2) <-- K(1)
-I OP_KLOAD 3 2         # R(3) <-- K(2)
-I OP_SCALL 2 SFUN_MOD  # R(2,3)=REGI; R(4)=REGO
-I OP_GSTORE 4 1        # R(4) --> G(1)
+I OP_KLOAD 3 1         # R(3) <-- K(1)
+I OP_KLOAD 4 2         # R(4) <-- K(2)
+I OP_SCALL 2 SFUN_MOD  # R(2)=OUT; R(3,4)=IN(0,1)
+I OP_GSTORE 2 1        # R(2) --> G(1)
 
-I OP_KLOAD 5 2         # R(5) <-- K(2)
 I OP_KLOAD 6 2         # R(6) <-- K(2)
-I OP_SCALL 5 SFUN_EXPT # R(5,6)=REGI; R(7)=REGO
-I OP_GSTORE 7 2        # R(7) --> G(2)
+I OP_KLOAD 7 2         # R(7) <-- K(2)
+I OP_SCALL 5 SFUN_EXPT # R(5)=OUT; R(6,7)=IN(0,1)
+I OP_GSTORE 5 2        # R(5) --> G(2)
 I OP_HALT 0 0 0        # Halt

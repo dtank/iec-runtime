@@ -73,7 +73,7 @@ typedef enum {
 #define MAX_OPCODE OP_RET
 /*-----------------------------------------------------------------------------
  * Instructoin Decoder Macro
- * Note: decoder won't change original instruction definitely!
+ * Note: decoder won't change original instruction!
  *---------------------------------------------------------------------------*/
 #define GET_OPCODE(i) (cast(OpCode, ((i)>>POS_OP) & MASK1(0, SIZE_OP)))
 #define getarg(i,pos,size) (cast(int, ((i)>>pos) & MASK1(0, size)))
@@ -84,6 +84,7 @@ typedef enum {
 #define GETARG_sAx(i) (getarg(i, POS_sAx, SIZE_sAx) - BIAS_sAx)
 /*-----------------------------------------------------------------------------
  * Instructoin Encoder Macro
+ * Deprecated temporarily
  *---------------------------------------------------------------------------*/
 #define CREATE_ABC(o,a,b,c)	((cast(Instruction, o)<<POS_OP) \
 			| (cast(Instruction, a)<<POS_A)                 \
