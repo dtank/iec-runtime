@@ -120,6 +120,16 @@ typedef struct Value {
         arith3vd(op, a, b, c);                  \
     }                                           \
 }
+#define comp3v(op, a, b, c) { /* a = b op c */ \
+    settuint(a);                               \
+    if (isint(b)) {                            \
+        vuint(a) = vint(b) op vint(c);         \
+    } else if (isuint(b)) {                    \
+        vuint(a) = vuint(b) op vuint(c);       \
+    } else if (isdouble(b)) {                  \
+        vuint(a) = vdouble(b) op vdouble(c);   \
+    }                                          \
+}
 #define vadd(a, b, c) arith3v(+, a, b, c)
 #define vsub(a, b, c) arith3v(-, a, b, c)
 #define vmul(a, b, c) arith3v(*, a, b, c)
@@ -137,12 +147,12 @@ typedef struct Value {
 #define vlxor(a, b, c) arith3vu(^, a, b, c)
 #define vlnot(a, b)    arith2vu(!, a, b)
 
-#define vlt(a, b, c)   arith3vu(<, a, b, c)
-#define vle(a, b, c)   arith3vu(<=, a, b, c)
-#define vgt(a, b, c)   arith3vu(>, a, b, c)
-#define vge(a, b, c)   arith3vu(>=, a, b, c)
-#define veq(a, b, c)   arith3vu(==, a, b, c)
-#define vne(a, b, c)   arith3vu(!=, a, b, c)
+#define vlt(a, b, c)   comp3v(<, a, b, c)
+#define vle(a, b, c)   comp3v(<=, a, b, c)
+#define vgt(a, b, c)   comp3v(>, a, b, c)
+#define vge(a, b, c)   comp3v(>=, a, b, c)
+#define veq(a, b, c)   comp3v(==, a, b, c)
+#define vne(a, b, c)   comp3v(!=, a, b, c)
 //#define vmod(a, b, c) {vint(a) = vint(b) % vint(c);} /* int type only */
 /*-----------------------------------------------------------------------------
  * Comparation Macro

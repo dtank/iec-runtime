@@ -44,22 +44,30 @@ tds_interval     100000000
 tds_sp_size      256
 tds_cs_size      4
 tds_pou_count    1
-tds_const_count  3
+tds_const_count  11
 tds_global_count 3
-tds_inst_count   12
+tds_inst_count   36
 
 # OBJ POU Description Segment
 pds_name         main
 pds_input_count  0
 pds_inout_count  0
 pds_output_count 0
-pds_local_count  8
+pds_local_count  14
 pds_entry        0
 
 # OBJ PLC Task Constant Segment
-K TDOUBLE 16.0
-K TINT 7
-K TINT 3
+K TDOUBLE 16.0 # 0
+K TINT 7       # 1
+K TINT 3       # 2
+K TINT 2       # 3
+K TINT 1       # 4
+K TUINT 4      # 5
+K TUINT 7      # 6
+K TUINT 3      # 7
+K TUINT 2      # 8
+K TUINT 1      # 9
+K TSTRING hello # 10
 
 # OBJ PLC Task Global Variables Segment
 G TDOUBLE 0
@@ -67,17 +75,46 @@ G TINT 0
 G TINT 0
 
 # OBJ PLC Task Code Segment
-I OP_KLOAD 1 0         # R(1) <-- K(0)
+I OP_KLOAD 1 0         # R(1) <-- K(0) (IN == 16.0)
 I OP_SCALL 0 SFUN_SQRT # R(0)=OUT; R(1)=IN
-I OP_GSTORE 0 0        # R(0) --> G(0)
+I OP_GSTORE 0 0        # R(0) --> G(0) (OUT == 4.0)
 
-I OP_KLOAD 3 1         # R(3) <-- K(1)
-I OP_KLOAD 4 2         # R(4) <-- K(2)
-I OP_SCALL 2 SFUN_MOD  # R(2)=OUT; R(3,4)=IN(0,1)
-I OP_GSTORE 2 1        # R(2) --> G(1)
+I OP_KLOAD 3 1         # R(3) <-- K(1) (IN0 == 7)
+I OP_KLOAD 4 2         # R(4) <-- K(2) (IN1 == 3)
+I OP_SCALL 2 SFUN_MOD  # R(2)=OUT; R(3,4)=IN0, IN1
+I OP_GSTORE 2 1        # R(2) --> G(1) (OUT == 1)
 
-I OP_KLOAD 6 2         # R(6) <-- K(2)
-I OP_KLOAD 7 2         # R(7) <-- K(2)
-I OP_SCALL 5 SFUN_EXPT # R(5)=OUT; R(6,7)=IN(0,1)
-I OP_GSTORE 5 2        # R(5) --> G(2)
+I OP_KLOAD 6 2         # R(6) <-- K(2) (IN0 == 3)
+I OP_KLOAD 7 2         # R(7) <-- K(2) (IN1 == 3)
+I OP_SCALL 5 SFUN_EXPT # R(5)=OUT; R(6,7)=IN0, IN1
+I OP_GSTORE 5 2        # R(5) --> G(2) (OUT == 27)
+
+I OP_KLOAD 9 5         # R(9) <-- K(5) (SIZE == 4)
+I OP_KLOAD 10 1        # R(10) <-- K(1) (IN1 == 7)
+I OP_KLOAD 11 2        # R(11) <-- K(2) (IN2 == 3)
+I OP_KLOAD 12 3        # R(12) <-- K(3) (IN3 == 2)
+I OP_KLOAD 13 4        # R(13) <-- K(4) (IN4 == 1)
+I OP_SCALL 8 SFUN_ADD  # R(8)=OUT; R(9,10,...)=SIZE, IN1, ...
+I OP_GSTORE 8 2        # R(8) --> G(2) (OUT == 13)
+
+I OP_KLOAD 9 7         # R(9) <-- K(7) (SIZE == 3)
+I OP_KLOAD 10 6        # R(10) <-- K(6) (IN1 == 7)
+I OP_KLOAD 11 7        # R(11) <-- K(7) (IN2 == 3)
+I OP_KLOAD 12 8        # R(12) <-- K(8) (IN3 == 2)
+I OP_SCALL 8 SFUN_AND  # R(8)=OUT; R(9,10,...)=SIZE, IN1, ...
+I OP_GSTORE 8 2        # R(8) --> G(2) (OUT == 2)
+
+I OP_KLOAD 10 8        # R(10) <-- K(8) (IN1 == 2)
+I OP_KLOAD 11 7        # R(11) <-- K(7) (IN2 == 3)
+I OP_KLOAD 12 6        # R(12) <-- K(6) (IN3 == 7)
+I OP_SCALL 8 SFUN_LT   # R(8)=OUT; R(9,10,...)=SIZE, IN1, ...
+I OP_GSTORE 8 2        # R(8) --> G(2) (OUT == 1)
+
+I OP_KLOAD 9 9         # R(9) <-- K(9) (G == 1)
+I OP_SCALL 8 SFUN_SEL  # R(8)=OUT; R(9,10,11)=G, IN1, IN2
+I OP_GSTORE 8 2        # R(8) --> G(2) (OUT == 3)
+
+I OP_KLOAD 9 10        # R(9) <-- K(10) (STR == 'hello')
+I OP_SCALL 8 SFUN_LEN  # R(8)=OUT; R(9)=STR
+I OP_GSTORE 8 2        # R(8) --> G(2) (OUT == LEN(STR) == 5)
 I OP_HALT 0 0 0        # Halt

@@ -17,14 +17,14 @@
  *---------------------------------------------------------------------------*/
 /**
  * OUT := ABS(IN)
- * OUT.type := IN.type (int, uint & double only)
+ * OUT & IN: int, uint & double only
  */
 void sfun_abs(IValue *reg_base) {
     arith2v(fabs, REGO(0), REGI(SFUN_ABS, 0));
 }
 /**
  * OUT := SQRT(IN)
- * OUT.type := IN.type (double only)
+ * OUT & IN: double only
  */
 void sfun_sqrt(IValue *reg_base) {
     arith2vd(sqrt, REGO(0), REGI(SFUN_SQRT, 0));
@@ -41,11 +41,21 @@ void sfun_atan(IValue *reg_base){}
 /*-----------------------------------------------------------------------------
  * Arithmetic Functions
  *---------------------------------------------------------------------------*/
-void sfun_add(IValue *reg_base){}
+/**
+ * OUT := IN1+IN2+...
+ * SIZE := IN0 (uint only)
+ * OUT & IN: int, uint & double only
+ */
+void sfun_add(IValue *reg_base) {
+    REGO(0) = REGI(SFUN_ADD, 1);
+    for (IUInt i = 2; i <= vuint(REGI(SFUN_ADD, 0)); i++) {
+        arith3v(+, REGO(0), REGO(0), REGI(SFUN_ADD, i));
+    }
+}
 void sfun_mul(IValue *reg_base){}
 /**
  * OUT := IN0 % IN1
- * OUT.type := IN0.type (int & uint type only)
+ * OUT & IN: int & uint only
  */
 void sfun_mod(IValue *reg_base) {
     if (isint(REGI(SFUN_MOD, 0))) {
@@ -56,8 +66,8 @@ void sfun_mod(IValue *reg_base) {
 }
 /**
  * OUT := IN0 ** IN1
- * IN1.type MUST be int
- * OUT.type := IN0.type (int, uint & double only)
+ * IN1: int only
+ * OUT & IN0: int, uint & double only
  */
 void sfun_expt(IValue *reg_base) {
     if (isint(REGI(SFUN_EXPT, 0))) {
@@ -74,7 +84,17 @@ void sfun_expt(IValue *reg_base) {
 /*-----------------------------------------------------------------------------
  * Bit Operation Functions
  *---------------------------------------------------------------------------*/
-void sfun_and(IValue *reg_base){}
+/**
+ * OUT := IN1 & IN2 & ...
+ * SIZE := IN0 (uint only)
+ * OUT & IN: uint only
+ */
+void sfun_and(IValue *reg_base) {
+    REGO(0) = REGI(SFUN_AND, 1);
+    for (IUInt i = 2; i <= vuint(REGI(SFUN_ADD, 0)); i++) {
+        arith3vu(&, REGO(0), REGO(0), REGI(SFUN_ADD, i));
+    }
+}
 void sfun_or(IValue *reg_base){}
 void sfun_xor(IValue *reg_base){}
 void sfun_rol(IValue *reg_base){}
@@ -82,7 +102,20 @@ void sfun_ror(IValue *reg_base){}
 /*-----------------------------------------------------------------------------
  * Comparison Functions
  *---------------------------------------------------------------------------*/
-void sfun_lt(IValue *reg_base){}
+/**
+ * OUT := (IN1<IN2) && (IN2<IN3) ...
+ * SIZE := IN0 (uint only)
+ * OUT: uint only
+ * IN: int, uint & double only
+ */
+void sfun_lt(IValue *reg_base) {
+    IValue temp;
+    vlt(REGO(0), REGI(SFUN_LT, 1), REGI(SFUN_LT, 2));
+    for (IUInt i = 2; i < vuint(REGI(SFUN_ADD, 0)); i++) {
+        vlt(temp, REGI(SFUN_LT, i), REGI(SFUN_LT, i+1));
+        vland(REGO(0), REGO(0), temp);
+    }
+}
 void sfun_le(IValue *reg_base){}
 void sfun_gt(IValue *reg_base){}
 void sfun_ge(IValue *reg_base){}
@@ -90,7 +123,18 @@ void sfun_eq(IValue *reg_base){}
 /*-----------------------------------------------------------------------------
  * Selection Functions
  *---------------------------------------------------------------------------*/
-void sfun_sel(IValue *reg_base){}
+/**
+ * OUT := IN1(if G == 0) || IN2(if G == 1)
+ * G := IN0 (uint only)
+ * OUT & IN: int, uint & double only
+ */
+void sfun_sel(IValue *reg_base) {
+    if (vuint(REGI(SFUN_SEL, 0)) == 0) {
+        REGO(0) = REGI(SFUN_SEL, 1);
+    } else if (vuint(REGI(SFUN_SEL, 0)) == 1) {
+        REGO(0) = REGI(SFUN_SEL, 2);
+    }
+}
 void sfun_max(IValue *reg_base){}
 void sfun_min(IValue *reg_base){}
 void sfun_limit(IValue *reg_base){}
@@ -98,7 +142,15 @@ void sfun_mux(IValue *reg_base){}
 /*-----------------------------------------------------------------------------
  * String Functions
  *---------------------------------------------------------------------------*/
-void sfun_len(IValue *reg_base){}
+/**
+ * OUT := LEN(STR)
+ * STR := IN0 (string only)
+ * OUT: uint only
+ */
+void sfun_len(IValue *reg_base) {
+    settuint(REGO(0));
+    setvuint(REGO(0), vstrlen(REGI(SFUN_LEN, 0))-1); /* '\0' excluded ! */
+}
 void sfun_left(IValue *reg_base){}
 void sfun_right(IValue *reg_base){}
 void sfun_mid(IValue *reg_base){}

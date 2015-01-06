@@ -257,7 +257,7 @@ def dump_value(obj, words):
     if words[1] == 'TDOUBLE':
         obj.write(struct.pack('d', float(words[2])));
     if words[1] == 'TSTRING':
-        length = len(words[2]) + 1;
+        length = len(words[2]) + 1; # '\0' included
         obj.write(struct.pack('I', length));
         obj.write(struct.pack(str(length) + 's', words[2]));
 

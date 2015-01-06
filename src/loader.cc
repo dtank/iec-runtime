@@ -173,7 +173,7 @@ static int load_string(FILE *fp, IString *str, StrPool *sp) {
     assert(fp != NULL);
     assert(str != NULL);
 
-    loadv(fp, &str->length);
+    loadv(fp, &str->length); /* '\0' included */
     verify(MAX_STRLEN < str->length, EC_LOAD_STRLEN, "");
     char strtemp[str->length];
     loadvs(fp, strtemp, str->length);
@@ -200,6 +200,7 @@ static int load_value(FILE *fp, IValue *value, StrPool *sp) {
         default: break;
     }
     dump_value("loaded value", *value);
+    EOL;
     return 0;
 }
 static int load_plc_task(FILE *fp, PLCTask *task) {
